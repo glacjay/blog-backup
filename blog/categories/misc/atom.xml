@@ -4,7 +4,7 @@
   <title><![CDATA[Category: misc | Random Stuff from GlacJAY]]></title>
   <link href="http://glacjay.github.com/blog/categories/misc/atom.xml" rel="self"/>
   <link href="http://glacjay.github.com/"/>
-  <updated>2012-12-30T23:00:23+08:00</updated>
+  <updated>2012-12-30T23:11:51+08:00</updated>
   <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[new-post]]></title>
-    <link href="http://glacjay.github.com/blog/2012/12/29/new-post/"/>
+    <link href="http://glacjay.github.com/blog/2012-12-29-new-post/"/>
     <updated>2012-12-29T16:45:00+08:00</updated>
-    <id>http://glacjay.github.com/blog/2012/12/29/new-post</id>
+    <id>http://glacjay.github.com/blog/new-post</id>
     <content type="html"><![CDATA[<p>= hello octopress</p>
 
 <p>试一下中文。</p>

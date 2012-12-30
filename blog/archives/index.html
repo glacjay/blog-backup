@@ -9,9 +9,9 @@
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content=" Blog Archive 2012 中文标题测试
+  <meta name="description" content="Blog Archive 2012 中文标题测试
 Dec 30 2012 new-post
-Dec 29 2012 posted in misc Recent Posts 中文标题测试 new-post ">
+Dec 29 2012 posted in misc Recent Posts 中文标题测试 new-post GitHub Repos Status updating... @glacjay on &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,7 +81,7 @@ Dec 29 2012 posted in misc Recent Posts 中文标题测试 new-post ">
 
 <article>
   
-<h1><a href="/blog/2012/12/30/%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95/">中文标题测试</a></h1>
+<h1><a href="/blog/2012-12-30-%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95/">中文标题测试</a></h1>
 <time datetime="2012-12-30T22:51:00+08:00" pubdate><span class='month'>Dec</span> <span class='day'>30</span> <span class='year'>2012</span></time>
 
 
@@ -91,7 +91,7 @@ Dec 29 2012 posted in misc Recent Posts 中文标题测试 new-post ">
 
 <article>
   
-<h1><a href="/blog/2012/12/29/new-post/">new-post</a></h1>
+<h1><a href="/blog/2012-12-29-new-post/">new-post</a></h1>
 <time datetime="2012-12-29T16:45:00+08:00" pubdate><span class='month'>Dec</span> <span class='day'>29</span> <span class='year'>2012</span></time>
 
 <footer>
@@ -115,18 +115,72 @@ Dec 29 2012 posted in misc Recent Posts 中文标题测试 new-post ">
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/12/30/%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95/">中文标题测试</a>
+        <a href="/blog/2012-12-30-%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95/">中文标题测试</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/12/29/new-post/">new-post</a>
+        <a href="/blog/2012-12-29-new-post/">new-post</a>
       </li>
     
   </ul>
 </section>
 
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
 
 
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("glacjay", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/glacjay" class="twitter-follow-button" data-show-count="false">Follow @glacjay</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
 
 
 
@@ -144,9 +198,39 @@ Dec 29 2012 posted in misc Recent Posts 中文标题测试 new-post ">
 </footer>
   
 
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
 
 
 
