@@ -2,26 +2,16 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>
-            http://glacjay.github.com/blog/2009-03-18-bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/
+            http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/
         </loc>
-        <lastmod>2012-12-30T23:44:22+08:00</lastmod>
-    </url>
-    <url>
-        <loc>http://glacjay.github.com/blog/2012-12-29-new-post/</loc>
-        <lastmod>2012-12-29T16:47:30+08:00</lastmod>
-    </url>
-    <url>
-        <loc>
-            http://glacjay.github.com/blog/2012-12-30-%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95/
-        </loc>
-        <lastmod>2012-12-30T22:52:11+08:00</lastmod>
+        <lastmod>2012-12-31T00:48:49+08:00</lastmod>
     </url>
     <url>
         <loc>http://glacjay.github.com/blog/archives/</loc>
-        <lastmod>2012-12-30T23:44:22+08:00</lastmod>
+        <lastmod>2012-12-31T00:48:49+08:00</lastmod>
     </url>
     <url>
         <loc>http://glacjay.github.com/</loc>
-        <lastmod>2012-12-30T23:44:22+08:00</lastmod>
+        <lastmod>2012-12-31T00:48:49+08:00</lastmod>
     </url>
 </urlset>

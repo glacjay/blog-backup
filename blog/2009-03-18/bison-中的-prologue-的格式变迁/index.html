@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: misc - Random Stuff from GlacJAY</title>
+  <title>Bison 中的 Prologue 的格式变迁 - Random Stuff from GlacJAY</title>
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content="Category: misc">
+  <meta name="description" content="今天在用 Bison 手册中的 C++ 例子作为一个编译器前端实现的起点时发现，这个官方示例居然编译通不过，具体错误为在 Bison 生成的头文件中，没有 Driver 类的声明。按照 POSIX Yacc 标准，位于 %union 块之前的 Prologue 区中的代码，应该会被拷到头文件中的啊 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.comblog/categories/misc/">
+  <link rel="canonical" href="http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -63,36 +63,97 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Misc</h1>
+    
+      <h1 class="entry-title">Bison 中的 Prologue 的格式变迁</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-18T00:00:00+08:00" pubdate data-updated="true">Mar 18<span>th</span>, 2009</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>今天在用 Bison 手册中的 C++ 例子作为一个编译器前端实现的起点时发现，这个官方示例居然编译通不过，具体错误为在 Bison 生成的头文件中，没有 Driver 类的声明。按照 POSIX Yacc 标准，位于 %union 块之前的 Prologue 区中的代码，应该会被拷到头文件中的啊，于是 google 半天，在某个地方的 Bison ChangeLog 中找到了线索。</p>
 
-  
-  <h2>2012</h2>
+<p>原来，POSIX Yacc 确实应该符合上述行为，可是 Bison 这家伙为了统一性，从 2.3a 版开始，就把所有 Prologue 中的代码，不管是 %union 前的还是之后的，统统只拷到实现文件中而不管头文件了。而为了对应不同的需求，又新增了一套 Prologue 语法，就是 %before-header 等四个新的 directive。好吧，这样也不错，以显式的统一格式的声明代替了可能会让人抓狂的隐规则。遂试之，结果告诉我说语法错误。接着往上看 ChangeLog 才发现，到了 2.3b 就又改了，把 %before-header 改成了 %code 之类的。这回终于没问题了。</p>
 
-<article>
-  
-<h1><a href="/blog/2012-12-29-new-post/">new-post</a></h1>
-<time datetime="2012-12-29T16:45:00+08:00" pubdate><span class='month'>Dec</span> <span class='day'>29</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/misc/'>misc</a></span>
-</footer>
-
-
-</article>
-
+<p>我说，这也太不厚道了吧，这种兼容性改动，我在它的文档里面扒了半天都没看到半个字，而且还是出现在流行度这么高的软件中。于是深刻体会到“错文档不如无文档”的道理啊。由此看来，要做好软件还是需要有相当的责任感的啊。</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-18T00:00:00+08:00" pubdate data-updated="true">Mar 18<span>th</span>, 2009</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/compiler/'>Compiler</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/" data-via="" data-counturl="http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -103,15 +164,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012-12-30-%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95/">中文标题测试</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012-12-29-new-post/">new-post</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2009-03-18-bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">Bison 中的 Prologue 的格式变迁</a>
+        <a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">Bison 中的 Prologue 的格式变迁</a>
       </li>
     
   </ul>
@@ -178,7 +231,10 @@
       var disqus_shortname = 'glacjay';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/';
+        var disqus_url = 'http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
