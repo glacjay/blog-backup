@@ -4,7 +4,7 @@
   <title><![CDATA[Random Stuff from GlacJAY]]></title>
   <link href="http://glacjay.github.com/atom.xml" rel="self"/>
   <link href="http://glacjay.github.com/"/>
-  <updated>2012-12-30T22:37:06+08:00</updated>
+  <updated>2012-12-30T22:52:21+08:00</updated>
   <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[中文标题测试]]></title>
+    <link href="http://glacjay.github.com/blog/2012/12/30/zhong-wen-biao-ti-ce-shi/"/>
+    <updated>2012-12-30T22:51:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2012/12/30/zhong-wen-biao-ti-ce-shi</id>
+    <content type="html"><![CDATA[<p>测试下中文标题。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[new-post]]></title>
