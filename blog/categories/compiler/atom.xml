@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Random Stuff from GlacJAY]]></title>
-  <link href="http://glacjay.github.com/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Compiler | Random Stuff from GlacJAY]]></title>
+  <link href="http://glacjay.github.com/blog/categories/compiler/atom.xml" rel="self"/>
   <link href="http://glacjay.github.com/"/>
   <updated>2012-12-31T00:06:31+08:00</updated>
   <id>http://glacjay.github.com/</id>
@@ -12,26 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[中文标题测试]]></title>
-    <link href="http://glacjay.github.com/blog/2012-12-30-%E4%B8%AD%E6%96%87%E6%A0%87%E9%A2%98%E6%B5%8B%E8%AF%95/"/>
-    <updated>2012-12-30T22:51:00+08:00</updated>
-    <id>http://glacjay.github.com/blog/中文标题测试</id>
-    <content type="html"><![CDATA[<p>测试下中文标题。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[new-post]]></title>
-    <link href="http://glacjay.github.com/blog/2012-12-29-new-post/"/>
-    <updated>2012-12-29T16:45:00+08:00</updated>
-    <id>http://glacjay.github.com/blog/new-post</id>
-    <content type="html"><![CDATA[<p>= hello octopress</p>
-
-<p>试一下中文。</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Bison 中的 Prologue 的格式变迁]]></title>
