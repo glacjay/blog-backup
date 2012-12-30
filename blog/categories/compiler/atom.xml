@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Compiler | Random Stuff from GlacJAY]]></title>
   <link href="http://glacjay.github.com/blog/categories/compiler/atom.xml" rel="self"/>
   <link href="http://glacjay.github.com/"/>
-  <updated>2012-12-31T01:03:39+08:00</updated>
+  <updated>2012-12-31T01:40:35+08:00</updated>
   <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
@@ -12,6 +12,72 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[对 Bison 手册中的 C++ 的例子的总结]]></title>
+    <link href="http://glacjay.github.com/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/"/>
+    <updated>2009-03-19T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2009-03-19/对-bison-手册中的-c-的例子的总结</id>
+    <content type="html"><![CDATA[<p>注意，我用的软件版本为：Bison - 2.4.1，Flex - 2.5.35 。至于老的版本会怎样我就不深究了。工具不是重点。</p>
+
+<hr />
+
+<p><code>
+%skeleton "lalr1.cc"
+</code></p>
+
+<p>可以用</p>
+
+<p><code>
+%language "c++"
+</code></p>
+
+<p>来代替了，其中参数 "c++" 不区分大小写。</p>
+
+<hr />
+
+<p>如我在<a href="http://glacjay.info/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">上一篇 Blog</a> 中所说，分别在 <code>%union</code> 的前后放不同的 <code>%{ %}</code> 形式的 Prologue 这种方式对于需要输出头文件的情况已经不适用了，新的方法为在</p>
+
+<p><code>
+%code requires { ... }
+</code></p>
+
+<p>中放 Bison 定义要用到的 C/C++ 代码，在</p>
+
+<p><code>
+%code provides { ... }
+</code></p>
+
+<p>中放需要 Bison 定义的 C/C++ 代码。这两部分的代码都会原样输出到生成的头文件中。</p>
+
+<hr />
+
+<p>在 <code>%code provides</code> 块中要如下定义 <code>YYSTYPE</code> 和 <code>YYLTYPE</code> 这两个类型：</p>
+
+<p><code>cpp
+typedef yy::Parser::semantic_type YYSTYPE;
+typedef yy::Parser::location_type YYLTYPE;
+</code></p>
+
+<p>不然 Flex 就会抱怨说这两个类型没有声明，我不知道为什么。</p>
+
+<hr />
+
+<p>这一点我一直有点奇怪，既然在 <code>%option</code> 中已经指定了 <code>noyywrap</code> 这个选项，为什么还要对 <code>yywrap</code> 做 <code>#undef</code> 再 <code>#define</code> 的处理呢，也许是之前版本的 Bug 吧，反正我用的这个版本只要指定了那个选项就 OK 了。</p>
+
+<hr />
+
+<p>Flex 中有两个选项是针对与 Bison 之间的配合使用的，就是 <code>bison-bridge</code> 和 <code>bison-locations</code> 。不过我是没搞懂这两个选项是怎么用的啦，至少是按照例子中的那样定义 <code>YY_DECL</code> 这个宏的情况下。按照错误提示更改了 <code>yylex</code> 的两个参数的名称之后，编译出来的程序会 segmentation fault 的。</p>
+
+<hr />
+
+<p>其他就没什么说的了，按照例子上的来就可以了。</p>
+
+<p>PS. 其实有个蛮不错的 Bison 的替代品，叫作 Lemon 的一个 Parser Generator ，是写 SQLite 的那个家伙搞出来的，并且就用在了 SQLite 的实现中。这东东较 Bison 有很多使用上的改进，用起来会很舒服，唯一可惜的就是不自动支持 <code>Location</code> ，至于这个特性有没有那么重要呢？谁知道，先就这样吧。</p>
+
+<p>PPS. 其实还是有几个有趣的针对 C++ 后端的 Parser Generator 的，像 YARD 就是一个充分挖掘了 C++ 的模板特性的 Parser 库，用起来感觉会很不一样就是了；Boost.Spirit 则是充分发挥了 C++ 的运算符重载能力的 Parser 库，算的上是 C++ 的 Internal DSL 应用了；再有就是连 Guido 都称赞过的 ANTLR 了，只是为其写 C 后端的那个家伙一直说要完成 C++ 后端又一直不见影子。其实我倒是很想用 ANTLR 这种 Lexer 和 Parser 原生整合在一起的工具的，看回来有时间是不是自己动手实现一个 C++ 的后端出来玩玩。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Bison 中的 Prologue 的格式变迁]]></title>

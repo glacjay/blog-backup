@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Random Stuff from GlacJAY</title>
+  <title>对 Bison 手册中的 C++ 的例子的总结 - Random Stuff from GlacJAY</title>
   <meta name="author" content="GlacJAY">
 
   
@@ -20,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.com/">
+  <link rel="canonical" href="http://glacjay.github.com/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -64,15 +64,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/">对 Bison 手册中的 C++ 的例子的总结</a></h1>
+      <h1 class="entry-title">对 Bison 手册中的 C++ 的例子的总结</h1>
     
     
       <p class="meta">
@@ -90,14 +87,14 @@
 
 <time datetime="2009-03-19T00:00:00+08:00" pubdate data-updated="true">Mar 19<span>th</span>, 2009</time>
         
-         | <a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>注意，我用的软件版本为：Bison - 2.4.1，Flex - 2.5.35 。至于老的版本会怎样我就不深究了。工具不是重点。</p>
+<div class="entry-content"><p>注意，我用的软件版本为：Bison - 2.4.1，Flex - 2.5.35 。至于老的版本会怎样我就不深究了。工具不是重点。</p>
 
 <hr />
 
@@ -158,22 +155,16 @@
 
 <p>PPS. 其实还是有几个有趣的针对 C++ 后端的 Parser Generator 的，像 YARD 就是一个充分挖掘了 C++ 的模板特性的 Parser 库，用起来感觉会很不一样就是了；Boost.Spirit 则是充分发挥了 C++ 的运算符重载能力的 Parser 库，算的上是 C++ 的 Internal DSL 应用了；再有就是连 Guido 都称赞过的 ANTLR 了，只是为其写 C 后端的那个家伙一直说要完成 C++ 后端又一直不见影子。其实我倒是很想用 ANTLR 这种 Lexer 和 Parser 原生整合在一起的工具的，看回来有时间是不是自己动手实现一个 C++ 的后端出来玩玩。</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">Bison 中的 Prologue 的格式变迁</a></h1>
-    
-    
-      <p class="meta">
-        
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
 
 
 
@@ -185,33 +176,46 @@
   
 
 
-<time datetime="2009-03-18T00:00:00+08:00" pubdate data-updated="true">Mar 18<span>th</span>, 2009</time>
-        
-         | <a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/#disqus_thread">Comments</a>
-        
-      </p>
+<time datetime="2009-03-19T00:00:00+08:00" pubdate data-updated="true">Mar 19<span>th</span>, 2009</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/compiler/'>Compiler</a>
+  
+</span>
+
+
+    </p>
     
-  </header>
-
-
-  <div class="entry-content"><p>今天在用 Bison 手册中的 C++ 例子作为一个编译器前端实现的起点时发现，这个官方示例居然编译通不过，具体错误为在 Bison 生成的头文件中，没有 Driver 类的声明。按照 POSIX Yacc 标准，位于 %union 块之前的 Prologue 区中的代码，应该会被拷到头文件中的啊，于是 google 半天，在某个地方的 Bison ChangeLog 中找到了线索。</p>
-
-<p>原来，POSIX Yacc 确实应该符合上述行为，可是 Bison 这家伙为了统一性，从 2.3a 版开始，就把所有 Prologue 中的代码，不管是 %union 前的还是之后的，统统只拷到实现文件中而不管头文件了。而为了对应不同的需求，又新增了一套 Prologue 语法，就是 %before-header 等四个新的 directive。好吧，这样也不错，以显式的统一格式的声明代替了可能会让人抓狂的隐规则。遂试之，结果告诉我说语法错误。接着往上看 ChangeLog 才发现，到了 2.3b 就又改了，把 %before-header 改成了 %code 之类的。这回终于没问题了。</p>
-
-<p>我说，这也太不厚道了吧，这种兼容性改动，我在它的文档里面扒了半天都没看到半个字，而且还是出现在流行度这么高的软件中。于是深刻体会到“错文档不如无文档”的道理啊。由此看来，要做好软件还是需要有相当的责任感的啊。</p>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/" data-via="" data-counturl="http://glacjay.github.com/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/" title="Previous Post: Bison 中的 Prologue 的格式变迁">&laquo; Bison 中的 Prologue 的格式变迁</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -232,7 +236,7 @@
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/glacjay">@glacjay</a> on GitHub
@@ -275,6 +279,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -289,7 +294,10 @@
       var disqus_shortname = 'glacjay';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/';
+        var disqus_url = 'http://glacjay.github.com/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
