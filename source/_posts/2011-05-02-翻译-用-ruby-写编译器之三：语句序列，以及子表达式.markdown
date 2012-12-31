@@ -1,0 +1,151 @@
+---
+categories:
+  - Compiler
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - compiler
+  - linux
+  - ruby
+title: "[翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式"
+type: post
+---
+
+原文链接：[http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html](http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html)
+
+**我本来是想要早点发表的，可是我这周又不行了 -- 虽然整理一篇旧文只需要半个小时。不管怎样，这是第三章，而且我会在末尾大概列一下之后的大纲。由于我会试着把一些小的步骤组合成更有内容的章节（下面就有个这样的例子），因此原来的 30 篇文章已经被我给减到了 20 篇左右（当然，这只是我已经完成了的，后面还有新的呢）。**
+
+## 用 do 语句将表达式给串起来
+
+到目前为止，[上次的第二版程序](http://www.hokstad.com/static/compiler/step2b.rb)只能编译一个单独的表达式。只是这样的话，并不是非常的有用啊。因此我决定实现一种支持顺序执行的结构，就像函数体那样的。当然，如你所想，这是很简单的。我会增加一个关键字 `do` ，而其作用就是顺序执行传给它的每一个（个数不限哦，或者说，只受限于内存的大小）参数表达式。看起来就像这样：
+
+``` ruby
+prog = [:do,
+  [:printf,"Hello"],
+  [:printf," "],
+  [:printf,"World\n"]
+]
+```
+
+要实现这个是非常简单的。我们只需要在函数 `#compile_exp` 的开头加入下列代码：
+
+``` ruby
+    if exp[0] == :do
+      exp[1..-1].each { |e| compile_exp(e) }
+      return
+    end
+```
+
+递归在这里的作用很重要哦 -- 毕竟你是在处理一个树形结构，那也就需要在越来越深层的树结点之上调用实现编译的核心函数，而这当然也包括我们的下一个目标，即对子表达式的处理。
+
+## 子表达式，步骤一
+
+先来给出一个我们想要支持的用例：
+
+``` ruby
+prog = [:printf,"‘hello world’ takes %ld bytes\n",[:strlen, “hello world"]]
+```
+
+第一个需要改变的地方，在函数 `#get_arg` 中，我们在其开头加入如下的代码：
+
+``` ruby
+    # Handle strings or subexpressions
+    if a.is_a?(Array)
+      compile_exp(a)
+      return nil # What should we return?
+    end
+```
+
+如果你这时已经试着用上面的代码来编译测试用例了的话，gcc 会报错给你的，因为我们现在只处理了 `#get_arg` 的返回值是一个字符串常量对应的序列号的情况，而这对子表达式来说显然是不适用的。
+
+## 子表达式，步骤二：返回值
+
+那么 gcc 是怎么处理这个的呢。让我们来看看下面这段代码：
+
+``` c
+int main()
+{
+  printf("'Hello world' takes %ld bytes\n",foo("Hello world"));
+}
+```
+
+所产生的汇编吧（只截取 `main` 中相关的部分）：
+
+``` nasm
+    subl    $20, %esp
+    movl    $.LC0, (%esp)
+    call    foo
+    movl    %eax, 4(%esp)
+    movl    $.LC1, (%esp)
+    call    printf
+    addl    $20, %esp
+```
+
+应该说还是很直观的吧。gcc 首先会去调用子表达式（ `foo` ），并且希望这个函数能够把它的返回值放入寄存器 `%eax` 中，然后就会把这个值作为参数拷到堆栈上，而不是什么字符串常量的地址。
+
+首先是要调整 `#get_arg` 函数：
+
+``` ruby
+  def get_arg(a)
+    # Handle strings and subexpressions
+    if a.is_a?(Array)
+      compile_exp(a)
+      return [:subexpr]
+    end
+    seq = @string_constants[a]
+    return seq if seq
+    seq = @seq
+    @seq += 1
+    @string_constants[a] = seq
+    return [:strconst,seq]
+  end
+```
+
+唯一需要改动的地方就是返回值了，我们增加了一个表示返回值类型的标识 -- 以后还会加入其他类型的。
+
+剩下的工作就是改写 `#compile_exp` 函数中的相关部分了。这时就不能直接收集 `#get_arg` 的返回值了，而是需要对每个参数都做相应的处理并直接输出（而这同时也是 `stack_adjustment` 需要修改的原因，因为已经没有 `args` 数组了）：
+
+``` ruby
+    stack_adjustment = PTR_SIZE + (((exp.length-1+0.5)*PTR_SIZE/(4.0*PTR_SIZE)).round) * (4*PTR_SIZE)
+    puts "\tsubl\t$#{stack_adjustment}, %esp" if exp[0] != :do
+
+    exp[1..-1].each_with_index do |a,i|
+      atype, aparam = get_arg(a)
+      if exp[0] != :do
+        if atype == :strconst
+          param = "$.LC#{aparam}"
+        else
+          param = "%eax"
+        end
+        puts "\tmovl\t#{param},#{i>0 ? i*4 : ""}(%esp)"
+      end
+    end
+```
+
+如你所见，并不是什么复杂的更改。我们只是检查了 `#get_arg` 所返回的类型信息，并相应的输出字符串常量或者寄存器 `%eax` 而已。随着我们加入更多要处理的情况，这个部分代码还会继续扩充的。
+
+[你可以在这里找到最新版本的代码](http://www.hokstad.com/static/compiler/step3.rb)。
+
+## 之后的计划
+
+这里只列出的基本完成的部分。我的计划是，当我开始着手写新的部分时，我会将重心放在一个简单的解析器上，以尽快实现编译器的自举（即，编译它自己）。
+
+- 步骤四：运行时，以及函数的定义
+- 步骤五：处理其他类型的常量值
+- 步骤六：条件表达式 `if ... then ... else`
+- 步骤七：循环语句
+- 步骤八：匿名函数（ `lambda` ）
+- 步骤九：用匿名函数来实现循环，以及对函数参数的处理
+- 步骤十：赋值，以及简单的代数运算
+- 步骤十一：更简结的 `while` 循环
+- 步骤十二：测试我们的语言：开发一个简单的输入转换模块
+- 步骤十三：重构代码生成模块，并抽象出平台相关的部分
+- 步骤十四：对一些概念的讨论，以及今后的前进方向
+- 步骤十五：数组
+- 步骤十六：局部变量以及多种作用域
+- 步骤十七：可变长参数列表
+- 步骤十八：再看输入转换模块：测试新的功能点，以及自我转换
+- 步骤十九：确定自举所需要实现的功能
+- 步骤二十：开始实现真正的解析器

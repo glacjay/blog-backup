@@ -1,0 +1,172 @@
+---
+categories:
+  - Programming
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - c++
+  - linux
+title: 发布一个寻找局域网内主机的小工具
+type: post
+---
+
+在工作中，经常需要远程登录到机房中的设备上进行调试与开发，走的是工作局域网。由于这些设备的地址也是动态获取的，因此在遇到一些意外事故，如网线松了、网络不稳定之类的，这些地址可能就变了。每当这时，我们就得跑到机房，给设备连上显示器（我们连 KVM 都没有，命苦啊），查看 IP ，然后再跑回去重新连。太麻烦了。
+
+我知道有支持动态地址的 DNS 服务，可是我们没权限操作 DNS 服务器，而且设备也都是不固定的，没必要惊动网络管理员（好吧，我甚至都不知道谁是网络管理员，作为三年的“老”员工，我面壁去了。好吧，其实我就是想写写程序练练手），所以我就写了个小程序，用来查找一台特定设备的 IP 地址。
+
+原理其实很简单啦。客户端（也就是我的笔记本）发个 UDP 广播报文，里面有要找的主机的名字。服务端呢，启动时则指定一个主机名字。当服务端收到一个 UDP 广播报文，并且发现找的就是自己呢，就返回一个 `bingo` 报文。这样，客户端就知道这个主机的 IP 地址啦。
+
+现在用的服务端口是 `5460` （取自某本网络小说 :-），应该没有哪个知名服务用这个端口吧。当然，因为这个工具确实太简单了，所以就没有考虑冲突的情况啦。请大家在使用的时候，给主机取个有个性的名字哟。
+
+我通过这个程序学到的新知识就是，要发送 UDP 的广播报文，只是指定一个全 `1` 的地址是不够的，还要设置 socket 选项 `SO_BROADCAST` （我继续面壁去了）。
+
+下面是代码（好撑篇幅啊，又没人给我稿费的说）：
+
+``` c
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+#define PORT 5460
+
+static char *progname;
+static int sock;
+
+static void usage(void)
+{
+    fprintf(stderr,
+            "Usage: %s options\n"
+            "where options must be one of:\n"
+            "  -s         Running as a  named server.\n"
+            "  -c         Asking for 's address.\n",
+            progname);
+    exit(1);
+}
+
+static int udp_socket(void)
+{
+    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+    if (sock == -1) {
+        fprintf(stderr, "Cannot open a new socket: %s\n", strerror(errno));
+        exit(1);
+    }
+    return sock;
+}
+
+static void server(const char *name)
+{
+    struct sockaddr_in listen_addr;
+
+    listen_addr.sin_family = AF_INET;
+    listen_addr.sin_addr.s_addr = INADDR_ANY;
+    listen_addr.sin_port = htons(PORT);
+
+    if (bind(sock, (struct sockaddr *) &listen_addr,
+             sizeof(listen_addr)) == -1)
+    {
+        fprintf(stderr, "Cannot bind to the UDP port %d: %s\n",
+                PORT, strerror(errno));
+        exit(1);
+    }
+
+    while (1) {
+        char buf[BUFSIZ+1];
+        struct sockaddr_in addr;
+        int addrlen = sizeof(addr);
+        int received;
+
+        received = recvfrom(sock, buf, sizeof(buf)-1, 0,
+                            (struct sockaddr *) &addr, (socklen_t *) &addrlen);
+        if (received == -1)
+            continue;
+
+        buf[received] = 0;
+        if (strcmp(buf, name) == 0)
+            sendto(sock, "bingo", 5, 0, (struct sockaddr *) &addr, addrlen);
+    }
+}
+
+static void *waiton_response(void *arg)
+{
+    char *name = (char *) arg;
+
+    while (1) {
+        char buf[BUFSIZ+1];
+        struct sockaddr_in addr;
+        socklen_t addrlen = sizeof(addr);
+        int received;
+
+        received = recvfrom(sock, buf, sizeof(buf)-1, 0,
+                            (struct sockaddr *) &addr, &addrlen);
+        if (received == -1)
+            continue;
+        buf[received] = 0;
+        if (strcmp(buf, "bingo") == 0) {
+            printf("Got. %s's address is %s.\n",
+                   name, inet_ntoa(addr.sin_addr));
+            exit(0);
+        }
+    }
+
+    return NULL;
+}
+
+static void client(const char *name)
+{
+    int bcast = 1;
+    pthread_t tid;
+    pthread_attr_t attr;
+    struct sockaddr_in addr;
+    int i;
+
+    setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &bcast, sizeof(bcast));
+
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = 0xffffffff;
+    addr.sin_port = htons(PORT);
+
+    for (i = 0; i < 6; i++) {
+        printf("Searching...\n");
+
+        sendto(sock, name, strlen(name), 0,
+               (struct sockaddr *) &addr, sizeof(addr));
+        if (i == 0)
+            pthread_create(&tid, &attr, waiton_response, (void *) name);
+        sleep(5);
+    }
+
+    printf("Cannot find the machine.\n");
+    pthread_attr_destroy(&attr);
+}
+
+int main(int argc, char **argv)
+{
+    progname = argv[0];
+    sock = udp_socket();
+
+    if (argc != 3)
+        usage();
+    if (strcmp(argv[1], "-s") == 0)
+        server(argv[2]);
+    else if (strcmp(argv[1], "-c") == 0)
+        client(argv[2]);
+    else
+        usage();
+
+    return 0;
+}
+```
+
+PS. 最近 gist.github.com 好像不是很给力，用它贴代码的话，不翻墙就看不到，只好直接贴这里了。

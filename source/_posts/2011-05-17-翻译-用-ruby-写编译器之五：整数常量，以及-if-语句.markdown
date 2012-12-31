@@ -1,0 +1,244 @@
+---
+categories:
+  - Compiler
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - compiler
+  - linux
+  - ruby
+title: "[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句"
+type: post
+---
+
+原文链接：[http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html](http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html)
+
+上次我承诺会发布的更快一些，不过还是失败了⋯⋯作为补偿，这章的内容将会是原计划中的第 5，6，7 章内容的合并，因为这三章确实都很短。闲话少叙：
+
+## 处理数字常量
+
+到目前为止，我们只处理了一些实现所必须的数字常量，也就是当一个外部函数的返回值是数字的情况，而且没有做任何形式的类型检查。
+
+那么，就让我们来看一下 gcc 在 C 语言中是怎样处理各种类型（包括 `long long` 等）的整数的吧。当然，这次还是针对 32 位的 x86 架构：
+
+``` c
+void foo1(unsigned short a) {}
+void foo2(signed short a) {}
+void foo3(unsigned int a) {}
+void foo4(signed int a) {}
+void foo5(unsigned long a) {}
+void foo6(signed long a) {}
+void foo7(unsigned long long a) {}
+void foo8(signed long long a) {}
+
+int main()
+{
+  foo1(1);
+  foo2(2);
+  foo3(3);
+  foo4(4);
+  foo5(5);
+  foo6(6);
+  foo7(7);
+}
+```
+
+我略掉了大部分 gcc 所生成的代码，如果愿意，你可以自己执行 `gcc -S` 命令来看。有趣的部分是对各个函数的调用，其生成的代码如下：
+
+``` nasm
+        movl    $1, (%esp)
+        call    foo1
+        movl    $2, (%esp)
+        call    foo2
+        movl    $3, (%esp)
+        call    foo3
+        movl    $4, (%esp)
+        call    foo4
+        movl    $5, (%esp)
+        call    foo5
+        movl    $6, (%esp)
+        call    foo6
+        movl    $7, (%esp)
+        movl    $0, 4(%esp)
+        call    foo7
+```
+
+换句话说，至少在处理函数调用的时候，gcc 都会把各种整数类型统一作为 32 位的整型来处理，除了 `long long` 类型之外。因此，我们可以暂时忘掉 `long long` 类型，而只处理 32 位以内的整数值，这样我们就可以忽略类型处理相关的东西了。
+
+懒惰还真是一种病啊。
+
+我们同时也会略过浮点型。为什么呢？因为只要有整数运算，你就可以实现一个完整的编译器了，所以现在就加入对浮点型的支持完全只是浪费时间而已。当然这个东西以后总归是要做的。
+
+另外，当**我**还年轻时，我们连 FPU 是啥都还不知道呢。尽管如此，我们依然可以用整数来模拟各种定点运算，一样可以完成很多事情。
+
+那么，我们真正要做的修改有哪些呢？
+
+在方法 `#get_arg` 中，在处理字符串常量之前，加入如下代码：
+
+``` ruby
+    return [:int, a] if (a.is_a?(Fixnum))
+```
+
+在方法 `#compile_exp` 中，我们用如下代码来处理 `#get_arg` 的返回值：
+
+``` ruby
+    elsif atype == :int then param = "$#{aparam}"
+```
+
+然后，就完事了。就这么简单。
+
+然后就是测试啦：
+
+``` ruby
+prog = [:do,
+  [:printf,"'hello world' takes %ld bytes\n",[:strlen, "hello world"]],
+  [:printf,"The above should show _%ld_ bytes\n",11]
+]
+```
+
+## 插曲：针对原生数据类型的一些思考
+
+“纯”面向对象类型的语言很棒，但并不是对底层的代码生成器而言的，我想。不管你是否想要实现一个纯的面向对象语言，我仍然坚信，首先实现原生的数据类型和其操作，是非常有价值的。你可以在后面的阶段再来考虑是否要对用户隐藏它们，或者是让它们看起来像是对象，或者是透明地在它们和对象之间执行自动转换的操作，等等。
+
+要注意的是，Matz 的 Ruby 解释器（Matz Ruby Interpreter，简称MRI）就是这样实现的：里面的数字就跟“真正的”对象神马的完全不一样，但是解释器本身却尽其所能的对用户隐藏这一事实。不过我个人认为 MRI 做的还是不够。
+
+## `If ... then ... else`
+
+如果没有某种形式的条件逻辑支持的话，我们的语言是没有太大用处的。几乎所有有用的语言都支持某种形式的 `if .. then .. else` 构造。现在，我们要实现的是像 `[:if, condition, if-arm, else-arm]` 这样的构造，而且是以 C 语言的形式来实现。也就是说， `0` 和空指针都表示假，其他值则都为真。
+
+仍然是一个简单的例子：
+
+``` c
+void foo() {}
+void bar() {}
+int main()
+{
+  if (baz()) {
+    foo();
+  } else {
+    bar();
+  }
+}
+```
+
+相关的汇编输出：
+
+``` nasm
+        call    baz
+        testl   %eax, %eax
+        je      .L6
+        call    foo
+        jmp     .L10
+.L6:
+        call    bar
+.L10:
+```
+
+对于大多数的语言和架构来说，这都是一个编译 `if .. then .. else` 时会采用的通用模板：
+
+- 计算条件表达式。
+- 对结果进行测试（这里用的是 `testl` 指令 -- 在其他架构中比较通用的还有 `cmp` 指令，或者对寄存器进行自减）。 `testl` 指令比较它的左右两个操作数，并进行相应的标志位设置。
+- 然后，条件跳转到 **`else` 语句处。这里，我们检查条件表达式的值是否不为真。在这种情况下我们用的是 `je` 指令，即“相等时跳转”（ jump on equal ），也就是当结果相等时跳转（要注意的是，在大多数的 CPU 架构中，很多指令都会设置条件码，而不仅仅是显示的测试指令）。**
+- 然后执行 `then` 子句。
+- 跳过 `else` 子句，继续执行整个 `if` 语句之后的部分。
+- 生成 `else` 子句的标号，以及其中的指令序列。
+- 生成 `if` 语句的结束标号。
+
+其他还有很多不同的变种，比如根据条件表达式取值的概率，或者某个架构中是否跳转的执行代价，进而调整两个子句的顺序等。不过就目前来说，上面的方法已经足够了。
+
+总之，编译的方法还是很简单的，应该说就是以上所述流程的直译：
+
+``` ruby
+  def ifelse cond, if_arg,else_arm
+    compile_exp(cond)
+    puts "\ttestl\t%eax, %eax"
+    @seq += 2
+    else_arm_seq = @seq - 1
+    end_if_arm_seq = @seq
+    puts "\tje\t.L#{else_arm_seq}"
+    compile_exp(if_arm)
+    puts "\tjmp\t.L#{end_if_arm_seq}"
+    puts ".L#{else_arm_seq}:"
+    compile_exp(else_arm)
+    puts ".L#{end_if_arm_seq}:"
+  end
+```
+
+这段代码应该很易懂的，其实就是对所有子句 -- 条件， `then` 子句，以及 `else` 子句 -- 分别调用 `#compile_exp` 方法，并在其间插入所需的辅助指令，同时用 `@seq` 成员来生成所需的标号。
+
+为了使其生效，我们在 `#compile_exp` 方法中的 `return defun ...` 之后插入如下代码：
+
+``` ruby
+    return ifelse(*exp[1..-1]) if (exp[0] == :if)
+```
+
+下面是一个简单的测试：
+
+``` ruby
+prog = [:do,
+  [:if, [:strlen,""],
+    [:puts, "IF: The string was not empty"],
+    [:puts, "ELSE: The string was empty"]
+  ],
+  [:if, [:strlen,"Test"],
+    [:puts, "Second IF: The string was not empty"],
+    [:puts, "Second IF: The string was empty"]
+  ]
+]
+```
+
+[这里是最终结果](http://www.hokstad.com/static/compiler/step5.rb)。
+
+如往常般，执行的方法如下：
+
+``` plain
+$ ruby step5.rb >step5.s
+$ make step5
+cc   step5.s   -o step5
+$ ./step5
+ELSE: The string was empty
+Second IF: The string was not empty
+$
+```
+
+## 有关循环的一些思考
+
+非条件循环是很容易实现的，不过我们需要实现它吗？显然不需要。我们已经可以用递归来实现循环了，又何必要乱加东西呢？
+
+不过，要令它工作良好，我们还需要实现尾递归优化，可是我现在还没有做好准备。尾递归优化，或者更一般的形式 -- 尾调用优化 -- 所说的情况是，在一个函数的末尾，调用了一个需要相同或者更少个数参数的函数，并返回它所返回的值。在这种情况下，你可以将当前函数的调用栈，复用给被调用的函数来使用，并且是通过 `jmp` 而不是 `call` 来调用这个函数。 `jmp` 指令不会在堆栈中压入一个新的返回地址，因此当这个被调用的函数返回，返回到的就是当前函数的调用者那里，而不是当前的这个函数。
+
+这就同时完成了几件事情：首先，也是最重要的，就是堆栈不再会随着调用而增长了。其次，我们能够省掉几个指令周期。有了尾调用优化，再配合其他几个优化之后，你就可以这样来写循环，而不用担心堆栈溢出的问题了：
+
+``` ruby
+[:defun, :loop, [], [:do,
+  [:puts, "I am all loopy"],
+  [:loop]
+],
+[:loop]
+```
+
+换句话说，尾调用优化意味着，对任何形如 `(defun foo () (do bar foo))` 的函数来说，堆栈的使用率都会从原来的成比例增长减少为定值了。
+
+当前的版本已经可以编译上面的代码了，不过它会很快用完堆栈并且崩溃掉的。不是很令人满意啊。
+
+果然（原文： I sense a disturbance in the force ），两位读到这篇文章的极客都指出了堆栈增长的问题。
+
+现在，让我们先忽略这个问题吧，同时注意下对堆栈空间的使用好了。之后，我们会实现一个专门的循环结构的。目前就这样吧 -- 如果以后我实现了尾调用优化的话，我们还可以重新考虑在运行时库中实现一个循环构造的方案。
+
+不管怎样，我们现在可以写出一个无限循环了⋯⋯不是太有用，不是吗？
+
+当然，我们其实也已经可以写 `while` 循环了：
+
+``` cl
+(defun some-while-loop () (if condition (some-while-loop) ()))
+```
+
+看起来不是太好，不过确实可以工作。但看起来总归还是太丑了，所以我们总归还是要实现一个正尔八经的 `while` 循环的。
+
+我不是一个 Lisp 程序员。我没办法处理那么多的括号⋯⋯不过 Lisp 的语法确实很适合于一门还没有语法的语言。到了一定的阶段之后，我会实现一个完整的解析器的。也许是出于偶然，我已经实现的和将要实现的很多东西在某种程度上来说都是取自于 Lisp 的，至少看起来是这样的。如果你能适应 Lisp 的语法的话，这个语言还是非常强大的。就算你不打算用它来开发你的程序，好好地学一下这门语言也是非常值得的。
+
+在我想来，很多看起来像是从 Lisp 中得来的点子，大概都是来自于我花在学习 Lisp 的有限经验。
+
+下一篇：匿名函数，也许不止。

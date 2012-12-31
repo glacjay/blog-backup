@@ -1,0 +1,19 @@
+---
+categories:
+  - Compiler
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - compiler
+  - ruby
+title: "[翻译] 用 Ruby 写编译器之零"
+type: post
+---
+
+这是一个国外的编译器达人写的一系列教程，内容为用 Ruby 语言，以自底向上的方式开发一个 Ruby 语言的编译器。这个教程非常适合于实战派的程序员。该教程的入口见[这里](http://www.hokstad.com/compiler)，其代码见[这里](https://github.com/vidarh/writing-a-compiler-in-ruby)。
+
+我会试着翻译一下这个教程。由于这个项目之后又有了很大的进展，而教程本身却又已经很久没有更新了，所以之后我可能也会自己总结一下那些最新的开发工作。
+
+使用版本管理软件的好处之一，就是你可以一步一步的学习一个软件的开发过程。不过这个项目用的是 Git，貌似不支持直接将 Working Tree 检出到历史上的某一个版本，所以我就新建了一个分支，然后将主干上的提交一个一个地 merge 到这个新的分支上，这样就可以一个提交一个提交的按顺序把玩这个编译器了。

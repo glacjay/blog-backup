@@ -1,0 +1,70 @@
+---
+categories:
+  - Programming
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - haskell
+title: "Haskell 中的可变长参数列表"
+type: post
+---
+
+说实话，我之前有就这个题目很有激情地写了很长很罗嗦的一篇草稿的，哦，确切来说是大半篇，直到被打断，激情不再，这篇草稿也就此躺了两个多月。好吧，其实是我还不是八卦那块料，就不卖弄了，直接总结。
+
+要在 Haskell 中实现可变长参数列表，就是利用其 Typeclass 系统，对函数进行最终结果类型和中间函数类型之间的重载，然后利用 Haskell 的类型推导机制为我们自动调用合适的重载版本。嗯，就这么简单。下面是一个最简单的例子：
+
+``` haskell
+class BuildList a r | r -> a where
+    buildList' :: [a] -> r
+
+instance BuildList a [a] where
+    buildList' = id
+
+instance BuildList a r => BuildList a (a -> r) where
+    buildList' as = \a -> buildList' $ as ++ [a]
+
+buildList :: BuildList a r => r
+buildList = buildList' []
+```
+
+好吧，这个例子我是从[这里](http://okmij.org/ftp/Haskell/vararg-fn.lhs)看到的，或者说我就是从这里学到这个东东的。在此友情提醒那些和我一样不怎么有耐心的家伙一句，原理解释在后面。
+
+按照我的想法，上面这个例子应该还可以进一步简化以去掉对两个语言扩展的依赖的，就是写一个 `buildIntList` 的特化版本，结果不幸地失败了。有知道的大大告诉我一声，在下洗耳恭听。
+
+-----
+
+**Update**: 不需要大大们来告诉我了，我已经知道该怎么简化上面的这个 `buildList` 了，不过简化后的版本是 `buildCharList` ，也就是 `buildString` 啦，而不是原先说的 `buildIntList` 。先看实现：
+
+``` haskell
+class BuildString r where
+    buildString' :: String -> r
+
+instance BuildString [Char] where
+    buildString' = id             -- or whatever you want
+
+instance BuildString r => BuildString (Char -> r) where
+    buildString' cs = \c -> buildString' $ cs ++ [c]
+
+buildString :: BuildString r => r
+buildString = buildString' []
+```
+
+这样就把对 `MultiParameterTypeClass` 和 `FunctionalDependency` 的依赖给简化掉了，可是又同时增加了对 `-XFlexibleInstances` 选项的需要（因为 `instance BuildString [Char] where` 这一行；如果你想把 `[Char]` 写成 `String` 的话，就还要再加上个 `-XTypeSynonymInstances`），暂时想不到更好的办法了。
+
+另外，关于我在这里为什么要用 `Char` 而不是 `Int` 呢，是因为 `'a'` 的类型很明确，就是 `Char` ，而 `5` 的类型就不明确了，因此，你可以这样调用 `buildString` ：
+
+```
+*TestVarargs> buildString 'a' 'b' 'c' :: String
+"abc"
+```
+
+可是却必须这样调用 `buildIntList` ：
+
+```
+*TestVarargs> buildIntList (1::Int) (2::Int) (3::Int) :: [Int]
+[1,2,3]
+```
+
+虽然在我看来，GHC 应该可以倒推出每个参数的类型的，可他就是不认，我暂时也没什么办法。

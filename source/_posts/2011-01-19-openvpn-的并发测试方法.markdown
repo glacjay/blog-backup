@@ -1,0 +1,24 @@
+---
+categories:
+  - Programming
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - openvpn
+title: "OpenVPN 的并发测试方法"
+type: post
+---
+
+由于 OpenVPN 本身协议的特殊性，用一般的方法不太好测它的并发。看过 LoadRunner ，但也最多只支持标准的 SSL/TLS 协议（当然，我也没细看这个）。于是动手改了其客户端的实现，最终完成任务。
+
+其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。貌似装十个左右的虚拟网卡驱动之后，机器就不行了。于是解决办法也很简单，把虚拟网卡相关的功能跳过就可以了。根据[上篇](/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html)的说明，只要在 `incoming_push_message()` 函数中，把对 `do_up()` 的调用直接换成 `initialization_sequence_completed()` 就 OK 了。
+
+当然，这样一来，流量的来源也就没有了，而没有数据流量也就无所谓测试了，最多测下并发接入的性能。要流量也很简单，改下 `io_wait()` 、 `read_tun()` 、 `write_tun()` 这几个函数的实现，手工组个 Ping 请求的 IP 报文给 OpenVPN 去发就行了。
+
+在这个过程中我也终于搞清楚那个 `checksum` 到底是怎么回事儿，原来在累加一遍求出一个和之后，如果这个和本身超过了 `16` 位，那么还要把这个和继续按 `16` 位来切分求和，这样才是最终结果。之前看 WikiPedia 上的那个例子，一直就没搞明白那个 `2` 到底是打哪儿来的。
+
+最后，就是要把起客户端这个过程给自动化了。于是又去研究 Windows 的 Batch 脚本，`for` 是循环， `start` 是后台运行， `ping` 用来模拟 `sleep` ， `taskkill` 是强制杀掉，搞了个 `1000` 客户端连了断、断了连的自动化测试出来。丢在那边跑了两天，服务端表示很淡定。
+
+以上。

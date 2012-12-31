@@ -1,0 +1,42 @@
+---
+categories:
+  - Programming
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - linux
+  - shell
+title: "Linux 下有关环境变量与换行符的一个小问题"
+type: post
+---
+
+最近在工作中，老是遇到一个莫名其妙的问题。我有一个用来设置一些环境变量的脚本，结果经常发现这个脚本设过的环境变量乱七八糟的，像 PATH 这种，就是之前的值跟后面添加的值重叠在了一起。直到后来才发现，原来是换行符搞的鬼。
+
+这样说还不太清楚，上代码吧。编辑文本文件 `test.sh` 如下，记得以 DOS 换行符的模式来保存：
+
+``` bash
+# Save this file using DOS's CR/LF.
+
+export VAR1=blahblahblah
+export VAR2=hello
+export VAR1=$VAR1:$VAR2
+```
+
+然后，执行一下命令：
+
+``` plain
+$ . ./test.sh
+```
+
+来使环境变量生效，并看一下结果：
+
+``` plain
+$ echo $VAR1
+:helloahblah
+```
+
+当然，Shell 看到的还不是这个样子，而是会把多出来的那个 CR 回车符也看作是路径（或者其他什么值）的一部分，最后当然也会导致所作的设置不生效啦。
+
+至于为什么会变成这种换行符，我倒是还没有搞明白，因为我的源文件确实是 Unix 风格的换行符。也许是因为是在 Windows 下用 ClearCase 来进行源码控制的关系？

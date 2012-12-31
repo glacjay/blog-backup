@@ -1,0 +1,73 @@
+---
+categories:
+  - Compiler
+comments: true
+layout: post
+published: true
+status: publish
+tags:
+  - bison
+  - compiler
+  - flex
+title: "对 Bison 手册中的 C++ 的例子的总结"
+type: post
+---
+
+注意，我用的软件版本为：Bison - 2.4.1，Flex - 2.5.35 。至于老的版本会怎样我就不深究了。工具不是重点。
+
+-----
+
+```
+%skeleton "lalr1.cc"
+```
+
+可以用
+
+```
+%language "c++"
+```
+
+来代替了，其中参数 "c++" 不区分大小写。
+
+-----
+
+如我在[上一篇 Blog](http://glacjay.info/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/) 中所说，分别在 `%union` 的前后放不同的 `%{ %}` 形式的 Prologue 这种方式对于需要输出头文件的情况已经不适用了，新的方法为在
+
+```
+%code requires { ... }
+```
+
+中放 Bison 定义要用到的 C/C++ 代码，在
+
+```
+%code provides { ... }
+```
+
+中放需要 Bison 定义的 C/C++ 代码。这两部分的代码都会原样输出到生成的头文件中。
+
+-----
+
+在 `%code provides` 块中要如下定义 `YYSTYPE` 和 `YYLTYPE` 这两个类型：
+
+``` cpp
+typedef yy::Parser::semantic_type YYSTYPE;
+typedef yy::Parser::location_type YYLTYPE;
+```
+
+不然 Flex 就会抱怨说这两个类型没有声明，我不知道为什么。
+
+-----
+
+这一点我一直有点奇怪，既然在 `%option` 中已经指定了 `noyywrap` 这个选项，为什么还要对 `yywrap` 做 `#undef` 再 `#define` 的处理呢，也许是之前版本的 Bug 吧，反正我用的这个版本只要指定了那个选项就 OK 了。
+
+-----
+
+Flex 中有两个选项是针对与 Bison 之间的配合使用的，就是 `bison-bridge` 和 `bison-locations` 。不过我是没搞懂这两个选项是怎么用的啦，至少是按照例子中的那样定义 `YY_DECL` 这个宏的情况下。按照错误提示更改了 `yylex` 的两个参数的名称之后，编译出来的程序会 segmentation fault 的。
+
+-----
+
+其他就没什么说的了，按照例子上的来就可以了。
+
+PS. 其实有个蛮不错的 Bison 的替代品，叫作 Lemon 的一个 Parser Generator ，是写 SQLite 的那个家伙搞出来的，并且就用在了 SQLite 的实现中。这东东较 Bison 有很多使用上的改进，用起来会很舒服，唯一可惜的就是不自动支持 `Location` ，至于这个特性有没有那么重要呢？谁知道，先就这样吧。
+
+PPS. 其实还是有几个有趣的针对 C++ 后端的 Parser Generator 的，像 YARD 就是一个充分挖掘了 C++ 的模板特性的 Parser 库，用起来感觉会很不一样就是了；Boost.Spirit 则是充分发挥了 C++ 的运算符重载能力的 Parser 库，算的上是 C++ 的 Internal DSL 应用了；再有就是连 Guido 都称赞过的 ANTLR 了，只是为其写 C 后端的那个家伙一直说要完成 C++ 后端又一直不见影子。其实我倒是很想用 ANTLR 这种 Lexer 和 Parser 原生整合在一起的工具的，看回来有时间是不是自己动手实现一个 C++ 的后端出来玩玩。
