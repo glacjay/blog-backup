@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案 - Random Stuff from GlacJAY</title>
+  <title>[翻译] 用 Ruby 写编译器之零 - Random Stuff from GlacJAY</title>
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content="我正在看虎书，在这本书中所给出的那个 MiniJava 语言的语法并不是 LALR(1) 语法，因此在某些情况下，所生成的语法分析器会对正确的输入给出语法解析错误。不过 Bison 提供了一个简单而又强大的解决方案，可以轻易的解决掉这个问题。 MiniJava 语法中的 non-LALR(1) &hellip;">
+  <meta name="description" content="这是一个国外的编译器达人写的一系列教程，内容为用 Ruby 语言，以自底向上的方式开发一个 Ruby 语言的编译器。这个教程非常适合于实战派的程序员。该教程的入口见这里，其代码见这里。 我会试着翻译一下这个教程。由于这个项目之后又有了很大的进展，而教程本身却又已经很久没有更新了， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html">
+  <link rel="canonical" href="http://glacjay.github.com/blog/2011-04-10/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</h1>
+      <h1 class="entry-title">[翻译] 用 Ruby 写编译器之零</h1>
     
     
       <p class="meta">
@@ -83,7 +83,7 @@
   
 
 
-<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+<time datetime="2011-04-10T00:00:00+08:00" pubdate data-updated="true">Apr 10<span>th</span>, 2011</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -92,15 +92,11 @@
   </header>
 
 
-<div class="entry-content"><p>我正在看<a href="http://www.cs.princeton.edu/~appel/modern/java/">虎书</a>，在这本书中所给出的那个 <a href="http://www.cambridge.org/us/features/052182060X/">MiniJava</a> 语言的语法并不是 LALR(1) 语法，因此在某些情况下，所生成的语法分析器会对正确的输入给出语法解析错误。不过 Bison 提供了一个简单而又强大的<a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Generalized-LR-Parsing">解决方案</a>，可以轻易的解决掉这个问题。</p>
+<div class="entry-content"><p>这是一个国外的编译器达人写的一系列教程，内容为用 Ruby 语言，以自底向上的方式开发一个 Ruby 语言的编译器。这个教程非常适合于实战派的程序员。该教程的入口见<a href="http://www.hokstad.com/compiler">这里</a>，其代码见<a href="https://github.com/vidarh/writing-a-compiler-in-ruby">这里</a>。</p>
 
-<p>MiniJava 语法中的 non-LALR(1) 部分其实是一个 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Shift_002fReduce">shift/reduce 冲突</a>。具体来说就是，在 <a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod7">MethodDeclaration</a> 中的 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod6">VarDeclaration</a>)<em> 和 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod5">Statement</a>)</em> 之间的状态下，当 Lookahead Token 是一个 IDENTIFIER 时，如果选择 shift ，那么下一步的动作就是进一步将这个 IDENTIFIER reduce 为一个 Type ，即将这个 IDENTIFIER 看作一个新的变量定义的开始；而如果选择 reduce 的话，实际上就是按照 (Statement)* 中的 epsilon 规则来 reduce ，即结束变量定义部分的解析，转而进入语句定义部分的解析。我们可以看到，仅仅依靠目前的信息，即 IDENTIFIER 这个 Lookahead Token ，是不足以决定接下来的动作的，因此 Bison 的默认策略，即 shift ，就会在某些情况下（这种情况其实很常见，就是当第一条语句是赋值语句时）产生错误的解析步骤。</p>
+<p>我会试着翻译一下这个教程。由于这个项目之后又有了很大的进展，而教程本身却又已经很久没有更新了，所以之后我可能也会自己总结一下那些最新的开发工作。</p>
 
-<p>这个问题其实很好解决，只要 Bison 能多向前看一个 Token 就可以了，可是 Bison 是 LALR(1) 语法分析器生成器，而不是 LALR(2) 。不过 Bison 提供了另外一条解决问题的途径，就是 GLR - Generalized LR Parsing 。简单来说，就是当 Bison 遇到一个冲突时，不管是 shift/reduce 冲突，还是 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Reduce_002fReduce">reduce/reduce 冲突</a>，就会将分析路径分为两条，分别跟进两种情况。当其中一条分析路径遇到语法错误，进行不下去时，就会自动消失。如果我们的文法是没有二义性的 LR 文法的话，最后就肯定可以得到正确的分析结果了。而我们的 MiniJava 的文法就是这种情况。说来好像复杂，但用起来其实很简单，只要在我们的 Bison 文法文件中加上 %glr-parser 这个选项就可以了。</p>
-
-<p>不过奇怪的是，加上这个选项之后，我们就不用再自己写 YYSTYPE 和 YYLTYPE 的定义了，搞不懂，莫非是个 Bug ？</p>
-
-<p>另外，本来我以为只要将变量定义语句也算到语句中的一种的话，这个问题也可以得到解决，不过后来发现我想错了，这样还是无法处理函数定义中的第一条语句是赋值语句的情况。未经证实，嗯，因为要改的地方还不少。</p>
+<p>使用版本管理软件的好处之一，就是你可以一步一步的学习一个软件的开发过程。不过这个项目用的是 Git，貌似不支持直接将 Working Tree 检出到历史上的某一个版本，所以我就新建了一个分支，然后将主干上的提交一个一个地 merge 到这个新的分支上，这样就可以一个提交一个提交的按顺序把玩这个编译器了。</p>
 </div>
 
 
@@ -123,7 +119,7 @@
   
 
 
-<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+<time datetime="2011-04-10T00:00:00+08:00" pubdate data-updated="true">Apr 10<span>th</span>, 2011</time>
       
 
 <span class="categories">
@@ -137,7 +133,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2011-04-10/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html" data-via="" data-counturl="http://glacjay.github.com/blog/2011-04-10/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -148,10 +144,10 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html" title="Previous Post: C++ 中的纯虚析构函数与抽象类">&laquo; C++ 中的纯虚析构函数与抽象类</a>
+        <a class="basic-alignment left" href="/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html" title="Previous Post: 总结一下学到的 LVS 相关知识（ DR 模式）">&laquo; 总结一下学到的 LVS 相关知识（ DR 模式）</a>
       
       
-        <a class="basic-alignment right" href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html" title="Next Post: 有关 C/C++ 中的 do { ... } while (0) 惯用法">有关 C/C++ 中的 do { ... } while (0) 惯用法 &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2011-04-11/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html" title="Next Post: [翻译] 用 Ruby 写编译器之一：一个简单的 main 函数模板">[翻译] 用 Ruby 写编译器之一：一个简单的 main 函数模板 &raquo;</a>
       
     </p>
   </footer>
@@ -256,8 +252,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html';
-        var disqus_url = 'http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html';
+        var disqus_identifier = 'http://glacjay.github.com/blog/2011-04-10/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2011-04-10/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>总结一下学到的 LVS 相关知识（ DR 模式） - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="不喜欢看长的 Blog 文间，当然更不喜欢写，所以就分开写啦。另，因为 TUN 模式限制更多，实际很可能用不到，所以不一定会写。 所以这次要讲的是 DR 模式的负载均衡啦。 DR 模式，也就是 Direct Route ，其基本原理就是不对包做任何处理，直接转给所分配的真实服务； &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">总结一下学到的 LVS 相关知识（ DR 模式）</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-13T00:00:00+08:00" pubdate data-updated="true">Mar 13<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>不喜欢看长的 Blog 文间，当然更不喜欢写，所以就分开写啦。另，因为 TUN 模式限制更多，实际很可能用不到，所以不一定会写。</p>
+
+<p>所以这次要讲的是 DR 模式的负载均衡啦。 DR 模式，也就是 Direct Route ，其基本原理就是不对包做任何处理，直接转给所分配的真实服务；回包则由真实服务直接发给客户端而不走负载机。因为不像 NAT 模式那样有相似的架构可以参考，所以这次就上图来说明啦（注，该图偷自<a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.LVS-DR.html">这里</a>）。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>                           ________
+</span><span class='line'>                          |        |
+</span><span class='line'>                          | client |
+</span><span class='line'>                          |________|
+</span><span class='line'>                          CIP=192.168.1.254
+</span><span class='line'>                              |
+</span><span class='line'>                   CIP-&gt;VIP | |
+</span><span class='line'>                            v |
+</span><span class='line'>                              |
+</span><span class='line'>                           ________
+</span><span class='line'>                          |        |
+</span><span class='line'>                          | router | advertises route to VIP
+</span><span class='line'>                          |________|
+</span><span class='line'>                              |
+</span><span class='line'>                __________    |
+</span><span class='line'>               |          |   |    VIP=192.168.1.110 (eth0:0, arps)
+</span><span class='line'>               | director |---+     DIP=192.168.1.1 (eth0)
+</span><span class='line'>               |__________|   |
+</span><span class='line'>                              |  ^
+</span><span class='line'>MAC_DIP-&gt;MAC_RIP1(CIP-&gt;VIP) | |  |  VIP-&gt;CIP
+</span><span class='line'>                            v |
+</span><span class='line'>                              |
+</span><span class='line'>             +----------------+------------------+
+</span><span class='line'>             |                |                  |
+</span><span class='line'>             |                |                  |
+</span><span class='line'>      RIP1=192.168.1.2  RIP2=192.168.1.3  RIP3=192.168.1.4 (eth0)
+</span><span class='line'>      VIP=192.168.1.110 VIP=192.168.1.110 VIP=192.168.1.110 (all lo:0, non-arping)
+</span><span class='line'>      _____________     _____________      _____________
+</span><span class='line'>     |             |   |             |    |             |
+</span><span class='line'>     |   CIP-&gt;VIP  |   |             |    |             |
+</span><span class='line'>     |   VIP-&gt;CIP  |   |             |    |             |
+</span><span class='line'>     | realserver  |   | realserver  |    | realserver  |
+</span><span class='line'>     |_____________|   |_____________|    |_____________|
+</span><span class='line'></span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先，负载机（即图中的 <code>director</code> ）需要将服务发布地址配置成网卡的从地址 <code>VIP</code>（我还不太清楚为什么不能直接配成第一地址），以便接收来自客户端的 IP 报文。然后，它会根据分配置策略选择一个真实服务器（即图中的 <code>realserver</code> ），并将这个 IP 报文直接转发过去，而这就需要真实服务器也有一个从地址配置成 <code>VIP</code> （一般都配到 <code>lo</code> 网口上）。可是，大家都是在一个网段的，如果没有什么措施的话，那一开始来自客户端的目的地址为 <code>VIP</code> 的 IP 报文就不知道要由谁来处理了。所以，在真实服务器上都要把 <code>lo</code> 这个网卡的 ARP 广播与响应功能给禁掉，让客户端不知道真实服务器也有 <code>VIP</code> 这个地址。而负载机则是通过真实服务器的真实地址（非 <code>VIP</code> ）得知它的 MAC 地址，进而进行转发的。</p>
+
+<p>而当真实服务器需要往回发报文的时候，因为与客户端之间并不像 NAT 那样不在同一网段，也没有被负载机隔来，所以回应报文就通过正常途径直接到了客户端的手（网口？）中。</p>
+
+<p>这样一来，相比 NAT 模式而言，其额外的配置工作主要就是 <code>VIP</code> 从地址的配置以及 ARP 相关功能的禁用了。让我们一步一步来吧。首先是负载机的 <code>VIP</code> 配置（真实地址的配置就跟正常的一样，不写了）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ifconfig eth0:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+</span><span class='line'>$ sudo route add -host 192.168.1.110 eth0:0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后是真实服务器的 <code>VIP</code> 配置：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ifconfig lo:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+</span><span class='line'>$ sudo route add -host 192.168.1.110 eth0:0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>与负载机唯一不同的就是要把地址配到 <code>lo</code> 上。接下来是禁掉这个网卡的 ARP 相关的功能（这里就用不了 <code>sudo</code> 了，必须直接用 <code>root</code> 用户，不知道为嘛）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+</span><span class='line'># echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+</span><span class='line'># echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+</span><span class='line'># echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然更好的办法是修改 <code>/etc/sysctl.conf</code> 文件，然后执行 <code>sysctl -p</code> 命令来使修改生效。这样做的好处是配置被保存下来了，下次开机还有效，而且也可以用 <code>sudo</code> 来做。</p>
+
+<p>地址配完了，最后就是 ipvsadm 本身的配置了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ipvsadm -A -t 192.168.1.110:22 -s rr
+</span><span class='line'>$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.2:22 -g
+</span><span class='line'>$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.3:22 -g
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
+
+
+<p>嗯，跟 NAT 模式唯一的不同就是 <code>-g</code> 选项，表示 DR 模式。因为是默认选项，所以不写 <code>-g</code> 也可以。</p>
+
+<p>TCP 服务的话这样就可以了，可是 UDP 服务却还有一些问题需要解决。正如上面所说，服务端发给客户端的回包是不经过负载的，这样的话，如果这个服务程序没有绑定到特定网卡的话，这个回包的源地址默认就是服务器本身的真实地址（如 <code>192.168.1.2</code> ）了，而这样的回包一般是不会被客户端所接受的，因为客户端当初可是往 <code>VIP</code> 这个地址发的请求包。而最通用的解决方法就是将该服务显式绑定到 <code>VIP</code> 这个地址上，强迫其回包的源地址为 <code>VIP</code> ，而这正是客户端所希望看到的。</p>
+
+<p>由上可知，DR 模式相对 NAT 模式而言，对真实服务器来说就是侵入式的配置方式，增加了不少配置工作和限制，而其性能方面的优势据说在现在也大大降低了。因此一般应用的话，直接用 NAT 模式就可以了。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-13T00:00:00+08:00" pubdate data-updated="true">Mar 13<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html" data-via="" data-counturl="http://glacjay.github.com/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html" title="Previous Post: 总结一下学到的 LVS 相关知识（ NAT 模式）">&laquo; 总结一下学到的 LVS 相关知识（ NAT 模式）</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011-04-10/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html" title="Next Post: [翻译] 用 Ruby 写编译器之零">[翻译] 用 Ruby 写编译器之零 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: what are you thinking about?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 lambda</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-17/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html">[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

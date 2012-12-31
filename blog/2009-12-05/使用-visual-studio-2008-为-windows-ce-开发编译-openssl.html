@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="我的编译环境是 Visual Studio Team System 2008 版本 9.0.21022.8 RTM ， Windows Mobile 5.0 SDK R2 （ VS2008 自带的版本）。当然， Perl 也是需要的，我装的是 ActivePerl 。我要编译的 OpenSSL &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-05T00:00:00+08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2009</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>我的编译环境是 Visual Studio Team System 2008 版本 9.0.21022.8 RTM ， Windows Mobile 5.0 SDK R2 （ VS2008 自带的版本）。当然， Perl 也是需要的，我装的是 ActivePerl 。我要编译的 OpenSSL 版本是 0.9.8e 。</p>
+
+<h2>VS2008 的安装</h2>
+
+<p>那个 Web Developer Tools （好像叫这个）的安装会失败，又不能不装，根据网上的说明，要把它的目录单独从光盘上解压出来安装，且安装的时候要挂 Office 的安装光盘（我的 Office 版本是 2007 ）。这个装好了之后，再从光盘上安装 VS2008 就没有问题了。</p>
+
+<h2>配置编译环境</h2>
+
+<p>首先要写个定义环境变量的脚本，以把 CE 的路径给配置好。 VS2008 的那个命令行启动脚本只配置了 VC 的环境变量，没有配 CE 的环境变量，因为这个是要根据用户需要来做的。我写的脚本内容如下，你可能要根据自己的 VS2008 相关安装目录做调整。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bat'><span class='line'><span class="k">set</span> <span class="nv">PATH</span><span class="o">=</span>D:\Program Files\Microsoft Visual Studio <span class="m">9</span>.<span class="m">0</span>\VC\ce\bin\x<span class="m">86</span>_arm;<span class="nv">%PATH%</span>
+</span><span class='line'><span class="k">set</span> <span class="nv">INCLUDE</span><span class="o">=</span>D:\Program Files\Microsoft Visual Studio <span class="m">9</span>.<span class="m">0</span>\VC\ce\include;C:\Program Files\Windows Mobile <span class="m">5</span>.<span class="m">0</span> SDK R<span class="m">2</span>\PocketPC\Include\Armv<span class="m">4</span>i;D:\Program Files\Microsoft Visual Studio <span class="m">9</span>.<span class="m">0</span>\VC\ce\atlmfc\include;<span class="nv">%INCLUDE%</span>
+</span><span class='line'><span class="k">set</span> <span class="nv">LIB</span><span class="o">=</span>C:\Program Files\Windows Mobile <span class="m">5</span>.<span class="m">0</span> SDK R<span class="m">2</span>\PocketPC\Lib\ARMV<span class="m">4</span>I;D:\Program Files\Microsoft Visual Studio <span class="m">9</span>.<span class="m">0</span>\VC\ce\atlmfc\lib\armv<span class="m">4</span>i;D:\Program Files\Microsoft Visual Studio <span class="m">9</span>.<span class="m">0</span>\VC\ce\lib\armv<span class="m">4</span>i;<span class="nv">%LIB%</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">set</span> <span class="nv">OSVERSION</span><span class="o">=</span>WCE<span class="m">501</span>
+</span><span class='line'><span class="k">set</span> <span class="nv">TARGETCPU</span><span class="o">=</span>ARMV<span class="m">4</span>I
+</span><span class='line'><span class="k">set</span> <span class="nv">PLATFORM</span><span class="o">=</span>VC-CE
+</span><span class='line'><span class="k">set</span> <span class="nv">WCECOMPAT</span><span class="o">=</span>D:\program\wcecompat
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中 <code>PATH</code> 、 <code>INCLUDE</code> 、 <code>LIB</code> 都是 CE 相关的环境变量，在编译 WCECompat 和 OpenSSL 的时候都是需要的，后面的是 WCECompat 需要的，其中有些是 OpenSSL 也需要的。</p>
+
+<p>然后启动 Visual Studio 2008 命令提示（开始菜单），并运行上面的这个脚本，编译环境就算是准备好了，可以开始编译 WCECompat 了。</p>
+
+<h2>编译 WCECompat</h2>
+
+<p>要编译 CE 版本的 OpenSSL 的话，需要 WCECompat 这个库，这个库实现了许多在 Desktop 开发环境中有而在 CE 中没有的功能，而这些功能是编译与使用 OpenSSL 所必需的。</p>
+
+<p>不过，官方版本的 WCECompat 现在已经用不起来了（虽然我没有进一步确定），我们要使用 OpenSSL 开发团队 fork 的分支，其下载地址在<a href="http://github.com/mauricek/wcecompat">http://github.com/mauricek/wcecompat</a>，在这个页面上有打包下载的链接，我下载的版本是 cb796f5 （ git 是用 GUID 来表示版本的）。</p>
+
+<p>下载下来之后，先解压，我的解压路径是 <code>D:\program\wcecompat</code> ，并进入该目录。这里注意，根据 WCECompat 的文档说明，不能把它解压到一个含空格的路径底下，不然会报文件找不到之类的错，这是因为 WCECompat 的 <code>makefile</code> 文件没有用引号括住文件名，而空格会把一个文件名分成两个。</p>
+
+<p>然后要修改一个源码文件 <code>src/time.c</code> ，在其中找到函数 <code>_tzset</code> 的定义，这是一个空函数，把它整个注释掉（或删掉），不然在后面我们的程序要链接这个库的时候，会报这个函数重复定义的错。</p>
+
+<p>运行命令</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bat'><span class='line'>D:\program\wcecompat<span class="p">&gt;</span><span class="n">perl</span> config.pl
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样会生成需要的 <code>makefile</code> 文件，不过还不能直接用它来编译，要手动改一下，删掉或注释掉其中的 <code>src/winmain.cpp \</code> 这一行，不然后面链进我们的程序时会报找不到 WinMain 所需的 <code>main</code> 函数这个错（大概是这样说的）。</p>
+
+<p>然后运行命令</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bat'><span class='line'>D:\program\wcecompat<span class="p">&gt;</span><span class="n">nmake</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>开始编译。完成之后，就会在 <code>lib</code> 目录中生成两个库文件 <code>wcecompat.lib</code> 和 <code>wcecompatex.lib</code> ，都是静态链接库。</p>
+
+<h2>编译 OpenSSL</h2>
+
+<p>还是同一个命令行窗口，进入 OpenSSL 的解压目录，我的是 <code>D:\program\openssl-0.9.8e</code> 。根据 <code>INSTALL.WCE</code> 文件中的说明，运行下列命令进行编译：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bat'><span class='line'>D:\program\openssl<span class="m">-0</span>.<span class="m">9</span>.<span class="m">8</span>e<span class="p">&gt;</span><span class="n">perl</span> Configure VC-CE
+</span><span class='line'>...
+</span><span class='line'>D:\program\openssl<span class="m">-0</span>.<span class="m">9</span>.<span class="m">8</span>e<span class="p">&gt;</span><span class="n">ms</span>\do_ms.bat
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这一步完成之后，打开生成的 <code>ms\ce.mak</code> 文件，把第 <code>19</code> 行 <code>CFLAG</code> 的变量定义中的 <code>/WX</code> 选项给删掉，不然后面有编译警告会被当成错误，从而编译失败。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bat'><span class='line'>D:\program\openssl<span class="m">-0</span>.<span class="m">9</span>.<span class="m">8</span>e<span class="p">&gt;</span><span class="n">nmake</span> -f ms\ce.mak
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这一步的编译过程最终还是会失败退出，不过不要紧（也许吧），失败的是测试程序，这时看 <code>out32_ARMV4I</code> 目录中，已经有编译好的 <code>libeay32.lib</code> 和 <code>ssleay32.lib</code> 这两个文件了。因为前面是用 <code>ms\ce.mak</code> 文件而不是 <code>ms\cedll.mak</code> ，所以编译出来的这两个文件都是静态链接库。</p>
+
+<h2>测试 OpenSSL</h2>
+
+<p>最后来测试一下我们编译出来的 OpenSSL （以及 WCECompat ）。打开 VS2008 ，新建个智能设备的项目。然后打开项目属性对话框，先在“配置属性-> C/C++ ->常规”的“附加包含目录”中把 <code>D:\program\openssl-0.9.8e\inc32</code> 给加进来（测试的话加绝对路径就好了，实际开发的时候要把所有需要的文件拷到项目目录里面）（另，不要加 WCECompat 的 <code>include</code> 目录，不然会有 <code>abs</code> 函数不属于 <code>global namespace</code> 的编译错误），在“配置属性->链接器->常规”的“附加库目录”中把 <code>D:\program\openssl-0.9.8e\out32_ARMV4I</code> 和 <code>D:\program\wcecompat\lib</code> 给加进来，在“配置属性->链接器->输入”的“附加依赖项”中加入 <code>wcecompat.lib wcecompatex.lib libeay32.lib ssleay32.lib</code>。</p>
+
+<p>打开个源文件（比如某个事件处理函数定义的地方），在最开始的地方加进去 OpenSSL 的头文件包含</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#define NO_SYS_TYPES_H</span>
+</span><span class='line'><span class="cp">#include &lt;openssl/ssl.h&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中第一行的宏定义是需要的。虽然 WCECompat 为我们提供了 <code>sys/types.h</code> 头文件，不过我们不能用（理由见上）。</p>
+
+<p>然后在事件处理函数中加条语句</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">SSL_CTX</span> <span class="o">*</span><span class="n">ctx</span> <span class="o">=</span> <span class="n">SSL_CTX_new</span><span class="p">(</span><span class="n">SSLv23_method</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>编译下试试吧，看有没有问题。如果没有，那就恭喜了，我们暂时解决了将 OpenSSL 用于 CE 开发的问题，我还不能保证后面不会出其他的问题。</p>
+
+<h2>另</h2>
+
+<p>虽然我之前配置环境变量等步骤都是基于 PocketPC 来做的，不过最后编出来的库貌似也能用到 Smartphone 程序中，不知道会不会有什么问题。 Mobile 开发果然还是相当的麻烦啊。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-05T00:00:00+08:00" pubdate data-updated="true">Dec 5<span>th</span>, 2009</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0.html" title="Previous Post: 在 Haskell 中实现 Generic zip 函数">&laquo; 在 Haskell 中实现 Generic zip 函数</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html" title="Next Post: 让 Vim 在保存时自动调用外部命令进行格式化">让 Vim 在保存时自动调用外部命令进行格式化 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: what are you thinking about?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 lambda</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-17/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html">[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

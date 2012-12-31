@@ -5,17 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>有关 C/C++ 中的 do { ... } while (0) 惯用法 - Random Stuff from GlacJAY</title>
+  <title>让 Vim 在保存时自动调用外部命令进行格式化 - Random Stuff from GlacJAY</title>
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content="C/C++ 中的宏是个让人又爱又恨的家伙（感觉这句话好俗啊），在带给我们很强大的 Power 的同时，却也需要我们绝对的细心，而这也是在宏定义中诸多惯用法的由来。 当我们要把一组语句定义成一个宏，并希望像用一条语句那样来使用它的时候，我们就可以这样做： 1
-2
-3
-4
-5
-6
-#define &hellip;">
+  <meta name="description" content="肯定有许多人遇到过这个问题，也肯定有许多现成的解决方案被发现，可是我没找到（或者说没耐心找）。无所谓，自己找到的话，得到的就不仅仅是最终结果了。 闲话少说。其实以前也干过类似的事情，就是在保存的时候自动去掉所有的行末空白；不过这个操作使用 Vim 本身的功能就能实现，不需要借助于外部程序， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -24,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.com/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html">
+  <link rel="canonical" href="http://glacjay.github.com/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -73,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">有关 C/C++ 中的 Do { ... } While (0) 惯用法</h1>
+      <h1 class="entry-title">让 Vim 在保存时自动调用外部命令进行格式化</h1>
     
     
       <p class="meta">
@@ -89,7 +83,7 @@
   
 
 
-<time datetime="2009-04-08T00:00:00+08:00" pubdate data-updated="true">Apr 8<span>th</span>, 2009</time>
+<time datetime="2009-12-13T00:00:00+08:00" pubdate data-updated="true">Dec 13<span>th</span>, 2009</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -98,26 +92,15 @@
   </header>
 
 
-<div class="entry-content"><p>C/C++ 中的宏是个让人又爱又恨的家伙（感觉这句话好俗啊），在带给我们很强大的 Power 的同时，却也需要我们绝对的细心，而这也是在宏定义中诸多惯用法的由来。</p>
+<div class="entry-content"><p>肯定有许多人遇到过这个问题，也肯定有许多现成的解决方案被发现，可是我没找到（或者说没耐心找）。无所谓，自己找到的话，得到的就不仅仅是最终结果了。</p>
 
-<p>当我们要把一组语句定义成一个宏，并希望像用一条语句那样来使用它的时候，我们就可以这样做：</p>
+<p>闲话少说。其实以前也干过类似的事情，就是在保存的时候自动去掉所有的行末空白；不过这个操作使用 Vim 本身的功能就能实现，不需要借助于外部程序，所以只要简单地设一个 <code>BufWrite</code> 时的自动命令就行了。但当需要借助外部程序的时候，在 <code>BufWrite</code> 或者 <code>BufWritePre</code> 或者 <code>FileWritePre</code> 时执行的自动命令就不行了，老是提示说什么文件本身已更改，是否确定写入。我在这上面反覆试了好多次，才发现是自己没有搞清楚底下到底发生了什么。要让外部程序对文件内容进行格式化（或者其他什么操作。我想调的是 gofmt，顺带一提），首先当然得要那个外部程序能看到你做过的，还没有保存的更改，所以说应该是先写入再操作的，即在 <code>BufWritePost</code> 的时候执行自动命令。而我一开始就把基本步骤给搞反了。</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#define MACROX \</span>
-</span><span class='line'><span class="cp">    do { \</span>
-</span><span class='line'><span class="cp">        statement1 \</span>
-</span><span class='line'><span class="cp">        statement2 \</span>
-</span><span class='line'><span class="cp">        ... \</span>
-</span><span class='line'><span class="cp">    } while (0)</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>这一步搞对了之后，接下来的问题就是要让 Vim 知道格式化后的变化。这个我之前倒是真不知道，原来每天都要用到的 <code>:e</code> 命令，全称就是 <code>:edit</code> ，在不加参数的情况下就是干这个事情的。</p>
 
+<p><code>:edit</code> 这个命令本身的话，应该是影响不到语法高亮功能的，在我看来。我的意思是，原来是语法高亮的，执行这个命令之后应该还是会语法高亮。但是在我把上面的两步命令做成自动命令之后，代码格式化好了，却也变黑了。不得其解，于是又在后面加上了 <code>syntax enable</code> 这条命令。结果，倒是连执行外部命令之后的那个回车确认步骤都给屏掉了，算是一个意料之外的成果。</p>
 
-<p>之后，我们只要在调用方写 <code>MACROX;</code> 就可以了。之所以不能简单的用花括号把这一组语句括起来，是为了防止扰乱 <code>if</code> 语句中的 <code>else</code> 子句的匹配问题。嗯，确实是个不错的主意啊，直到我遇到了一个，嗯，也许只有我才会遇到的问题。那就是，我在这组语句中，不能用 <code>break</code> 和 <code>continue</code> 。是不是觉得这需求蛮诡异的，呵呵，连我自己都觉得，不过这是我在重构一些相似的循环体时遇到的。但总之，我是找到了另外的一种包装方法啦，自己想想也没什么问题，大概，就像下面这样：</p>
+<p>最后，做为参考，把我的相关配置给贴出来吧。就是在文件 <code>~/.vim/ftplugin/go.vim</code> 中，加了这么一段代码：</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -125,16 +108,41 @@
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#define MACROX \</span>
-</span><span class='line'><span class="cp">    if (true) { \</span>
-</span><span class='line'><span class="cp">        statement1 \</span>
-</span><span class='line'><span class="cp">        statement2 \</span>
-</span><span class='line'><span class="cp">        ... \</span>
-</span><span class='line'><span class="cp">    } else</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">function</span><span class="p">!</span> <span class="k">b</span>:Format<span class="p">()</span>
+</span><span class='line'>    <span class="p">!</span>gofmt <span class="p">-</span><span class="k">w</span> %
+</span><span class='line'>    edit
+</span><span class='line'>    <span class="nb">syntax</span> enable
+</span><span class='line'><span class="k">endfunction</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">au</span> <span class="nb">BufWritePost</span>  :<span class="k">call</span> <span class="k">b</span>:Format<span class="p">()</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>嗯，看起来是不是要比大家都知道的那个诡异很多啊。不管了，以后发现问题了再说吧。</p>
+<p>最后的最后，在 <code>c.vim</code> 中也如法炮制了一下，不过用的是 <code>indent</code> 。</p>
+
+<hr />
+
+<p><strong>Update 2010-08-18:</strong> 参考<a href="http://www.miek.nl/blog/archives/2010/08/08/formatting_go_code_with_vim/index.html">这篇文章</a>的话，可以将上面的函数修改如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='vim'><span class='line'><span class="k">function</span><span class="p">!</span> <span class="k">b</span>:Format<span class="p">()</span>
+</span><span class='line'>    <span class="k">let</span> regel<span class="p">=</span>line<span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">let</span> regec<span class="p">=</span><span class="k">col</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+</span><span class='line'>    %<span class="p">!</span>gofmt
+</span><span class='line'>    <span class="k">call</span> cursor<span class="p">(</span>regel<span class="p">,</span> regec<span class="p">)</span>
+</span><span class='line'><span class="k">endfunction</span>
+</span><span class='line'>autocmd <span class="nb">BufWritePre</span>  :<span class="k">call</span> <span class="k">b</span>:Format<span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样的话，Undo History 不会因为对外部程序的调用而被清空，而且外部程序所作的修改也同时成为了 Undo History 中的一步。</p>
 </div>
 
 
@@ -157,12 +165,12 @@
   
 
 
-<time datetime="2009-04-08T00:00:00+08:00" pubdate data-updated="true">Apr 8<span>th</span>, 2009</time>
+<time datetime="2009-12-13T00:00:00+08:00" pubdate data-updated="true">Dec 13<span>th</span>, 2009</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/programming/'>Programming</a>
+    <a class='category' href='/blog/categories/tools/'>Tools</a>
   
 </span>
 
@@ -171,7 +179,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -182,10 +190,10 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html" title="Previous Post: MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案">&laquo; MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</a>
+        <a class="basic-alignment left" href="/blog/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl.html" title="Previous Post: 使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL">&laquo; 使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL</a>
       
       
-        <a class="basic-alignment right" href="/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html" title="Next Post: Haskell 中的可变长参数列表">Haskell 中的可变长参数列表 &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html" title="Next Post: 利用 XMPP 协议实现 VPN">利用 XMPP 协议实现 VPN &raquo;</a>
       
     </p>
   </footer>
@@ -290,8 +298,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://glacjay.github.com/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html';
-        var disqus_url = 'http://glacjay.github.com/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html';
+        var disqus_identifier = 'http://glacjay.github.com/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html';
         var disqus_script = 'embed.js';
       
     (function () {

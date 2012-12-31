@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>用 Python 操作虚拟网卡 - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="在我的 XTunnel 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。 在 Linux &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">用 Python 操作虚拟网卡</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-18T00:00:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2010</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>在我的 <a href="/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html">XTunnel</a> 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。</p>
+
+<p>在 Linux 内核中，特别是在现在的发行版中，应该都已经有了 <code>TUN/TAP</code> 虚拟网卡的驱动程序，看一下有没有 <code>/dev/net/tun</code> 这个文件就可以知道了。如果没有，就执行一下 <code>sudo modprobe tun</code> 这个命令吧。如果还是没有，那就 Google 之吧。下面上代码：</p>
+
+<div><script src='https://gist.github.com/585369.js?file='></script>
+<noscript><pre><code>import fcntl
+import os
+import struct
+import subprocess
+
+
+# Some constants used to ioctl the device file. I got them by a simple C
+# program.
+TUNSETIFF = 0x400454ca
+TUNSETOWNER = TUNSETIFF + 2
+IFF_TUN = 0x0001
+IFF_TAP = 0x0002
+IFF_NO_PI = 0x1000
+
+# Open TUN device file.
+tun = open('/dev/net/tun', 'r+b')
+# Tall it we want a TUN device named tun0.
+ifr = struct.pack('16sH', 'tun0', IFF_TUN | IFF_NO_PI)
+fcntl.ioctl(tun, TUNSETIFF, ifr)
+# Optionally, we want it be accessed by the normal user.
+fcntl.ioctl(tun, TUNSETOWNER, 1000)
+
+# Bring it up and assign addresses.
+subprocess.check_call('ifconfig tun0 192.168.7.1 pointopoint 192.168.7.2 up',
+        shell=True)
+
+while True:
+    # Read an IP packet been sent to this TUN device.
+    packet = list(os.read(tun.fileno(), 2048))
+
+    # Modify it to an ICMP Echo Reply packet.
+    #
+    # Note that I have not checked content of the packet, but treat all packets
+    # been sent to our TUN device as an ICMP Echo Request.
+
+    # Swap source and destination address.
+    packet[12:16], packet[16:20] = packet[16:20], packet[12:16]
+
+    # Under Linux, the code below is not necessary to make the TUN device to
+    # work. I don't know why yet, but if you run tcpdump, you can see the
+    # difference.
+    if True:
+        # Change ICMP type code to Echo Reply (0).
+        packet[20] = chr(0)
+        # Clear original ICMP Checksum field.
+        packet[22:24] = chr(0), chr(0)
+        # Calculate new checksum.
+        checksum = 0
+        # for every 16-bit of the ICMP payload:
+        for i in range(20, len(packet), 2):
+            half_word = (ord(packet[i]) &lt;&lt; 8) + ord(packet[i+1])
+            checksum += half_word
+        # Get one's complement of the checksum.
+        checksum = ~(checksum + 4) &amp; 0xffff
+        # Put the new checksum back into the packet.
+        packet[22] = chr(checksum &gt;&gt; 8)
+        packet[23] = chr(checksum &amp; ((1 &lt;&lt; 8) -1))
+
+    # Write the reply packet into TUN device.
+    os.write(tun.fileno(), ''.join(packet))
+</code></pre></noscript></div>
+
+
+<p>简而言之，就是首先打开对应的设备文件，然后通过 <code>ioctl</code> 系统调用告诉它我们想要的网卡类型和名称，同时还可以告诉它我们想以普通用户的身份来对它进行操作。之后通过 <code>ifconfig</code> 命令将新建的网卡拉起来，就可以开始读写了。</p>
+
+<p>当你以 root 身份运行这个脚本的时候，可以 <code>ping</code> 一下 <code>192.168.7.2</code> 这个地址试试，看看是不是能 <code>ping</code> 得通。</p>
+
+<p>下面的代码则在 Mac 环境中实现了同样的功能（不过还没有设置用户身份的功能）：</p>
+
+<div><script src='https://gist.github.com/586860.js?file='></script>
+<noscript><pre><code>import os
+import subprocess
+
+
+# Open file corresponding to the TUN device.
+tun = open('/dev/tun0', 'r+b')
+
+# Bring it up and assign addresses.
+subprocess.check_call('ifconfig tun0 192.168.7.1 192.168.7.2 up', shell=True)
+
+while True:
+    # Read an IP packet been sent to this TUN device.
+    packet = list(os.read(tun.fileno(), 2048))
+
+    # Modify it to an ICMP Echo Reply packet.
+    #
+    # Note that I have not checked content of the packet, but treat all packets
+    # been sent to our TUN device as an ICMP Echo Request.
+
+    # Swap source and destination address.
+    packet[12:16], packet[16:20] = packet[16:20], packet[12:16]
+    # Change ICMP type code to Echo Reply (0).
+    packet[20] = chr(0)
+    # Clear original ICMP Checksum field.
+    packet[22:24] = chr(0), chr(0)
+    # Calculate new checksum.
+    checksum = 0
+    # for every 16-bit of the ICMP payload:
+    for i in range(20, len(packet), 2):
+        half_word = (ord(packet[i]) &lt;&lt; 8) + ord(packet[i+1])
+        checksum += half_word
+    # Get one's complement of the checksum.
+    checksum = ~(checksum + 4) &amp; 0xffff
+    # Put the new checksum back into the packet.
+    packet[22] = chr(checksum &gt;&gt; 8)
+    packet[23] = chr(checksum &amp; ((1 &lt;&lt; 8) - 1))
+
+    # Write the reply packet into TUN device.
+    os.write(tun.fileno(), ''.join(packet))</code></pre></noscript></div>
+
+
+<p>当然要运行上面的代码，你首先要到<a href="http://tuntaposx.sourceforge.net/">这里</a>下载并安装 Mac 下的 <code>TUN/TAP</code> 设备驱动程序才行。安装之后，在系统的 <code>/dev</code> 目录中就会分别有 16 个 <code>/dev/tunX</code> 以及 <code>/dev/tapX</code> （ <code>X</code> 表示网卡序号）字符设备文件，分别对应于 <code>16</code> 个同名的 <code>TUN/TAP</code> 虚拟网卡。当然，在运行这个脚本之前，你是看不到这些网卡的。不不，用 <code>ifconfig -a</code> 也不行。</p>
+
+<p>因为与 Linux 下的驱动的实现方法不同，这里是用的文件名来标识网卡类型与名称，所以就不需要 Linux 版本中的第一个 <code>ioctl</code> 调用了。</p>
+
+<p>也不记得一开始是在哪边看到的一个讲 <code>TUN/TAP</code> 编程的文章，说要实现对 <code>ping</code> 报文的处理，只要简单地将读到的 IP 报文中的源地址与目的地址对换一下，再写回去就可以了。在 Linux 系统中也确实是如此，因此我也就没有深究。直到后来才发现，同样的招数在 Mac 下居然没用。于是赶紧上网翻 ICMP 的报文格式，改报文中的 <code>type</code> 码，并重新计算 <code>checksum</code> ，这才搞定。这时也才发现，用 Python 来操作原始的字节流还是没有 C 这种底层语言直观啊。</p>
+
+<p>可是 Linux 下为什么不需要这么麻烦呢？于是回去抓了抓包，这才发现，相对于 Mac 下的一问（ <code>ping</code> 命令）一答（ Python 脚本），在 Linux 下居然是两问两答，一问是 <code>ping</code> 命令，一问是我们的那个 Python 脚本。这也不奇怪，我连 <code>ICMP</code> 中的 <code>type</code> 码都没改，发过来的是 <code>request</code> ，那再发出去的当然还是 <code>request</code> 。至于应答，大概就是 Linux 的 <code>TUN/TAP</code> 驱动搞的鬼了。</p>
+
+<p>最后，当然也有 Windows 的实现版本啦，不过代码被我丢到公司的 Windows 工作用机上了，所以，就请您且听下回分解了。</p>
+
+<hr />
+
+<p><strong>Update 2011-04-26:</strong> Windows 下的实现代码如下：</p>
+
+<div><script src='https://gist.github.com/586892.js?file=tun-ping-win.py'></script>
+<noscript><pre><code>import _winreg as reg
+import win32file
+
+
+adapter_key = r'SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002BE10318}'
+
+
+def get_device_guid():
+    with reg.OpenKey(reg.HKEY_LOCAL_MACHINE, adapter_key) as adapters:
+        try:
+            for i in xrange(10000):
+                key_name = reg.EnumKey(adapters, i)
+                with reg.OpenKey(adapters, key_name) as adapter:
+                    try:
+                        component_id = reg.QueryValueEx(adapter, 'ComponentId')[0]
+                        if component_id == 'tap0801':
+                            return reg.QueryValueEx(adapter, 'NetCfgInstanceId')[0]
+                    except WindowsError, err:
+                        pass
+        except WindowsError, err:
+            pass
+
+def CTL_CODE(device_type, function, method, access):
+    return (device_type &lt;&lt; 16) | (access &lt;&lt; 14) | (function &lt;&lt; 2) | method;
+
+def TAP_CONTROL_CODE(request, method):
+    return CTL_CODE(34, request, method, 0)
+
+TAP_IOCTL_CONFIG_POINT_TO_POINT = TAP_CONTROL_CODE(5, 0)
+TAP_IOCTL_SET_MEDIA_STATUS = TAP_CONTROL_CODE(6, 0)
+TAP_IOCTL_CONFIG_TUN = TAP_CONTROL_CODE(10, 0)
+
+
+if __name__ == '__main__':
+    guid = get_device_guid()
+    handle = win32file.CreateFile(r'\\.\Global\%s.tap' % guid,
+                                  win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                                  win32file.FILE_SHARE_READ | win32file.FILE_SHARE_WRITE,
+                                  None, win32file.OPEN_EXISTING,
+                                  win32file.FILE_ATTRIBUTE_SYSTEM, # | win32file.FILE_FLAG_OVERLAPPED,
+                                  None)
+    print(handle.handle)
+    if False:
+        win32file.DeviceIoControl(handle, TAP_IOCTL_CONFIG_POINT_TO_POINT,
+                                  '\xc0\xa8\x11\x01\xc0\xa8\x11\x10', None);
+    else:
+        win32file.DeviceIoControl(handle, TAP_IOCTL_SET_MEDIA_STATUS, '\x01\x00\x00\x00', None)
+        win32file.DeviceIoControl(handle, TAP_IOCTL_CONFIG_TUN,
+                                  '\x0a\x03\x00\x01\x0a\x03\x00\x00\xff\xff\xff\x00', None)
+    while True:
+        l, p = win32file.ReadFile(handle, 2000)
+        q = p[:12] + p[16:20] + p[12:16] + p[20:]
+        win32file.WriteFile(handle, q)
+        print(p, q)
+    win32file.CloseHandle(handle)
+</code></pre></noscript></div>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-18T00:00:00+08:00" pubdate data-updated="true">Sep 18<span>th</span>, 2010</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html" data-via="" data-counturl="http://glacjay.github.com/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html" title="Previous Post: 通过 ODBC 接口访问 Oracle 数据库 -- Linux 篇">&laquo; 通过 ODBC 接口访问 Oracle 数据库 -- Linux 篇</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html" title="Next Post: OpenVPN 的握手协议分析">OpenVPN 的握手协议分析 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: what are you thinking about?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 lambda</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-17/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html">[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

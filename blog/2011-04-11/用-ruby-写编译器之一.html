@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>[翻译] 用 Ruby 写编译器之一：一个简单的 main 函数模板 - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="原文链接：http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html [译者抱怨：翻译好麻烦啊。] 我已经将这件事情搁置了很长时间了 &#8211; 这个系列中最早的文章甚至可以追溯到 2005 年的早期， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2011-04-11/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">[翻译] 用 Ruby 写编译器之一：一个简单的 Main 函数模板</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-11T00:00:00+08:00" pubdate data-updated="true">Apr 11<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html</a></p>
+
+<p>[译者抱怨：翻译好麻烦啊。]</p>
+
+<p>我已经将这件事情搁置了很长时间了 &#8211; 这个系列中最早的文章甚至可以追溯到 2005 年的早期，而那时我还没有开始写这个博客呢。</p>
+
+<p>我灰常喜欢编译器技术，而且我也已经写过好几个小型的编译器了。不久前我开始用 Ruby 语言写一个简单的编译器，而且我也以发表为目的记下了大量的笔记。问题在于，当我一步步地完成这个系列文章的时候，我的博客却渐渐地，没落了（？原文： Problem was I was that by the time I was finishing up the steps I have so far, my blog was languishing, and so it&#8217;s been just gathering dust. 啊，我的英文好渣）。</p>
+
+<p>我已经写完了大概 30 篇文章，并形成了一个简单但是可以工作的编译器。我也许要花上一段时间来发表它们，因为这些文章均需要一定程度的整理，而且我能花在写作上的时间不是很多。不过根据具体的时间安排，我也有可能一周就发表好几篇。</p>
+
+<p>闲话少叙，第一篇参上：</p>
+
+<h2>有关一些背景，以及一小段代码</h2>
+
+<p>通常，在开始尝试编写一个编译器时，我会选择自顶向下的开发方式。换句话说就是，我会采取常见的策略，从设计一个语法分析器开始，而不管这个分析器是手写的，还是通过分析器生成器来生成。然后我会通过一系列的树形结构转换程序将 <code>AST</code>（即 <a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree，抽象语法树</a>）转化为符号表，同时进行错误检查，为树结点附加各类信息，并最终进行代码生成的步骤。在我转而使用 Linux 之后，我在这里就会选择生成 C 代码，前提是你的语言能够很好的契合 C 的语意。从这里也可以看出，C 是一门多么低层的语言了。</p>
+
+<p>不过，我的第一个编译器是用 M68000 汇编语言写的，而且其输出也是 M68000 的汇编程序。</p>
+
+<p>我是从允许内嵌的汇编代码片断开始<a href="http://en.wikipedia.org/wiki/Bootstrapping_(compilers)">自举</a>这个编译器的，并在此基础上逐步地增加所支持的语法结构。</p>
+
+<p>首先我加入了对函数的定义以及调用的支持，并以此为基础构建我的整个编译器。然后我会增加基于寄存器的基本四则运算的支持，然后是局部变量，等等等等，但在同时也会解析汇编，以保证当遇到内嵌汇编代码片段中的寄存器时，还能够保持寄存器分配器的简洁（原文： but parse the assembly so that the register allocator would stay clear of registers used in the assembler that was interspersed. ）。</p>
+
+<p>然后这个编译器就从编译汇编语言的语法，逐渐演变成编译我所设计的杂牌语言的语法，其中的汇编也越来越少。</p>
+
+<p>我想再自举一个编译器出来。不过这次我就不打算用汇编来实现它了。这次我会<strong>从底层 &#8211; 也就是代码生成器 &#8211; 开始</strong>。并且我会完成如下几个目标：</p>
+
+<ul>
+<li><strong>实现的简洁性优先于其性能。</strong>要点在于，我希望能够将它重写为以其自身来实现。换句话说，我希望它能够实现自举（ self hosted ，跟 bootstrap 有啥区别呢？）。由于开始的代码最终会被替换掉，那么也就没有必要浪费时间在使它可以运行的更快上面。性能问题大可以以后再考虑。</li>
+<li><strong>不要做限制性能的决定。</strong>虽然性能并不是我们最初的目标，但也不能太大意，而导致今后不好对此进行改进。 Ruby ，说的就是你（ Ruby 的运行时非常的动态）。</li>
+<li><strong>实现的简洁性优先于惯例。</strong>不要仅仅因为一个特性很方便就去实现它，而仅实现那些可以帮助我们完成对编译器的自举的特性。而这就意味着，这些特性要能使我们的生活更加方便，而不仅仅是无谓地增加了实现编译器本身的难度。</li>
+<li><strong>不要急着设计语言，我们要设计的是特性。</strong>我想首先实现一个灵活而强大的代码生成器，以及一个可以支持各种功能的简洁的 <code>AST</code> 。我的意思是像 Lisp 语言那样极富表达能力的语法结构，并尽量用 Ruby 来达到相似的目标（这段翻的太渣了，请参考原文）。</li>
+<li><strong>我并不想深入学习 x86 的汇编语言，虽然我会以其作为我的目标语言。</strong>这样说有点夸张。我很熟悉 M68K 和 6510 的汇编语言，同时我也具备足够的知识来阅读 x86 的汇编程序。虽然我从来没有用它写过什么像样的代码，而且我也不打算这么做。我所需要知道的一切信息都来自于查看 gcc 产生的汇编输出。要善用 <code>gcc -S</code> 命令。虽然可能对 x86 的某些细节存在疑问，但我所具备的基础汇编知识已经足够我理解那些个汇编代码了。虽然在此过程中，我很可能会犯一些很愚蠢的错误，但我同时也可以从中学到很多知识（而且那些非常相信能够从我这里学到相关知识的人们也请注意了 - 我在这方面也只是个初学者哦）。</li>
+</ul>
+
+
+<p>听起来之后貌似会抄很多的小道，同时也会遇到很多痛苦的地方，不是吗？但这同时也会非常有趣哦！</p>
+
+<p>不管怎样，我们先从一段没什么实际用处的代码开始吧：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/bin/env ruby</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Compiler</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># Taken from gcc -S output</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="o">&lt;&lt;</span><span class="no">PROLOG</span>
+</span><span class='line'><span class="sh"> .file &quot;bootstrap.rb&quot;</span>
+</span><span class='line'><span class="sh"> .text</span>
+</span><span class='line'><span class="sh">.globl main</span>
+</span><span class='line'><span class="sh"> .type main, @function</span>
+</span><span class='line'><span class="sh">main:</span>
+</span><span class='line'><span class="sh"> leal 4(%esp), %ecx</span>
+</span><span class='line'><span class="sh"> andl $-16, %esp</span>
+</span><span class='line'><span class="sh"> pushl -4(%ecx)</span>
+</span><span class='line'><span class="sh"> pushl %ebp</span>
+</span><span class='line'><span class="sh"> movl %esp, %ebp</span>
+</span><span class='line'><span class="sh"> pushl %ecx</span>
+</span><span class='line'><span class="no">PROLOG</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">puts</span> <span class="o">&lt;&lt;</span><span class="no">EPILOG</span>
+</span><span class='line'><span class="sh"> popl %ecx</span>
+</span><span class='line'><span class="sh"> popl %ebp</span>
+</span><span class='line'><span class="sh"> leal -4(%ecx), %esp</span>
+</span><span class='line'><span class="sh"> ret</span>
+</span><span class='line'><span class="no">EPILOG</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">puts</span> <span class="o">&lt;&lt;</span><span class="no">GLOBAL_EPILOG</span>
+</span><span class='line'><span class="sh"> .size main, .-main</span>
+</span><span class='line'><span class="no">GLOBAL_EPILOG</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">prog</span> <span class="o">=</span> <span class="o">[</span><span class="ss">:puts</span><span class="p">,</span><span class="s2">&quot;Hello World&quot;</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Compiler</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">prog</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>说实话，这段代码嘛也没做。它只是把用 <code>gcc -S</code> 命令将下面这段代码编译出来的结果拆吧拆吧之后给打印出来了而已：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这可是一个完整可工作的编译器哟 &#8211; 某种程度上来说吧。不幸地是，不管用它编译什么程序，得到的都只是一段毫无用处的代码，因些可以说它本身也是同样毫无用处的。但我们总要踏出这最初的一步。</p>
+
+<p>你可以认为这个系列的文章是我的“意识流”。我做这件事仅仅是因为好玩而已。我并没打算坐下来，好好地完成一个多么赞的设计。我甚至会因为一时兴起而把一段代码给丢掉，或者之后又把它给找回来。</p>
+
+<p>你在这里将要看到的其实已经是我第二次的代码了：我所做的每一个 SVN 提交都对应于我的一篇文章，不过我会在文章中做很多额外的讲解。有时这些讲解会令我中途改变主意 &#8211; 但我不会对代码做太大的修改，除非我认为这个修改能令我的讲解更清晰，或者我一开始完全就想错掉了。就算是这样，我也多半不会做出修改，除了在那边标注一下我会在之后解决。有些时候，我也会把几个我做起来很麻烦，但解释起来又很简单的步骤合而为一。</p>
+
+<p>我在这里欢迎大家涌跃发言。不过要记住，虽然我会十分留意您的发言，但我已经完成了这个系列中的很大一部分，我不会因为某些意见而完全重写这些文章。不过我会留下一些笔记，并同时记住我之前都写了些什么内容。</p>
+
+<p>下次我会让这个编译器真正去处理它的输入的，我保证。</p>
+
+<p>[译者再次抱怨：翻译好麻烦啊。]</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-11T00:00:00+08:00" pubdate data-updated="true">Apr 11<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/compiler/'>Compiler</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2011-04-11/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html" data-via="" data-counturl="http://glacjay.github.com/blog/2011-04-11/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011-04-10/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html" title="Previous Post: [翻译] 用 Ruby 写编译器之零">&laquo; [翻译] 用 Ruby 写编译器之零</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011-04-29/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html" title="Next Post: [翻译] 用 Ruby 写编译器之二：函数调用，以及 Hello World">[翻译] 用 Ruby 写编译器之二：函数调用，以及 Hello World &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: what are you thinking about?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 lambda</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-17/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html">[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2011-04-11/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2011-04-11/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

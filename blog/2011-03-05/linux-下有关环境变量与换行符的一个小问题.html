@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案 - Random Stuff from GlacJAY</title>
+  <title>Linux 下有关环境变量与换行符的一个小问题 - Random Stuff from GlacJAY</title>
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content="我正在看虎书，在这本书中所给出的那个 MiniJava 语言的语法并不是 LALR(1) 语法，因此在某些情况下，所生成的语法分析器会对正确的输入给出语法解析错误。不过 Bison 提供了一个简单而又强大的解决方案，可以轻易的解决掉这个问题。 MiniJava 语法中的 non-LALR(1) &hellip;">
+  <meta name="description" content="最近在工作中，老是遇到一个莫名其妙的问题。我有一个用来设置一些环境变量的脚本，结果经常发现这个脚本设过的环境变量乱七八糟的，像 PATH 这种，就是之前的值跟后面添加的值重叠在了一起。直到后来才发现，原来是换行符搞的鬼。 这样说还不太清楚，上代码吧。编辑文本文件 test.sh 如下，记得以 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html">
+  <link rel="canonical" href="http://glacjay.github.com/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -67,7 +67,7 @@
   
   <header>
     
-      <h1 class="entry-title">MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</h1>
+      <h1 class="entry-title">Linux 下有关环境变量与换行符的一个小问题</h1>
     
     
       <p class="meta">
@@ -83,7 +83,7 @@
   
 
 
-<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+<time datetime="2011-03-05T00:00:00+08:00" pubdate data-updated="true">Mar 5<span>th</span>, 2011</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -92,15 +92,40 @@
   </header>
 
 
-<div class="entry-content"><p>我正在看<a href="http://www.cs.princeton.edu/~appel/modern/java/">虎书</a>，在这本书中所给出的那个 <a href="http://www.cambridge.org/us/features/052182060X/">MiniJava</a> 语言的语法并不是 LALR(1) 语法，因此在某些情况下，所生成的语法分析器会对正确的输入给出语法解析错误。不过 Bison 提供了一个简单而又强大的<a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Generalized-LR-Parsing">解决方案</a>，可以轻易的解决掉这个问题。</p>
+<div class="entry-content"><p>最近在工作中，老是遇到一个莫名其妙的问题。我有一个用来设置一些环境变量的脚本，结果经常发现这个脚本设过的环境变量乱七八糟的，像 PATH 这种，就是之前的值跟后面添加的值重叠在了一起。直到后来才发现，原来是换行符搞的鬼。</p>
 
-<p>MiniJava 语法中的 non-LALR(1) 部分其实是一个 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Shift_002fReduce">shift/reduce 冲突</a>。具体来说就是，在 <a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod7">MethodDeclaration</a> 中的 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod6">VarDeclaration</a>)<em> 和 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod5">Statement</a>)</em> 之间的状态下，当 Lookahead Token 是一个 IDENTIFIER 时，如果选择 shift ，那么下一步的动作就是进一步将这个 IDENTIFIER reduce 为一个 Type ，即将这个 IDENTIFIER 看作一个新的变量定义的开始；而如果选择 reduce 的话，实际上就是按照 (Statement)* 中的 epsilon 规则来 reduce ，即结束变量定义部分的解析，转而进入语句定义部分的解析。我们可以看到，仅仅依靠目前的信息，即 IDENTIFIER 这个 Lookahead Token ，是不足以决定接下来的动作的，因此 Bison 的默认策略，即 shift ，就会在某些情况下（这种情况其实很常见，就是当第一条语句是赋值语句时）产生错误的解析步骤。</p>
+<p>这样说还不太清楚，上代码吧。编辑文本文件 <code>test.sh</code> 如下，记得以 DOS 换行符的模式来保存：</p>
 
-<p>这个问题其实很好解决，只要 Bison 能多向前看一个 Token 就可以了，可是 Bison 是 LALR(1) 语法分析器生成器，而不是 LALR(2) 。不过 Bison 提供了另外一条解决问题的途径，就是 GLR - Generalized LR Parsing 。简单来说，就是当 Bison 遇到一个冲突时，不管是 shift/reduce 冲突，还是 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Reduce_002fReduce">reduce/reduce 冲突</a>，就会将分析路径分为两条，分别跟进两种情况。当其中一条分析路径遇到语法错误，进行不下去时，就会自动消失。如果我们的文法是没有二义性的 LR 文法的话，最后就肯定可以得到正确的分析结果了。而我们的 MiniJava 的文法就是这种情况。说来好像复杂，但用起来其实很简单，只要在我们的 Bison 文法文件中加上 %glr-parser 这个选项就可以了。</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Save this file using DOS&#39;s CR/LF.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">export </span><span class="nv">VAR1</span><span class="o">=</span>blahblahblah
+</span><span class='line'><span class="nb">export </span><span class="nv">VAR2</span><span class="o">=</span>hello
+</span><span class='line'><span class="nb">export </span><span class="nv">VAR1</span><span class="o">=</span><span class="nv">$VAR1</span>:<span class="nv">$VAR2</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>不过奇怪的是，加上这个选项之后，我们就不用再自己写 YYSTYPE 和 YYLTYPE 的定义了，搞不懂，莫非是个 Bug ？</p>
 
-<p>另外，本来我以为只要将变量定义语句也算到语句中的一种的话，这个问题也可以得到解决，不过后来发现我想错了，这样还是无法处理函数定义中的第一条语句是赋值语句的情况。未经证实，嗯，因为要改的地方还不少。</p>
+<p>然后，执行一下命令：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ . ./test.sh</span></code></pre></td></tr></table></div></figure>
+
+
+<p>来使环境变量生效，并看一下结果：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ echo $VAR1
+</span><span class='line'>:helloahblah</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然，Shell 看到的还不是这个样子，而是会把多出来的那个 CR 回车符也看作是路径（或者其他什么值）的一部分，最后当然也会导致所作的设置不生效啦。</p>
+
+<p>至于为什么会变成这种换行符，我倒是还没有搞明白，因为我的源文件确实是 Unix 风格的换行符。也许是因为是在 Windows 下用 ClearCase 来进行源码控制的关系？</p>
 </div>
 
 
@@ -123,12 +148,12 @@
   
 
 
-<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+<time datetime="2011-03-05T00:00:00+08:00" pubdate data-updated="true">Mar 5<span>th</span>, 2011</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/compiler/'>Compiler</a>
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
   
 </span>
 
@@ -137,7 +162,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html" data-via="" data-counturl="http://glacjay.github.com/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -148,10 +173,10 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html" title="Previous Post: C++ 中的纯虚析构函数与抽象类">&laquo; C++ 中的纯虚析构函数与抽象类</a>
+        <a class="basic-alignment left" href="/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html" title="Previous Post: OpenVPN 的并发测试方法">&laquo; OpenVPN 的并发测试方法</a>
       
       
-        <a class="basic-alignment right" href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html" title="Next Post: 有关 C/C++ 中的 do { ... } while (0) 惯用法">有关 C/C++ 中的 do { ... } while (0) 惯用法 &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html" title="Next Post: 发布一个寻找局域网内主机的小工具">发布一个寻找局域网内主机的小工具 &raquo;</a>
       
     </p>
   </footer>
@@ -256,8 +281,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html';
-        var disqus_url = 'http://glacjay.github.com/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html';
+        var disqus_identifier = 'http://glacjay.github.com/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html';
         var disqus_script = 'embed.js';
       
     (function () {

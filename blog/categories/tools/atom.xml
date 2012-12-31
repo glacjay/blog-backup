@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Tools | Random Stuff from GlacJAY]]></title>
+  <link href="http://glacjay.github.com/blog/categories/tools/atom.xml" rel="self"/>
+  <link href="http://glacjay.github.com/"/>
+  <updated>2012-12-31T21:43:15+08:00</updated>
+  <id>http://glacjay.github.com/</id>
+  <author>
+    <name><![CDATA[GlacJAY]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[让 Vim 在保存时自动调用外部命令进行格式化]]></title>
+    <link href="http://glacjay.github.com/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html"/>
+    <updated>2009-12-13T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2009-12-13/让-vim-在保存时自动调用外部命令进行格式化</id>
+    <content type="html"><![CDATA[<p>肯定有许多人遇到过这个问题，也肯定有许多现成的解决方案被发现，可是我没找到（或者说没耐心找）。无所谓，自己找到的话，得到的就不仅仅是最终结果了。</p>
+
+<p>闲话少说。其实以前也干过类似的事情，就是在保存的时候自动去掉所有的行末空白；不过这个操作使用 Vim 本身的功能就能实现，不需要借助于外部程序，所以只要简单地设一个 <code>BufWrite</code> 时的自动命令就行了。但当需要借助外部程序的时候，在 <code>BufWrite</code> 或者 <code>BufWritePre</code> 或者 <code>FileWritePre</code> 时执行的自动命令就不行了，老是提示说什么文件本身已更改，是否确定写入。我在这上面反覆试了好多次，才发现是自己没有搞清楚底下到底发生了什么。要让外部程序对文件内容进行格式化（或者其他什么操作。我想调的是 gofmt，顺带一提），首先当然得要那个外部程序能看到你做过的，还没有保存的更改，所以说应该是先写入再操作的，即在 <code>BufWritePost</code> 的时候执行自动命令。而我一开始就把基本步骤给搞反了。</p>
+
+<p>这一步搞对了之后，接下来的问题就是要让 Vim 知道格式化后的变化。这个我之前倒是真不知道，原来每天都要用到的 <code>:e</code> 命令，全称就是 <code>:edit</code> ，在不加参数的情况下就是干这个事情的。</p>
+
+<p><code>:edit</code> 这个命令本身的话，应该是影响不到语法高亮功能的，在我看来。我的意思是，原来是语法高亮的，执行这个命令之后应该还是会语法高亮。但是在我把上面的两步命令做成自动命令之后，代码格式化好了，却也变黑了。不得其解，于是又在后面加上了 <code>syntax enable</code> 这条命令。结果，倒是连执行外部命令之后的那个回车确认步骤都给屏掉了，算是一个意料之外的成果。</p>
+
+<p>最后，做为参考，把我的相关配置给贴出来吧。就是在文件 <code>~/.vim/ftplugin/go.vim</code> 中，加了这么一段代码：</p>
+
+<p>``` vim
+function! b:Format()</p>
+
+<pre><code>!gofmt -w %
+edit
+syntax enable
+</code></pre>
+
+<p>endfunction</p>
+
+<p>au BufWritePost  :call b:Format()
+```</p>
+
+<p>最后的最后，在 <code>c.vim</code> 中也如法炮制了一下，不过用的是 <code>indent</code> 。</p>
+
+<hr />
+
+<p><strong>Update 2010-08-18:</strong> 参考<a href="http://www.miek.nl/blog/archives/2010/08/08/formatting_go_code_with_vim/index.html">这篇文章</a>的话，可以将上面的函数修改如下：</p>
+
+<p>``` vim
+function! b:Format()</p>
+
+<pre><code>let regel=line(".")
+let regec=col(".")
+%!gofmt
+call cursor(regel, regec)
+</code></pre>
+
+<p>endfunction
+autocmd BufWritePre  :call b:Format()
+```</p>
+
+<p>这样的话，Undo History 不会因为对外部程序的调用而被清空，而且外部程序所作的修改也同时成为了 Undo History 中的一步。</p>
+]]></content>
+  </entry>
+  
+</feed>

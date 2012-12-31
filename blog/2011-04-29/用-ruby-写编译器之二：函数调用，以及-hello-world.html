@@ -1,0 +1,591 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>[翻译] 用 Ruby 写编译器之二：函数调用，以及 Hello World - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="原文地址：http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-2.html 我会选择 Ruby 来作为我的实现语言并没有什么特别的理由。在现阶段，语言的选择并不重要；不过，我确实很喜欢 Ruby。 在这之后， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2011-04-29/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">[翻译] 用 Ruby 写编译器之二：函数调用，以及 Hello World</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-29T00:00:00+08:00" pubdate data-updated="true">Apr 29<span>th</span>, 2011</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>原文地址：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-2.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-2.html</a></p>
+
+<p>我会选择 Ruby 来作为我的实现语言并没有什么特别的理由。在现阶段，语言的选择并不重要；不过，我确实很喜欢 Ruby。</p>
+
+<p>在这之后，我会采取一系列的步骤令所实现的语言向其实现语言靠拢。我的意思是，我想将编译器实现为可以<strong>自举</strong>的，即它应该能够编译自身。</p>
+
+<p>而这也就意味着，要么我的编译器需要至少支持 Ruby 语言的一个子集，要么就需要一个中间的翻译步骤，来将编译器中的实现翻译成它自己可以编译的语言。</p>
+
+<p>虽然这一点并没有限制你所用的实现语言，但那至少意味着你用来实现的语言跟你要实现的语言之间很相似，除非你对实现编译器的自举没有什么兴趣。</p>
+
+<p>这也同时意味着，如果你想实现编译器的自举，那你最好不要用实现语言中的什么复杂的特性。要记住，你得实现所有你用过的那些语言特性，不然，当你要开始做自举的时候，你就得对整个编译器的架构做大的调整了。那一点都不好玩。</p>
+
+<p>话说回来，使用 Ruby 来作为实现语言的一大优点（同样对于其他某些语言来说也是这样，比如说 Lisp ），就是你可以很容易地构建出一个树形的数据结构出来 &#8211; Ruby 的话就是用数组或者哈希， Lisp 的话就是用列表。</p>
+
+<p>这也就是说，我可以用数组来手工构建抽象语法树，从而避免了实现一个语法分析器的工作。耶！代价就是很丑，不过也可以接受的语法啦。</p>
+
+<h2>Hello World</h2>
+
+<p>Hello World 的话看起来会是这个样子的：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">[</span><span class="ss">:puts</span><span class="p">,</span> <span class="s2">&quot;Hello World&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里，我们需要处理的东西非常简单：我们需要将一个参数压入堆栈，然后调用一个函数。</p>
+
+<p>那么就让我们来看一下怎样用 x86 汇编来做这件事吧。我用 <code>gcc -S</code> 编译了下面的这段 C 程序：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">puts</span><span class="p">(</span><span class="s">&quot;Hello World&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后看看输出会是什么样子的。下面给出的是真正相关的部分，是与上一次的输出比较之后的结果：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='nasm'><span class='line'>    <span class="nf">.section</span>        <span class="nv">.rodata</span>
+</span><span class='line'><span class="nl">.LC0:</span>
+</span><span class='line'>    <span class="nf">.string</span> <span class="s">&quot;Hello World&quot;</span>
+</span><span class='line'>    <span class="nf">.text</span>
+</span><span class='line'><span class="nf">...</span>
+</span><span class='line'>    <span class="nf">subl</span>    <span class="kc">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">%</span><span class="nb">esp</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="nv">.LC0</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">puts</span>
+</span><span class='line'>    <span class="nf">addl</span>    <span class="kc">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">%</span><span class="nb">esp</span>
+</span><span class='line'><span class="nf">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果你懂一些汇编的话，就算以前没有写过 x86 的汇编程序，也应该可以很容易的看懂这段代码吧：</p>
+
+<ul>
+<li>这里首先定义了一个字符串常量。</li>
+<li>通过对堆栈指针的减 <code>4</code> 操作，在堆栈上申请了一段 <code>4</code> 个字节大小的空间。</li>
+<li>然后将之前定义的字符串常量的地址，放入刚刚申请的那 <code>4</code> 个字节的空间中。</li>
+<li>接着，我们调用了由 glibc 提供的 <code>puts</code> 函数（在这个系列中，我会假设你已经有了 gcc/gas + glibc ；Linux 的话这些东东应该已经有了）。</li>
+<li>最后，通过一个加 <code>4</code> 操作来释放堆栈空间。</li>
+</ul>
+
+
+<p>那么，我们要怎样在我们的编译器中实现这一切呢？首先，我们需要一种方法来处理那些字符串常量，通过在上次的 Compiler 类的实现中添加下面的代码（我的所有 Ruby 代码都在<a href="http://www.hokstad.com/static/compiler/step2.rb">这里</a>，这样你就知道该做什么了）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span>
+</span><span class='line'>    <span class="vi">@string_constants</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>    <span class="vi">@seq</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">get_arg</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># For now we assume strings only</span>
+</span><span class='line'>    <span class="n">seq</span> <span class="o">=</span> <span class="vi">@string_constants</span><span class="o">[</span><span class="n">a</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">seq</span> <span class="k">if</span> <span class="n">seq</span>
+</span><span class='line'>    <span class="n">seq</span> <span class="o">=</span> <span class="vi">@seq</span>
+</span><span class='line'>    <span class="vi">@seq</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="vi">@string_constants</span><span class="o">[</span><span class="n">a</span><span class="o">]</span> <span class="o">=</span> <span class="n">seq</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">seq</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这段代码就是简单地将一个字符串常量映射到一个整数上，而这个整数则对应着一个标号。相同的字符串常量会对应到相同的整数上，因此也只会被输出一次。用哈希而不是数组来保证这种唯一性是一种很常用的优化手段，不过也不一定非要这样做。</p>
+
+<p>下面这个函数是用来输出所有的字符串常量的：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">output_constants</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">.section</span><span class="se">\t</span><span class="s2">.rodata&quot;</span>
+</span><span class='line'>    <span class="vi">@string_constants</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">c</span><span class="p">,</span><span class="n">seq</span><span class="o">|</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s2">&quot;.LC</span><span class="si">#{</span><span class="n">seq</span><span class="si">}</span><span class="s2">:&quot;</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">.string </span><span class="se">\&quot;</span><span class="si">#{</span><span class="n">c</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后剩下的就是编译函数调用的代码了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">compile_exp</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">call</span> <span class="o">=</span> <span class="n">exp</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="n">to_s</span>
+</span><span class='line'>    <span class="n">args</span> <span class="o">=</span> <span class="n">exp</span><span class="o">[</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="o">-</span><span class="mi">1</span><span class="o">].</span><span class="n">collect</span> <span class="p">{</span><span class="o">|</span><span class="n">a</span><span class="o">|</span> <span class="n">get_arg</span><span class="p">(</span><span class="n">a</span><span class="p">)}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">subl</span><span class="se">\t</span><span class="s2">$4,%esp&quot;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">args</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">a</span><span class="o">|</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">movl</span><span class="se">\t</span><span class="s2">$.LC</span><span class="si">#{</span><span class="n">a</span><span class="si">}</span><span class="s2">,(%esp)&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">call</span><span class="se">\t</span><span class="si">#{</span><span class="n">call</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">addl</span><span class="se">\t</span><span class="s2">$4, %esp&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>也许你已经注意到这里的不一致性了：上面的代码虽然好像是可以处理多参数调用的样子，但却只从堆栈中减掉了一个 <code>4</code> ，而不是按照实际的参数个数而进行相应的调整，从而导致了不同参数间的相互覆盖。</p>
+
+<p>我们马上就会处理这个问题的。对于我们简单的 Hello World 程序来说，目前这样已经足够了。</p>
+
+<p>在这段代码中还有几点需要注意：</p>
+
+<ul>
+<li>我们甚至都还没有检查被调用的函数到底存不存在 &#8211; gcc/gas 会帮我们处理这个问题的，虽然这也意味着没啥帮助的错误信息。</li>
+<li>我们可以调用任何一个可以连接的函数，只要这个函数只需一个字符串作为参数。</li>
+<li>这段代码目前还有很多需要被抽像出去的地方，比如说得到被调函数地址的方法，还有所有那些硬编码进来的 x86 汇编等。相信我，我会（慢慢）解决这些问题的。</li>
+</ul>
+
+
+<p>现在我们可以来<a href="http://www.hokstad.com/static/compiler/step2.rb">试着运行一下这个编译器</a>了。你应该会得到下面这样的输出：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='nasm'><span class='line'>    <span class="nf">.text</span>
+</span><span class='line'><span class="nf">.globl</span> <span class="nv">main</span>
+</span><span class='line'>    <span class="nf">.type</span>   <span class="nv">main</span><span class="p">,</span> <span class="err">@</span><span class="nv">function</span>
+</span><span class='line'><span class="nl">main:</span>
+</span><span class='line'>    <span class="nf">leal</span>    <span class="mi">4</span><span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">),</span> <span class="o">%</span><span class="nb">ecx</span>
+</span><span class='line'>    <span class="nf">andl</span>    <span class="kc">$</span><span class="o">-</span><span class="mi">16</span><span class="p">,</span> <span class="o">%</span><span class="nb">esp</span>
+</span><span class='line'>    <span class="nf">pushl</span>   <span class="o">-</span><span class="mi">4</span><span class="p">(</span><span class="o">%</span><span class="nb">ecx</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">pushl</span>   <span class="o">%</span><span class="nb">ebp</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="o">%</span><span class="nb">esp</span><span class="p">,</span> <span class="o">%</span><span class="nb">ebp</span>
+</span><span class='line'>    <span class="nf">pushl</span>   <span class="o">%</span><span class="nb">ecx</span>
+</span><span class='line'>    <span class="nf">subl</span>    <span class="kc">$</span><span class="mi">4</span><span class="p">,</span><span class="o">%</span><span class="nb">esp</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="nv">.LC0</span><span class="p">,(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">puts</span>
+</span><span class='line'>    <span class="nf">addl</span>    <span class="kc">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">%</span><span class="nb">esp</span>
+</span><span class='line'>    <span class="nf">popl</span>    <span class="o">%</span><span class="nb">ecx</span>
+</span><span class='line'>    <span class="nf">popl</span>    <span class="o">%</span><span class="nb">ebp</span>
+</span><span class='line'>    <span class="nf">leal</span>    <span class="o">-</span><span class="mi">4</span><span class="p">(</span><span class="o">%</span><span class="nb">ecx</span><span class="p">),</span> <span class="o">%</span><span class="nb">esp</span>
+</span><span class='line'>    <span class="nf">ret</span>
+</span><span class='line'>    <span class="nf">.size</span>   <span class="nv">main</span><span class="p">,</span> <span class="nv">.</span><span class="o">-</span><span class="nv">main</span>
+</span><span class='line'>    <span class="nf">.section</span>        <span class="nv">.rodata</span>
+</span><span class='line'><span class="nl">.LC0:</span>
+</span><span class='line'>    <span class="nf">.string</span> <span class="s">&quot;Hello World&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下面来测试一下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[vidarh@dev compiler]$ ruby step2.rb &gt;hello.s
+</span><span class='line'>[vidarh@dev compiler]$ gcc -o hello hello.s
+</span><span class='line'>[vidarh@dev compiler]$ ./hello
+</span><span class='line'>Hello World
+</span><span class='line'>[vidarh@dev compiler]$</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>那么，要怎么处理多个参数的情况呢？</h2>
+
+<p>我不会再展示用来说明的 C 代码和对应的汇编代码了 &#8211; 进行不同参数个数的调用并查看其输出对你来说应该不难。相反，我就直接给出对 compile_exp 函数所做的修改了（完整的代码在<a href="http://www.hokstad.com/static/compiler/step2b.rb">这里</a>）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="no">PTR_SIZE</span><span class="o">=</span><span class="mi">4</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">compile_exp</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">call</span> <span class="o">=</span> <span class="n">exp</span><span class="o">[</span><span class="mi">0</span><span class="o">].</span><span class="n">to_s</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">args</span> <span class="o">=</span> <span class="n">exp</span><span class="o">[</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="o">-</span><span class="mi">1</span><span class="o">].</span><span class="n">collect</span> <span class="p">{</span><span class="o">|</span><span class="n">a</span><span class="o">|</span> <span class="n">get_arg</span><span class="p">(</span><span class="n">a</span><span class="p">)}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># gcc on i386 does 4 bytes regardless of arguments, and then</span>
+</span><span class='line'>    <span class="c1"># jumps up 16 at a time, We will blindly do the same.</span>
+</span><span class='line'>    <span class="n">stack_adjustment</span> <span class="o">=</span> <span class="no">PTR_SIZE</span> <span class="o">+</span> <span class="p">(((</span><span class="n">args</span><span class="o">.</span><span class="n">length</span><span class="o">+</span><span class="mi">0</span><span class="o">.</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="no">PTR_SIZE</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">.</span><span class="mi">0</span><span class="o">*</span><span class="no">PTR_SIZE</span><span class="p">))</span><span class="o">.</span><span class="n">round</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="no">PTR_SIZE</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">subl</span><span class="se">\t</span><span class="s2">$</span><span class="si">#{</span><span class="n">stack_adjustment</span><span class="si">}</span><span class="s2">, %esp&quot;</span>
+</span><span class='line'>    <span class="n">args</span><span class="o">.</span><span class="n">each_with_index</span> <span class="k">do</span> <span class="o">|</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="o">|</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">movl</span><span class="se">\t</span><span class="s2">$.LC</span><span class="si">#{</span><span class="n">a</span><span class="si">}</span><span class="s2">,</span><span class="si">#{</span><span class="n">i</span><span class="o">&gt;</span><span class="mi">0</span> <span class="o">?</span> <span class="n">i</span><span class="o">*</span><span class="no">PTR_SIZE</span> <span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="si">}</span><span class="s2">(%esp)&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">call</span><span class="se">\t</span><span class="si">#{</span><span class="n">call</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">addl</span><span class="se">\t</span><span class="s2">$</span><span class="si">#{</span><span class="n">stack_adjustment</span><span class="si">}</span><span class="s2">, %esp&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里做了什么呢？改动的地方没几个：</p>
+
+<ul>
+<li>这里不再是申请固定大小的堆栈空间了（上一个版本中是 <code>4</code> 个字节），而是根据实际参数的个数来相应的调整堆栈指针。我得承认，我不知道 gcc 为什么会做这样的调整 &#8211; 而且原因并不重要，虽然我猜这是为了堆栈的对齐。优化和清理<strong>以后</strong>再说，并且，当你不知道某事的运行机理时，那就不要去改变它。</li>
+<li>这之后，如你所见，参数被一个一个地放到堆栈上了。我们还是假定它们全都是相同大小的指针（因此在 x86 上就是 <code>4</code> 个字节）。</li>
+<li>同时你还可以看到，第一个参数是被放在堆栈中最靠下的位置的。如果你还没有写过汇编程序，并且无法想象出这是怎么回事的话，那就把它们画出来吧；还要记住，这里的堆栈是向下扩展的。当申请空间时，我们是将堆栈指针向下移动的，而拷贝参数时则是从下往上（用越来越大的索引来访问 <code>%esp</code> ，就像你访问数组时一样）。</li>
+</ul>
+
+
+<p>这个编译器现在已经可以编译下面这样的代码了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">[</span><span class="ss">:printf</span><span class="p">,</span><span class="s2">&quot;Hello %s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;World&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>至于以后嘛</h2>
+
+<p>这就是我们踏出的第一步，而且我保证之后的步骤会越来越实际的，因为只要实现很少的几个功能点，我们就可以编译实际的程序了。而且我会努力令这些步骤更加精炼，更多的说明这样做的原因，而不是仅仅解释做了什么。</p>
+
+<p>下面我会处理多个参数的调用（译者：我们不是才处理过嘛），然后是语句序列、子表达式，以及对返回值的处理，等等。</p>
+
+<p>大约十二个这样难度的步骤之后，我们就会完成函数定义、参数传递、条件判断、运行时库，甚至是一个用来实现匿名函数的简单的 lambda （真正的<a href="http://en.wikipedia.org/wiki/Closure_(computer_science)">闭包</a>就要到后面了）。</p>
+
+<p>再之后，我们会实现一个简单的文本处理程序，来对一个比 Ruby 的数组和符号更好一点的语法提供支持（只是某种程度啦，真正的语法分析得再多等等）。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-29T00:00:00+08:00" pubdate data-updated="true">Apr 29<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/compiler/'>Compiler</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2011-04-29/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html" data-via="" data-counturl="http://glacjay.github.com/blog/2011-04-29/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011-04-11/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html" title="Previous Post: [翻译] 用 Ruby 写编译器之一：一个简单的 main 函数模板">&laquo; [翻译] 用 Ruby 写编译器之一：一个简单的 main 函数模板</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011-05-02/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%EF%BC%9A%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F.html" title="Next Post: [翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式">[翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: what are you thinking about?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 lambda</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-17/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html">[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2011-04-29/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2011-04-29/%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
