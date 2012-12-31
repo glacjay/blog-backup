@@ -9,9 +9,7 @@
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content="注意，我用的软件版本为：Bison - 2.4.1，Flex - 2.5.35 。至于老的版本会怎样我就不深究了。工具不是重点。 1
-%skeleton "lalr1.cc" 可以用 1
-%language "c++" 来代替了，其中参数 &#8220;c++&#8221; 不区分大小写。 &hellip;">
+  <meta name="description" content="其实嗫，这个问题已经有标准和其他的解决方案了。标准解决方案参见 Control.Applicative 中的 ZipList ，不过这东东用起来蛮麻烦的说；其他解决方案见 bff 库的 Data.Zippable 模块，嗯，我还没搞明白这玩意怎么用，不过总感觉杀鸡用牛刀了有点（Template &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.com/">
+  <link rel="canonical" href="http://glacjay.github.com/index.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -72,7 +70,368 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/">对 Bison 手册中的 C++ 的例子的总结</a></h1>
+      <h1 class="entry-title"><a href="/blog/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0.html">在 Haskell 中实现 Generic Zip 函数</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-07-14T00:00:00+08:00" pubdate data-updated="true">Jul 14<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0.html#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>其实嗫，这个问题已经有标准和其他的解决方案了。标准解决方案参见 <code>Control.Applicative</code> 中的 <code>ZipList</code> ，不过这东东用起来蛮麻烦的说；其他解决方案见 bff 库的 <code>Data.Zippable</code> 模块，嗯，我还没搞明白这玩意怎么用，不过总感觉杀鸡用牛刀了有点（Template Haskell ，以及其他依赖）。</p>
+
+<p>所以，如果你只是跟我一样，看 <code>Data.List</code> 中的那一砣 <code>zipn</code> 不顺眼的话（其实也只是看着不顺哈，用着还是蛮顺的，反正实现不用我写），一个更简单的方案在此：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="o">&gt;</span> <span class="n">z</span> <span class="ow">::</span> <span class="p">[</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">b</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span>
+</span><span class='line'><span class="o">&gt;</span> <span class="n">z</span> <span class="ow">=</span> <span class="n">zipWith</span> <span class="p">(</span><span class="o">$</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>吼吼，够简单的吧。其实这跟 <code>Control.Monad</code> 中的 <code>ap</code> 和 <code>Control.Applicative</code> 中的是一类东东啦，只不过是针对列表的 <code>zip</code> 功能滴。</p>
+
+<p>那要怎么用嗫，也不是很麻烦啦，像这样就可以了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="p">(,)</span> <span class="p">`</span><span class="n">map</span><span class="p">`</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="p">`</span><span class="n">z</span><span class="p">`</span> <span class="s">&quot;abc&quot;</span>
+</span><span class='line'><span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="n">&#39;a&#39;</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="n">&#39;b&#39;</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="n">&#39;c&#39;</span><span class="p">)]</span>
+</span><span class='line'><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="p">(,,)</span> <span class="p">`</span><span class="n">map</span><span class="p">`</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="p">`</span><span class="n">z</span><span class="p">`</span> <span class="s">&quot;abc&quot;</span> <span class="p">`</span><span class="n">z</span><span class="p">`</span> <span class="p">[</span><span class="kt">Nothing</span><span class="p">,</span> <span class="kt">Just</span> <span class="kt">False</span><span class="p">,</span> <span class="kt">Just</span> <span class="kt">True</span><span class="p">]</span>
+</span><span class='line'><span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="n">&#39;a&#39;</span><span class="p">,</span><span class="kt">Nothing</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="n">&#39;b&#39;</span><span class="p">,</span><span class="kt">Just</span> <span class="kt">False</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="n">&#39;c&#39;</span><span class="p">,</span><span class="kt">Just</span> <span class="kt">True</span><span class="p">)]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里的 <code>map</code> 所对应的自然就是 <code>Control.Applicative</code> 中的啦。</p>
+
+<p>还有更好玩的哦，如果再加上<a href="/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html">上一篇博</a>中的不定参函数
+的话呢：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="n">buildList</span> <span class="p">`</span><span class="n">map</span><span class="p">`</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="p">`</span><span class="n">z</span><span class="p">`</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span> <span class="ow">::</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">]]</span>
+</span><span class='line'><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="n">buildList</span> <span class="p">`</span><span class="n">map</span><span class="p">`</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="p">`</span><span class="n">z</span><span class="p">`</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span> <span class="p">`</span><span class="n">z</span><span class="p">`</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span> <span class="ow">::</span> <span class="p">[[</span><span class="kt">Int</span><span class="p">]]</span>
+</span><span class='line'><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">7</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">9</span><span class="p">]]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>那我这次要说得就这么多啦，至于怎么用，就请大家尽情地发挥你们的想象力吧（其实是我
+想象力不够 :-(）</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html">Haskell 中的可变长参数列表</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-05-06T00:00:00+08:00" pubdate data-updated="true">May 6<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>说实话，我之前有就这个题目很有激情地写了很长很罗嗦的一篇草稿的，哦，确切来说是大半篇，直到被打断，激情不再，这篇草稿也就此躺了两个多月。好吧，其实是我还不是八卦那块料，就不卖弄了，直接总结。</p>
+
+<p>要在 Haskell 中实现可变长参数列表，就是利用其 Typeclass 系统，对函数进行最终结果类型和中间函数类型之间的重载，然后利用 Haskell 的类型推导机制为我们自动调用合适的重载版本。嗯，就这么简单。下面是一个最简单的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">class</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="n">r</span> <span class="o">|</span> <span class="n">r</span> <span class="ow">-&gt;</span> <span class="n">a</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildList&#39;</span> <span class="ow">::</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="n">r</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildList&#39;</span> <span class="ow">=</span> <span class="n">id</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildList&#39;</span> <span class="n">as</span> <span class="ow">=</span> <span class="nf">\</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">buildList&#39;</span> <span class="o">$</span> <span class="n">as</span> <span class="o">++</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">buildList</span> <span class="ow">::</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="n">r</span>
+</span><span class='line'><span class="nf">buildList</span> <span class="ow">=</span> <span class="n">buildList&#39;</span> <span class="kt">[]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>好吧，这个例子我是从<a href="http://okmij.org/ftp/Haskell/vararg-fn.lhs">这里</a>看到的，或者说我就是从这里学到这个东东的。在此友情提醒那些和我一样不怎么有耐心的家伙一句，原理解释在后面。</p>
+
+<p>按照我的想法，上面这个例子应该还可以进一步简化以去掉对两个语言扩展的依赖的，就是写一个 <code>buildIntList</code> 的特化版本，结果不幸地失败了。有知道的大大告诉我一声，在下洗耳恭听。</p>
+
+<p><strong>Update</strong>: 不需要大大们来告诉我了，我已经知道该怎么简化上面的这个 <code>buildList</code> 了，不过简化后的版本是 <code>buildCharList</code> ，也就是 <code>buildString</code> 啦，而不是原先说的 <code>buildIntList</code> 。先看实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">class</span> <span class="kt">BuildString</span> <span class="n">r</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildString&#39;</span> <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="n">r</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildString</span> <span class="p">[</span><span class="kt">Char</span><span class="p">]</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildString&#39;</span> <span class="ow">=</span> <span class="n">id</span>             <span class="c1">-- or whatever you want</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildString</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="kt">BuildString</span> <span class="p">(</span><span class="kt">Char</span> <span class="ow">-&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildString&#39;</span> <span class="n">cs</span> <span class="ow">=</span> <span class="nf">\</span><span class="n">c</span> <span class="ow">-&gt;</span> <span class="n">buildString&#39;</span> <span class="o">$</span> <span class="n">cs</span> <span class="o">++</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">buildString</span> <span class="ow">::</span> <span class="kt">BuildString</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="n">r</span>
+</span><span class='line'><span class="nf">buildString</span> <span class="ow">=</span> <span class="n">buildString&#39;</span> <span class="kt">[]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样就把对 <code>MultiParameterTypeClass</code> 和 <code>FunctionalDependency</code> 的依赖给简化掉了，可是又同时增加了对 <code>-XFlexibleInstances</code> 选项的需要（因为 <code>instance BuildString [Char] where</code> 这一行；如果你想把 <code>[Char]</code> 写成 <code>String</code> 的话，就还要再加上个 <code>-XTypeSynonymInstances</code>），暂时想不到更好的办法了。</p>
+
+<p>另外，关于我在这里为什么要用 <code>Char</code> 而不是 <code>Int</code> 呢，是因为 <code>'a'</code> 的类型很明确，就是 <code>Char</code> ，而 <code>5</code> 的类型就不明确了，因此，你可以这样调用 <code>buildString</code> ：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="o">*</span><span class="kt">TestVarargs</span><span class="o">&gt;</span> <span class="n">buildString</span> <span class="n">&#39;a&#39;</span> <span class="n">&#39;b&#39;</span> <span class="n">&#39;c&#39;</span> <span class="ow">::</span> <span class="kt">String</span>
+</span><span class='line'><span class="s">&quot;abc&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可是却必须这样调用 <code>buildIntList</code> ：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="o">*</span><span class="kt">TestVarargs</span><span class="o">&gt;</span> <span class="n">buildIntList</span> <span class="p">(</span><span class="mi">1</span><span class="ow">::</span><span class="kt">Int</span><span class="p">)</span> <span class="p">(</span><span class="mi">2</span><span class="ow">::</span><span class="kt">Int</span><span class="p">)</span> <span class="p">(</span><span class="mi">3</span><span class="ow">::</span><span class="kt">Int</span><span class="p">)</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span>
+</span><span class='line'><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>虽然在我看来，GHC 应该可以倒推出每个参数的类型的，可他就是不认，我暂时也没什么办法。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html">有关 C/C++ 中的 Do { &#8230; } While (0) 惯用法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-04-08T00:00:00+08:00" pubdate data-updated="true">Apr 8<span>th</span>, 2009</time>
+        
+         | <a href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>C/C++ 中的宏是个让人又爱又恨的家伙（感觉这句话好俗啊），在带给我们很强大的 Power 的同时，却也需要我们绝对的细心，而这也是在宏定义中诸多惯用法的由来。</p>
+
+<p>当我们要把一组语句定义成一个宏，并希望像用一条语句那样来使用它的时候，我们就可以这样做：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#define MACROX \</span>
+</span><span class='line'><span class="cp">    do { \</span>
+</span><span class='line'><span class="cp">        statement1 \</span>
+</span><span class='line'><span class="cp">        statement2 \</span>
+</span><span class='line'><span class="cp">        ... \</span>
+</span><span class='line'><span class="cp">    } while (0)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>之后，我们只要在调用方写 <code>MACROX;</code> 就可以了。之所以不能简单的用花括号把这一组语句括起来，是为了防止扰乱 <code>if</code> 语句中的 <code>else</code> 子句的匹配问题。嗯，确实是个不错的主意啊，直到我遇到了一个，嗯，也许只有我才会遇到的问题。那就是，我在这组语句中，不能用 <code>break</code> 和 <code>continue</code> 。是不是觉得这需求蛮诡异的，呵呵，连我自己都觉得，不过这是我在重构一些相似的循环体时遇到的。但总之，我是找到了另外的一种包装方法啦，自己想想也没什么问题，大概，就像下面这样：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#define MACROX \</span>
+</span><span class='line'><span class="cp">    if (true) { \</span>
+</span><span class='line'><span class="cp">        statement1 \</span>
+</span><span class='line'><span class="cp">        statement2 \</span>
+</span><span class='line'><span class="cp">        ... \</span>
+</span><span class='line'><span class="cp">    } else</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>嗯，看起来是不是要比大家都知道的那个诡异很多啊。不管了，以后发现问题了再说吧。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html">MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+        
+         | <a href="/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>我正在看<a href="http://www.cs.princeton.edu/~appel/modern/java/">虎书</a>，在这本书中所给出的那个 <a href="http://www.cambridge.org/us/features/052182060X/">MiniJava</a> 语言的语法并不是 LALR(1) 语法，因此在某些情况下，所生成的语法分析器会对正确的输入给出语法解析错误。不过 Bison 提供了一个简单而又强大的<a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Generalized-LR-Parsing">解决方案</a>，可以轻易的解决掉这个问题。</p>
+
+<p>MiniJava 语法中的 non-LALR(1) 部分其实是一个 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Shift_002fReduce">shift/reduce 冲突</a>。具体来说就是，在 <a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod7">MethodDeclaration</a> 中的 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod6">VarDeclaration</a>)<em> 和 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod5">Statement</a>)</em> 之间的状态下，当 Lookahead Token 是一个 IDENTIFIER 时，如果选择 shift ，那么下一步的动作就是进一步将这个 IDENTIFIER reduce 为一个 Type ，即将这个 IDENTIFIER 看作一个新的变量定义的开始；而如果选择 reduce 的话，实际上就是按照 (Statement)* 中的 epsilon 规则来 reduce ，即结束变量定义部分的解析，转而进入语句定义部分的解析。我们可以看到，仅仅依靠目前的信息，即 IDENTIFIER 这个 Lookahead Token ，是不足以决定接下来的动作的，因此 Bison 的默认策略，即 shift ，就会在某些情况下（这种情况其实很常见，就是当第一条语句是赋值语句时）产生错误的解析步骤。</p>
+
+<p>这个问题其实很好解决，只要 Bison 能多向前看一个 Token 就可以了，可是 Bison 是 LALR(1) 语法分析器生成器，而不是 LALR(2) 。不过 Bison 提供了另外一条解决问题的途径，就是 GLR - Generalized LR Parsing 。简单来说，就是当 Bison 遇到一个冲突时，不管是 shift/reduce 冲突，还是 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Reduce_002fReduce">reduce/reduce 冲突</a>，就会将分析路径分为两条，分别跟进两种情况。当其中一条分析路径遇到语法错误，进行不下去时，就会自动消失。如果我们的文法是没有二义性的 LR 文法的话，最后就肯定可以得到正确的分析结果了。而我们的 MiniJava 的文法就是这种情况。说来好像复杂，但用起来其实很简单，只要在我们的 Bison 文法文件中加上 %glr-parser 这个选项就可以了。</p>
+
+<p>不过奇怪的是，加上这个选项之后，我们就不用再自己写 YYSTYPE 和 YYLTYPE 的定义了，搞不懂，莫非是个 Bug ？</p>
+
+<p>另外，本来我以为只要将变量定义语句也算到语句中的一种的话，这个问题也可以得到解决，不过后来发现我想错了，这样还是无法处理函数定义中的第一条语句是赋值语句的情况。未经证实，嗯，因为要改的地方还不少。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html">C++ 中的纯虚析构函数与抽象类</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+        
+         | <a href="/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>我以前只知道，在 C++ 中，如果要表示一个类是抽象基类，只要为它定义一个纯虚析构函数就可以了，没想到今天用到的时候才发现，连接的时候通不过，说没有找到那个函数的定义。到网上一搜才知道，原来纯虚函数也是可以有定义的啊。在实现文件中加上它的空定义之后，一切就 OK 了。</p>
+
+<p>不过，因为我那个基类里面已经有了一个纯虚函数，所以貌似没必要把析构函数也定义成纯虚的。</p>
+
+<p>PS. 在 C++ 里面要实现 AST 还真是一件麻烦的体力劳动，要写那么多类，每个类还得写那么一砣的样板代码。幸好不是那种长期运行的服务器程序，不需要太考虑 memory leak 的问题，就不用写析构函数和 delete 了（实际上是懒得写），不然样板代码还要更大砣。不知道有什么更好的方法没。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93.html">对 Bison 手册中的 C++ 的例子的总结</a></h1>
     
     
       <p class="meta">
@@ -90,7 +449,7 @@
 
 <time datetime="2009-03-19T00:00:00+08:00" pubdate data-updated="true">Mar 19<span>th</span>, 2009</time>
         
-         | <a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/#disqus_thread">Comments</a>
+         | <a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93.html#disqus_thread">Comments</a>
         
       </p>
     
@@ -169,7 +528,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">Bison 中的 Prologue 的格式变迁</a></h1>
+      <h1 class="entry-title"><a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81.html">Bison 中的 Prologue 的格式变迁</a></h1>
     
     
       <p class="meta">
@@ -187,7 +546,7 @@
 
 <time datetime="2009-03-18T00:00:00+08:00" pubdate data-updated="true">Mar 18<span>th</span>, 2009</time>
         
-         | <a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/#disqus_thread">Comments</a>
+         | <a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81.html#disqus_thread">Comments</a>
         
       </p>
     
@@ -219,11 +578,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/">对 Bison 手册中的 C++ 的例子的总结</a>
+        <a href="/blog/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0.html">在 Haskell 中实现 Generic zip 函数</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">Bison 中的 Prologue 的格式变迁</a>
+        <a href="/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html">Haskell 中的可变长参数列表</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html">有关 C/C++ 中的 do { &#8230; } while (0) 惯用法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html">MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html">C++ 中的纯虚析构函数与抽象类</a>
       </li>
     
   </ul>

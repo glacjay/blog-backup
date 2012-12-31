@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Compiler - Random Stuff from GlacJAY</title>
+  <title>C++ 中的纯虚析构函数与抽象类 - Random Stuff from GlacJAY</title>
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content="Category: Compiler">
+  <meta name="description" content="我以前只知道，在 C++ 中，如果要表示一个类是抽象基类，只要为它定义一个纯虚析构函数就可以了，没想到今天用到的时候才发现，连接的时候通不过，说没有找到那个函数的定义。到网上一搜才知道，原来纯虚函数也是可以有定义的啊。在实现文件中加上它的空定义之后，一切就 OK 了。 不过， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.comblog/categories/compiler/index.html">
+  <link rel="canonical" href="http://glacjay.github.com/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -63,64 +63,101 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Compiler</h1>
+    
+      <h1 class="entry-title">C++ 中的纯虚析构函数与抽象类</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>我以前只知道，在 C++ 中，如果要表示一个类是抽象基类，只要为它定义一个纯虚析构函数就可以了，没想到今天用到的时候才发现，连接的时候通不过，说没有找到那个函数的定义。到网上一搜才知道，原来纯虚函数也是可以有定义的啊。在实现文件中加上它的空定义之后，一切就 OK 了。</p>
 
-  
-  <h2>2009</h2>
+<p>不过，因为我那个基类里面已经有了一个纯虚函数，所以貌似没必要把析构函数也定义成纯虚的。</p>
 
-<article>
-  
-<h1><a href="/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html">MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</a></h1>
-<time datetime="2009-03-22T00:00:00+08:00" pubdate><span class='month'>Mar</span> <span class='day'>22</span> <span class='year'>2009</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/compiler/'>Compiler</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93.html">对 Bison 手册中的 C++ 的例子的总结</a></h1>
-<time datetime="2009-03-19T00:00:00+08:00" pubdate><span class='month'>Mar</span> <span class='day'>19</span> <span class='year'>2009</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/compiler/'>Compiler</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81.html">Bison 中的 Prologue 的格式变迁</a></h1>
-<time datetime="2009-03-18T00:00:00+08:00" pubdate><span class='month'>Mar</span> <span class='day'>18</span> <span class='year'>2009</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/compiler/'>Compiler</a></span>
-</footer>
-
-
-</article>
-
+<p>PS. 在 C++ 里面要实现 AST 还真是一件麻烦的体力劳动，要写那么多类，每个类还得写那么一砣的样板代码。幸好不是那种长期运行的服务器程序，不需要太考虑 memory leak 的问题，就不用写析构函数和 delete 了（实际上是懒得写），不然样板代码还要更大砣。不知道有什么更好的方法没。</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-03-22T00:00:00+08:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2009</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93.html" title="Previous Post: 对 Bison 手册中的 C++ 的例子的总结">&laquo; 对 Bison 手册中的 C++ 的例子的总结</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html" title="Next Post: MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案">MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案 &raquo;</a>
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -214,7 +251,10 @@
       var disqus_shortname = 'glacjay';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

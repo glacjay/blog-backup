@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Bison 中的 Prologue 的格式变迁 - Random Stuff from GlacJAY</title>
+  <title>Category: Programming - Random Stuff from GlacJAY</title>
   <meta name="author" content="GlacJAY">
 
   
-  <meta name="description" content="今天在用 Bison 手册中的 C++ 例子作为一个编译器前端实现的起点时发现，这个官方示例居然编译通不过，具体错误为在 Bison 生成的头文件中，没有 Driver 类的声明。按照 POSIX Yacc 标准，位于 %union 块之前的 Prologue 区中的代码，应该会被拷到头文件中的啊 &hellip;">
+  <meta name="description" content="Category: Programming">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">
+  <link rel="canonical" href="http://glacjay.github.comblog/categories/programming/index.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -63,99 +63,78 @@
   <div id="main">
     <div id="content">
       <div>
-<article class="hentry" role="article">
+<article role="article">
   
   <header>
-    
-      <h1 class="entry-title">Bison 中的 Prologue 的格式变迁</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-03-18T00:00:00+08:00" pubdate data-updated="true">Mar 18<span>th</span>, 2009</time>
-        
-         | <a href="#disqus_thread">Comments</a>
-        
-      </p>
+    <h1 class="entry-title">Category: Programming</h1>
     
   </header>
-
-
-<div class="entry-content"><p>今天在用 Bison 手册中的 C++ 例子作为一个编译器前端实现的起点时发现，这个官方示例居然编译通不过，具体错误为在 Bison 生成的头文件中，没有 Driver 类的声明。按照 POSIX Yacc 标准，位于 %union 块之前的 Prologue 区中的代码，应该会被拷到头文件中的啊，于是 google 半天，在某个地方的 Bison ChangeLog 中找到了线索。</p>
-
-<p>原来，POSIX Yacc 确实应该符合上述行为，可是 Bison 这家伙为了统一性，从 2.3a 版开始，就把所有 Prologue 中的代码，不管是 %union 前的还是之后的，统统只拷到实现文件中而不管头文件了。而为了对应不同的需求，又新增了一套 Prologue 语法，就是 %before-header 等四个新的 directive。好吧，这样也不错，以显式的统一格式的声明代替了可能会让人抓狂的隐规则。遂试之，结果告诉我说语法错误。接着往上看 ChangeLog 才发现，到了 2.3b 就又改了，把 %before-header 改成了 %code 之类的。这回终于没问题了。</p>
-
-<p>我说，这也太不厚道了吧，这种兼容性改动，我在它的文档里面扒了半天都没看到半个字，而且还是出现在流行度这么高的软件中。于是深刻体会到“错文档不如无文档”的道理啊。由此看来，要做好软件还是需要有相当的责任感的啊。</p>
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
-
-      
-
-
-
-
-
+  <div id="blog-archives" class="category">
 
 
 
   
+  <h2>2009</h2>
+
+<article>
+  
+<h1><a href="/blog/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0.html">在 Haskell 中实现 Generic zip 函数</a></h1>
+<time datetime="2009-07-14T00:00:00+08:00" pubdate><span class='month'>Jul</span> <span class='day'>14</span> <span class='year'>2009</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/programming/'>Programming</a></span>
+</footer>
 
 
-<time datetime="2009-03-18T00:00:00+08:00" pubdate data-updated="true">Mar 18<span>th</span>, 2009</time>
-      
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/compiler/'>Compiler</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/" data-via="" data-counturl="http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/" >Tweet</a>
-  
-  
-  <div class="g-plusone" data-size="medium"></div>
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-      
-        <a class="basic-alignment right" href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/" title="Next Post: 对 Bison 手册中的 C++ 的例子的总结">对 Bison 手册中的 C++ 的例子的总结 &raquo;</a>
-      
-    </p>
-  </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+<article>
+  
+<h1><a href="/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html">Haskell 中的可变长参数列表</a></h1>
+<time datetime="2009-05-06T00:00:00+08:00" pubdate><span class='month'>May</span> <span class='day'>06</span> <span class='year'>2009</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/programming/'>Programming</a></span>
+</footer>
+
+
+</article>
+
+
+
+<article>
+  
+<h1><a href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html">有关 C/C++ 中的 do { ... } while (0) 惯用法</a></h1>
+<time datetime="2009-04-08T00:00:00+08:00" pubdate><span class='month'>Apr</span> <span class='day'>08</span> <span class='year'>2009</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/programming/'>Programming</a></span>
+</footer>
+
+
+</article>
+
+
+
+<article>
+  
+<h1><a href="/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html">C++ 中的纯虚析构函数与抽象类</a></h1>
+<time datetime="2009-03-22T00:00:00+08:00" pubdate><span class='month'>Mar</span> <span class='day'>22</span> <span class='year'>2009</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/programming/'>Programming</a></span>
+</footer>
+
+
+</article>
+
 </div>
-  </section>
+
+  
+</article>
 
 </div>
 
@@ -166,11 +145,23 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/">对 Bison 手册中的 C++ 的例子的总结</a>
+        <a href="/blog/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0.html">在 Haskell 中实现 Generic zip 函数</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/">Bison 中的 Prologue 的格式变迁</a>
+        <a href="/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html">Haskell 中的可变长参数列表</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html">有关 C/C++ 中的 do { ... } while (0) 惯用法</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.html">MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB.html">C++ 中的纯虚析构函数与抽象类</a>
       </li>
     
   </ul>
@@ -237,10 +228,7 @@
       var disqus_shortname = 'glacjay';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/';
-        var disqus_url = 'http://glacjay.github.com/blog/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
