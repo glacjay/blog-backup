@@ -920,7 +920,7 @@
 
 <p>在 Linux 内核中，特别是在现在的发行版中，应该都已经有了 <code>TUN/TAP</code> 虚拟网卡的驱动程序，看一下有没有 <code>/dev/net/tun</code> 这个文件就可以知道了。如果没有，就执行一下 <code>sudo modprobe tun</code> 这个命令吧。如果还是没有，那就 Google 之吧。下面上代码：</p>
 
-<div><script src='https://gist.github.com/585369.js?file='></script>
+<div><script src='https://gist.github.com/585369.js'></script>
 <noscript><pre><code>import fcntl
 import os
 import struct
@@ -990,7 +990,7 @@ while True:
 
 <p>下面的代码则在 Mac 环境中实现了同样的功能（不过还没有设置用户身份的功能）：</p>
 
-<div><script src='https://gist.github.com/586860.js?file='></script>
+<div><script src='https://gist.github.com/586860.js'></script>
 <noscript><pre><code>import os
 import subprocess
 
@@ -1539,7 +1539,7 @@ if __name__ == '__main__':
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - GlacJAY -
+  Copyright &copy; 2013 - GlacJAY -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
