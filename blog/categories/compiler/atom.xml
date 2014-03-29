@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Compiler | Random Stuff from GlacJAY]]></title>
-  <link href="http://glacjay.info/blog/categories/compiler/atom.xml" rel="self"/>
-  <link href="http://glacjay.info/"/>
-  <updated>2014-03-30T00:23:29+08:00</updated>
-  <id>http://glacjay.info/</id>
+  <link href="http://glacjay.github.com/blog/categories/compiler/atom.xml" rel="self"/>
+  <link href="http://glacjay.github.com/"/>
+  <updated>2014-03-30T00:33:06+08:00</updated>
+  <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[[转载] Compilers: what are you thinking about?]]></title>
-    <link href="http://glacjay.info/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html"/>
+    <link href="http://glacjay.github.com/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html"/>
     <updated>2011-07-26T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-07-26/转载-compilers-what-are-you-thinking-about</id>
+    <id>http://glacjay.github.com/blog/2011-07-26/转载-compilers-what-are-you-thinking-about</id>
     <content type="html"><![CDATA[<p>最近在翻看以前加星的 Google Reader 文章，把有用的整理出来打标签，然后就看到了这篇。原文作者的博客现在不知道被丢到哪边去了，搜也搜不到，转到这里，权当保存一下吧。</p>
 
 <p>原文链接：<a href="http://www.onebadseed.com/blog/?p=119">Compilers: what are you thinking about?</a>。当然，已经打不开了。</p>
@@ -48,9 +48,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之六：匿名函数 lambda]]></title>
-    <link href="http://glacjay.info/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html"/>
     <updated>2011-05-21T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-21/翻译-用-ruby-写编译器之六：匿名函数-lambda</id>
+    <id>http://glacjay.github.com/blog/2011-05-21/翻译-用-ruby-写编译器之六：匿名函数-lambda</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html</a></p>
 
 <p>既然上次已经提到说，我们其实是在从 Lisp、Scheme 还有类似的其他语言中借鉴各种要实现的功能（我没想过要把这个项目做成原创的⋯⋯或者至少也要等到以后再说吧），那么现在也<strong>是时候</strong>实现一些更加强大的功能了。</p>
@@ -229,9 +229,9 @@ $
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句]]></title>
-    <link href="http://glacjay.info/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html"/>
     <updated>2011-05-17T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-17/翻译-用-ruby-写编译器之五：整数常量，以及-if-语句</id>
+    <id>http://glacjay.github.com/blog/2011-05-17/翻译-用-ruby-写编译器之五：整数常量，以及-if-语句</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html</a></p>
 
 <p>上次我承诺会发布的更快一些，不过还是失败了⋯⋯作为补偿，这章的内容将会是原计划中的第 5，6，7 章内容的合并，因为这三章确实都很短。闲话少叙：</p>
@@ -502,9 +502,9 @@ $
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持]]></title>
-    <link href="http://glacjay.info/blog/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%8C%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%8C%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81.html"/>
     <updated>2011-05-09T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-09/翻译-用-ruby-写编译器之四：自定义函数，以及运行时支持</id>
+    <id>http://glacjay.github.com/blog/2011-05-09/翻译-用-ruby-写编译器之四：自定义函数，以及运行时支持</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html</a></p>
 
 <p>抱歉，又拖了很长时间。要忙的事情实在很多。正如上一篇文章末尾提到的那样，这次要讲的是自定义函数，以及一个简单的“运行时库”。</p>
@@ -671,9 +671,9 @@ $
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式]]></title>
-    <link href="http://glacjay.info/blog/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%EF%BC%9A%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%EF%BC%9A%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F.html"/>
     <updated>2011-05-02T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-02/翻译-用-ruby-写编译器之三：语句序列，以及子表达式</id>
+    <id>http://glacjay.github.com/blog/2011-05-02/翻译-用-ruby-写编译器之三：语句序列，以及子表达式</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up&mdash;-step-3.html</a></p>
 
 <p><strong>我本来是想要早点发表的，可是我这周又不行了 &mdash; 虽然整理一篇旧文只需要半个小时。不管怎样，这是第三章，而且我会在末尾大概列一下之后的大纲。由于我会试着把一些小的步骤组合成更有内容的章节（下面就有个这样的例子），因此原来的 30 篇文章已经被我给减到了 20 篇左右（当然，这只是我已经完成了的，后面还有新的呢）。</strong></p>

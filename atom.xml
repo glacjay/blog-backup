@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Random Stuff from GlacJAY]]></title>
-  <link href="http://glacjay.info/atom.xml" rel="self"/>
-  <link href="http://glacjay.info/"/>
-  <updated>2014-03-30T00:23:29+08:00</updated>
-  <id>http://glacjay.info/</id>
+  <link href="http://glacjay.github.com/atom.xml" rel="self"/>
+  <link href="http://glacjay.github.com/"/>
+  <updated>2014-03-30T00:33:06+08:00</updated>
+  <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[OpenSSL 与 WinSock2 配合使用时遇到的一个坑]]></title>
-    <link href="http://glacjay.info/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html"/>
+    <link href="http://glacjay.github.com/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html"/>
     <updated>2014-03-29T23:06:38+08:00</updated>
-    <id>http://glacjay.info/blog/2014-03-29/openssl-与-winsock2-配合使用时遇到的一个坑</id>
+    <id>http://glacjay.github.com/blog/2014-03-29/openssl-与-winsock2-配合使用时遇到的一个坑</id>
     <content type="html"><![CDATA[<p>今天才发现，这里已经两年多没有被照看过了，估计连树都要长出来了吧。</p>
 
 <p>在用 Windows 的 WSAEventSelect 模式进行网络编程时，比较固定的一个模式是这样的：</p>
@@ -89,10 +89,10 @@
   
   <entry>
     <title type="html"><![CDATA[修改 OpenVPN 实现加密算法的自动协商]]></title>
-    <link href="http://glacjay.info/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html"/>
+    <link href="http://glacjay.github.com/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html"/>
     <updated>2011-09-17T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-09-17/修改-openvpn-实现加密算法的自动协商</id>
-    <content type="html"><![CDATA[<p>由<a href="http://glacjay.info/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">另一篇博</a>中的分析可知，OpenVPN 中有两个加解密通道。一条是标准的 SSL 协议通道，被 OpenVPN 用于协商自己所用的密钥。这个通道的加密算法当然也是通过 SSL 协议来进行协商的，可以通过 <code>--tls-cipher</code> 选项来进行配置。另一条是 OpenVPN 自己的加解密通道，用于交换实际的数据，也就是虚拟网卡抓到的 IP 报文。这个通道的加密算法则是通过 <code>--cipher</code> 和 <code>--auth</code> 两个选项，分别在通调两端指定的。</p>
+    <id>http://glacjay.github.com/blog/2011-09-17/修改-openvpn-实现加密算法的自动协商</id>
+    <content type="html"><![CDATA[<p>由<a href="http://glacjay.github.com/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">另一篇博</a>中的分析可知，OpenVPN 中有两个加解密通道。一条是标准的 SSL 协议通道，被 OpenVPN 用于协商自己所用的密钥。这个通道的加密算法当然也是通过 SSL 协议来进行协商的，可以通过 <code>--tls-cipher</code> 选项来进行配置。另一条是 OpenVPN 自己的加解密通道，用于交换实际的数据，也就是虚拟网卡抓到的 IP 报文。这个通道的加密算法则是通过 <code>--cipher</code> 和 <code>--auth</code> 两个选项，分别在通调两端指定的。</p>
 
 <p>对于第二条通道的加密算法，必须要同时在两端分别指定一致的选项，有时候不是很方便（当然，我研究的还是 2.1.1 版本的 OpenVPN ，不知道最新的版本还是不是这样）。比如说，我想通过在服务端修改配置，指定加密算法，然后让连接我的客户端自动用同一个算法。最简单的修改思路，就是借用第一条通道中的算法协商机制，从 SSL 对象中取得协商出来的算法。</p>
 
@@ -131,9 +131,9 @@
   
   <entry>
     <title type="html"><![CDATA[编写自己的 Web 版 Google Reader 客户端]]></title>
-    <link href="http://glacjay.info/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html"/>
+    <link href="http://glacjay.github.com/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html"/>
     <updated>2011-08-11T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-08-11/编写自己的-web-版-google-reader-客户端</id>
+    <id>http://glacjay.github.com/blog/2011-08-11/编写自己的-web-版-google-reader-客户端</id>
     <content type="html"><![CDATA[<p>最近花在路上的时间明显变多了，手机就成了我打发这些路上时间的利器。小说神马的看太多也会腻，正好 Google Reader 中也积累了大量的未读文章，因此用手机看看订阅文章就成了一个比较好的选择。</p>
 
 <p>但多次使用下来，却也发现了很多 Google 原版 Web 界面的不方便之处。Google 提供了两个版本的 Reader 界面给手机，一个是苹果风格的 <code>/i/</code> 界面，设计得很漂亮，功能也很全，用 Nokia 手机也能看，但太费流量（未证实，只是感觉，大概是因为一次加载了很多的文章吧），而且在网络状况不好的时候，体验不太好。另一个是 <code>/m/</code> 界面，很简洁，选项不多，但也总有些这样那样的细节另我不太满意，下面详述。然后又去找 Nokia 的 S60v3 客户端软件，总之是没一个喜欢啦。作为一个 Geek （至少是自称），在这种情况下，最佳选择自然就是打造一个自己专属的解决方案啦。</p>
@@ -176,9 +176,9 @@
   
   <entry>
     <title type="html"><![CDATA[[转载] Compilers: What Are You Thinking About?]]></title>
-    <link href="http://glacjay.info/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html"/>
+    <link href="http://glacjay.github.com/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html"/>
     <updated>2011-07-26T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-07-26/转载-compilers-what-are-you-thinking-about</id>
+    <id>http://glacjay.github.com/blog/2011-07-26/转载-compilers-what-are-you-thinking-about</id>
     <content type="html"><![CDATA[<p>最近在翻看以前加星的 Google Reader 文章，把有用的整理出来打标签，然后就看到了这篇。原文作者的博客现在不知道被丢到哪边去了，搜也搜不到，转到这里，权当保存一下吧。</p>
 
 <p>原文链接：<a href="http://www.onebadseed.com/blog/?p=119">Compilers: what are you thinking about?</a>。当然，已经打不开了。</p>
@@ -209,9 +209,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之六：匿名函数 Lambda]]></title>
-    <link href="http://glacjay.info/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html"/>
     <updated>2011-05-21T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-21/翻译-用-ruby-写编译器之六：匿名函数-lambda</id>
+    <id>http://glacjay.github.com/blog/2011-05-21/翻译-用-ruby-写编译器之六：匿名函数-lambda</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html</a></p>
 
 <p>既然上次已经提到说，我们其实是在从 Lisp、Scheme 还有类似的其他语言中借鉴各种要实现的功能（我没想过要把这个项目做成原创的⋯⋯或者至少也要等到以后再说吧），那么现在也<strong>是时候</strong>实现一些更加强大的功能了。</p>
@@ -424,9 +424,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句]]></title>
-    <link href="http://glacjay.info/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html"/>
     <updated>2011-05-17T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-17/翻译-用-ruby-写编译器之五：整数常量，以及-if-语句</id>
+    <id>http://glacjay.github.com/blog/2011-05-17/翻译-用-ruby-写编译器之五：整数常量，以及-if-语句</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html</a></p>
 
 <p>上次我承诺会发布的更快一些，不过还是失败了⋯⋯作为补偿，这章的内容将会是原计划中的第 5，6，7 章内容的合并，因为这三章确实都很短。闲话少叙：</p>
@@ -758,9 +758,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持]]></title>
-    <link href="http://glacjay.info/blog/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%8C%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%8C%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81.html"/>
     <updated>2011-05-09T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-09/翻译-用-ruby-写编译器之四：自定义函数，以及运行时支持</id>
+    <id>http://glacjay.github.com/blog/2011-05-09/翻译-用-ruby-写编译器之四：自定义函数，以及运行时支持</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html</a></p>
 
 <p>抱歉，又拖了很长时间。要忙的事情实在很多。正如上一篇文章末尾提到的那样，这次要讲的是自定义函数，以及一个简单的“运行时库”。</p>
@@ -953,9 +953,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式]]></title>
-    <link href="http://glacjay.info/blog/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%EF%BC%9A%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F.html"/>
+    <link href="http://glacjay.github.com/blog/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%EF%BC%9A%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F.html"/>
     <updated>2011-05-02T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-05-02/翻译-用-ruby-写编译器之三：语句序列，以及子表达式</id>
+    <id>http://glacjay.github.com/blog/2011-05-02/翻译-用-ruby-写编译器之三：语句序列，以及子表达式</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up&mdash;-step-3.html</a></p>
 
 <p><strong>我本来是想要早点发表的，可是我这周又不行了 &mdash; 虽然整理一篇旧文只需要半个小时。不管怎样，这是第三章，而且我会在末尾大概列一下之后的大纲。由于我会试着把一些小的步骤组合成更有内容的章节（下面就有个这样的例子），因此原来的 30 篇文章已经被我给减到了 20 篇左右（当然，这只是我已经完成了的，后面还有新的呢）。</strong></p>
@@ -1153,9 +1153,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之二：函数调用，以及 Hello World]]></title>
-    <link href="http://glacjay.info/blog/2011-04-29/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html"/>
+    <link href="http://glacjay.github.com/blog/2011-04-29/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%EF%BC%9A%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%EF%BC%8C%E4%BB%A5%E5%8F%8A-hello-world.html"/>
     <updated>2011-04-29T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-04-29/翻译-用-ruby-写编译器之二：函数调用，以及-hello-world</id>
+    <id>http://glacjay.github.com/blog/2011-04-29/翻译-用-ruby-写编译器之二：函数调用，以及-hello-world</id>
     <content type="html"><![CDATA[<p>原文地址：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-2.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-2.html</a></p>
 
 <p>我会选择 Ruby 来作为我的实现语言并没有什么特别的理由。在现阶段，语言的选择并不重要；不过，我确实很喜欢 Ruby。</p>
@@ -1462,9 +1462,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之一：一个简单的 Main 函数模板]]></title>
-    <link href="http://glacjay.info/blog/2011-04-11/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html"/>
+    <link href="http://glacjay.github.com/blog/2011-04-11/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80.html"/>
     <updated>2011-04-11T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-04-11/翻译-用-ruby-写编译器之一</id>
+    <id>http://glacjay.github.com/blog/2011-04-11/翻译-用-ruby-写编译器之一</id>
     <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html</a></p>
 
 <p>[译者抱怨：翻译好麻烦啊。]</p>
@@ -1604,9 +1604,9 @@
   
   <entry>
     <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之零]]></title>
-    <link href="http://glacjay.info/blog/2011-04-10/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html"/>
+    <link href="http://glacjay.github.com/blog/2011-04-10/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html"/>
     <updated>2011-04-10T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-04-10/翻译-用-ruby-写编译器之零</id>
+    <id>http://glacjay.github.com/blog/2011-04-10/翻译-用-ruby-写编译器之零</id>
     <content type="html"><![CDATA[<p>这是一个国外的编译器达人写的一系列教程，内容为用 Ruby 语言，以自底向上的方式开发一个 Ruby 语言的编译器。这个教程非常适合于实战派的程序员。该教程的入口见<a href="http://www.hokstad.com/compiler">这里</a>，其代码见<a href="https://github.com/vidarh/writing-a-compiler-in-ruby">这里</a>。</p>
 
 <p>我会试着翻译一下这个教程。由于这个项目之后又有了很大的进展，而教程本身却又已经很久没有更新了，所以之后我可能也会自己总结一下那些最新的开发工作。</p>
@@ -1617,9 +1617,9 @@
   
   <entry>
     <title type="html"><![CDATA[总结一下学到的 LVS 相关知识（ DR 模式）]]></title>
-    <link href="http://glacjay.info/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
+    <link href="http://glacjay.github.com/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
     <updated>2011-03-13T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-03-13/总结一下学到的-lvs-相关知识（-dr-模式）</id>
+    <id>http://glacjay.github.com/blog/2011-03-13/总结一下学到的-lvs-相关知识（-dr-模式）</id>
     <content type="html"><![CDATA[<p>不喜欢看长的 Blog 文间，当然更不喜欢写，所以就分开写啦。另，因为 TUN 模式限制更多，实际很可能用不到，所以不一定会写。</p>
 
 <p>所以这次要讲的是 DR 模式的负载均衡啦。 DR 模式，也就是 Direct Route ，其基本原理就是不对包做任何处理，直接转给所分配的真实服务；回包则由真实服务直接发给客户端而不走负载机。因为不像 NAT 模式那样有相似的架构可以参考，所以这次就上图来说明啦（注，该图偷自<a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.LVS-DR.html">这里</a>）。</p>
@@ -1752,9 +1752,9 @@
   
   <entry>
     <title type="html"><![CDATA[总结一下学到的 LVS 相关知识（ NAT 模式）]]></title>
-    <link href="http://glacjay.info/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
+    <link href="http://glacjay.github.com/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
     <updated>2011-03-12T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-03-12/总结一下学到的-lvs-相关知识（-nat-模式）</id>
+    <id>http://glacjay.github.com/blog/2011-03-12/总结一下学到的-lvs-相关知识（-nat-模式）</id>
     <content type="html"><![CDATA[<p>LVS，即 Linux Virtual Server 的简称，是 Linux 下用来实现负载均衡的一个项目。它支持三种负载模式，分别为 NAT 、 DR 以及 TUN 。</p>
 
 <p>注意，我这里讲的都是针对的 2.6 的内核， 2.4 、 2.2 、 2.0 版内核的实现方法和配置方法都各有不一样的地方。还好我不需要维护历史遗留系统（擦汗）。</p>
@@ -1801,9 +1801,9 @@
   
   <entry>
     <title type="html"><![CDATA[发布一个寻找局域网内主机的小工具]]></title>
-    <link href="http://glacjay.info/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html"/>
+    <link href="http://glacjay.github.com/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html"/>
     <updated>2011-03-05T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-03-05/发布一个寻找局域网内主机的小工具</id>
+    <id>http://glacjay.github.com/blog/2011-03-05/发布一个寻找局域网内主机的小工具</id>
     <content type="html"><![CDATA[<p>在工作中，经常需要远程登录到机房中的设备上进行调试与开发，走的是工作局域网。由于这些设备的地址也是动态获取的，因此在遇到一些意外事故，如网线松了、网络不稳定之类的，这些地址可能就变了。每当这时，我们就得跑到机房，给设备连上显示器（我们连 KVM 都没有，命苦啊），查看 IP ，然后再跑回去重新连。太麻烦了。</p>
 
 <p>我知道有支持动态地址的 DNS 服务，可是我们没权限操作 DNS 服务器，而且设备也都是不固定的，没必要惊动网络管理员（好吧，我甚至都不知道谁是网络管理员，作为三年的“老”员工，我面壁去了。好吧，其实我就是想写写程序练练手），所以我就写了个小程序，用来查找一台特定设备的 IP 地址。</p>
@@ -2109,9 +2109,9 @@
   
   <entry>
     <title type="html"><![CDATA[Linux 下有关环境变量与换行符的一个小问题]]></title>
-    <link href="http://glacjay.info/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html"/>
+    <link href="http://glacjay.github.com/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html"/>
     <updated>2011-03-05T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-03-05/linux-下有关环境变量与换行符的一个小问题</id>
+    <id>http://glacjay.github.com/blog/2011-03-05/linux-下有关环境变量与换行符的一个小问题</id>
     <content type="html"><![CDATA[<p>最近在工作中，老是遇到一个莫名其妙的问题。我有一个用来设置一些环境变量的脚本，结果经常发现这个脚本设过的环境变量乱七八糟的，像 PATH 这种，就是之前的值跟后面添加的值重叠在了一起。直到后来才发现，原来是换行符搞的鬼。</p>
 
 <p>这样说还不太清楚，上代码吧。编辑文本文件 <code>test.sh</code> 如下，记得以 DOS 换行符的模式来保存：</p>
@@ -2151,12 +2151,12 @@
   
   <entry>
     <title type="html"><![CDATA[OpenVPN 的并发测试方法]]></title>
-    <link href="http://glacjay.info/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html"/>
+    <link href="http://glacjay.github.com/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html"/>
     <updated>2011-01-19T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-01-19/openvpn-的并发测试方法</id>
+    <id>http://glacjay.github.com/blog/2011-01-19/openvpn-的并发测试方法</id>
     <content type="html"><![CDATA[<p>由于 OpenVPN 本身协议的特殊性，用一般的方法不太好测它的并发。看过 LoadRunner ，但也最多只支持标准的 SSL/TLS 协议（当然，我也没细看这个）。于是动手改了其客户端的实现，最终完成任务。</p>
 
-<p>其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。貌似装十个左右的虚拟网卡驱动之后，机器就不行了。于是解决办法也很简单，把虚拟网卡相关的功能跳过就可以了。根据<a href="http://glacjay.info/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">上篇</a>的说明，只要在 <code>incoming_push_message()</code> 函数中，把对 <code>do_up()</code> 的调用直接换成 <code>initialization_sequence_completed()</code> 就 OK 了。</p>
+<p>其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。貌似装十个左右的虚拟网卡驱动之后，机器就不行了。于是解决办法也很简单，把虚拟网卡相关的功能跳过就可以了。根据<a href="http://glacjay.github.com/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">上篇</a>的说明，只要在 <code>incoming_push_message()</code> 函数中，把对 <code>do_up()</code> 的调用直接换成 <code>initialization_sequence_completed()</code> 就 OK 了。</p>
 
 <p>当然，这样一来，流量的来源也就没有了，而没有数据流量也就无所谓测试了，最多测下并发接入的性能。要流量也很简单，改下 <code>io_wait()</code> 、 <code>read_tun()</code> 、 <code>write_tun()</code> 这几个函数的实现，手工组个 Ping 请求的 IP 报文给 OpenVPN 去发就行了。</p>
 
@@ -2170,9 +2170,9 @@
   
   <entry>
     <title type="html"><![CDATA[OpenVPN 的初始化过程分析]]></title>
-    <link href="http://glacjay.info/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html"/>
+    <link href="http://glacjay.github.com/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html"/>
     <updated>2011-01-18T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-01-18/openvpn-的初始化过程分析</id>
+    <id>http://glacjay.github.com/blog/2011-01-18/openvpn-的初始化过程分析</id>
     <content type="html"><![CDATA[<p>题外话：Eclipse CDT 很给力，至少在我用起来，比 gVim + Cscope 或者 SourceInsight 要来得给力，推荐一下。</p>
 
 <p>更准确的来说，是 OpenVPN 的客户端与服务端之间，从协商密钥、到推送配置，以及最后的网卡与路由配置生效，开始进行 IP 报文的传递，这整个的过程。</p>
@@ -2183,7 +2183,7 @@
 
 <p>那么先来看客户端的初始化。客户端进入的还是点对点模式，进入点，也是其事件循环的入口为 <code>tunnel_point_to_point()</code> 。然后是 <code>init_instance()</code> ，在这个函数中进行客户端自身的初始化，包括各种数据结构的建立，像分片啦、压缩啦、socket 啦、MTU 啦等。其中代码量最多的是 SSL 模块的初始化（ <code>do_init_crypto</code> 和 <code>do_init_frame_tls</code> ），要调很多的 OpenSSL 的函数；还有对 socket 的初始化，分为两个阶段，第一个阶段解析域名，第二个阶段发起连接（如果是 TCP 的话）。我一直搞不十分清楚的是 MTU ，也就是 <code>frame</code> 模块，因为太细节而且太分散了。</p>
 
-<p>然后通过 <code>pre_select()</code> 函数进入 <code>check_tls()</code> 过程。因为是客户端，这时就会准备好发送第一个握手报文，命令码为 <code>P_CONTROL_HARD_RESET_CLIENT_V1/2</code> 。按照<a href="http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html">上篇</a>所说与服务器交换好了密钥之后，会在 <code>tls_process()</code> 函数的 <code>3852</code> 行，设置连接成功建立的标志 <code>connection_established</code> 。</p>
+<p>然后通过 <code>pre_select()</code> 函数进入 <code>check_tls()</code> 过程。因为是客户端，这时就会准备好发送第一个握手报文，命令码为 <code>P_CONTROL_HARD_RESET_CLIENT_V1/2</code> 。按照<a href="http://glacjay.github.com/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html">上篇</a>所说与服务器交换好了密钥之后，会在 <code>tls_process()</code> 函数的 <code>3852</code> 行，设置连接成功建立的标志 <code>connection_established</code> 。</p>
 
 <p>之后，还是在 <code>pre_select()</code> 的 <code>check_connection_established()</code> 函数中，初始化 <code>push_request_interval</code> 定时器，由客户端开始发送推送配置的请求报文。推送配置功能的报文走的是和交换密钥相同的 SSL 隧道，按理说蛮可靠的，不过还是实现了重传，不知道是基于什么考虑。通过 <code>check_incoming_control_channel()</code> 函数收到服务器推过来的额外配置之后，调用 <code>process_incoming_push_msg()</code> 函数解析一下收到的配置字符串，就要根据这些配置，调用 <code>do_up()</code> 函数进行最终的初始化工作了。</p>
 
@@ -2199,9 +2199,9 @@
   
   <entry>
     <title type="html"><![CDATA[OpenVPN 的握手协议分析]]></title>
-    <link href="http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html"/>
+    <link href="http://glacjay.github.com/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html"/>
     <updated>2010-11-22T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2010-11-22/openvpn-的握手协议分析</id>
+    <id>http://glacjay.github.com/blog/2010-11-22/openvpn-的握手协议分析</id>
     <content type="html"><![CDATA[<p>又是好久没来这儿了啊。</p>
 
 <p>最近因为工作需要（其实也没需要那么多），一直在断断续续地看 OpenVPN 的代码，终于大概搞清楚了它的握手是怎么个流程了。简单来说的话其实非常的简单，首先在 <code>reliable</code> 模块中实现了一个可靠的 UDP 报文协议，就是加上超时重传和确认报文的功能；然后用该协议交换一个 Hard Reset 命令，开始握手；最后建立 SSL 对象，并且通过内存 <code>BIO</code> 在可靠 UDP 协议的基础上转发 OpenSSL 的握手协议报文，通过这个 SSL 连接交换 OpenVPN 自己的密钥。接下来就是用这些密钥，该干嘛干嘛了。</p>
@@ -2235,10 +2235,10 @@
   
   <entry>
     <title type="html"><![CDATA[用 Python 操作虚拟网卡]]></title>
-    <link href="http://glacjay.info/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html"/>
+    <link href="http://glacjay.github.com/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html"/>
     <updated>2010-09-18T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2010-09-18/用-python-操作虚拟网卡</id>
-    <content type="html"><![CDATA[<p>在我的 <a href="http://glacjay.info/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html">XTunnel</a> 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。</p>
+    <id>http://glacjay.github.com/blog/2010-09-18/用-python-操作虚拟网卡</id>
+    <content type="html"><![CDATA[<p>在我的 <a href="http://glacjay.github.com/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html">XTunnel</a> 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。</p>
 
 <p>在 Linux 内核中，特别是在现在的发行版中，应该都已经有了 <code>TUN/TAP</code> 虚拟网卡的驱动程序，看一下有没有 <code>/dev/net/tun</code> 这个文件就可以知道了。如果没有，就执行一下 <code>sudo modprobe tun</code> 这个命令吧。如果还是没有，那就 Google 之吧。下面上代码：</p>
 
@@ -2433,9 +2433,9 @@ if __name__ == &#39;__main__&#39;:
   
   <entry>
     <title type="html"><![CDATA[通过 ODBC 接口访问 Oracle 数据库 -- Linux 篇]]></title>
-    <link href="http://glacjay.info/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html"/>
+    <link href="http://glacjay.github.com/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html"/>
     <updated>2010-03-03T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2010-03-03/通过-odbc-接口访问-oracle-数据库-linux-篇</id>
+    <id>http://glacjay.github.com/blog/2010-03-03/通过-odbc-接口访问-oracle-数据库-linux-篇</id>
     <content type="html"><![CDATA[<p>首先，你要安装好 UnixODBC 软件包，这个就不多说了。</p>
 
 <p>然后，安装 Oracle 官方客户端，因为我的使用环境为 Fedora 12 ，所以我下载安装的是 <code>oracle-xe-client-10.2.0.1-1.0.i386.rpm</code> 。</p>

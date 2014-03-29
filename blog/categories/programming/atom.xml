@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Programming | Random Stuff from GlacJAY]]></title>
-  <link href="http://glacjay.info/blog/categories/programming/atom.xml" rel="self"/>
-  <link href="http://glacjay.info/"/>
-  <updated>2014-03-30T00:23:29+08:00</updated>
-  <id>http://glacjay.info/</id>
+  <link href="http://glacjay.github.com/blog/categories/programming/atom.xml" rel="self"/>
+  <link href="http://glacjay.github.com/"/>
+  <updated>2014-03-30T00:33:06+08:00</updated>
+  <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[修改 OpenVPN 实现加密算法的自动协商]]></title>
-    <link href="http://glacjay.info/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html"/>
+    <link href="http://glacjay.github.com/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html"/>
     <updated>2011-09-17T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-09-17/修改-openvpn-实现加密算法的自动协商</id>
+    <id>http://glacjay.github.com/blog/2011-09-17/修改-openvpn-实现加密算法的自动协商</id>
     <content type="html"><![CDATA[<p>由<a href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">另一篇博</a>中的分析可知，OpenVPN 中有两个加解密通道。一条是标准的 SSL 协议通道，被 OpenVPN 用于协商自己所用的密钥。这个通道的加密算法当然也是通过 SSL 协议来进行协商的，可以通过 <code>--tls-cipher</code> 选项来进行配置。另一条是 OpenVPN 自己的加解密通道，用于交换实际的数据，也就是虚拟网卡抓到的 IP 报文。这个通道的加密算法则是通过 <code>--cipher</code> 和 <code>--auth</code> 两个选项，分别在通调两端指定的。</p>
 
 <p>对于第二条通道的加密算法，必须要同时在两端分别指定一致的选项，有时候不是很方便（当然，我研究的还是 2.1.1 版本的 OpenVPN ，不知道最新的版本还是不是这样）。比如说，我想通过在服务端修改配置，指定加密算法，然后让连接我的客户端自动用同一个算法。最简单的修改思路，就是借用第一条通道中的算法协商机制，从 SSL 对象中取得协商出来的算法。</p>
@@ -54,9 +54,9 @@ key_type->cipher_length = EVP_CIPHER_key_length (session->opt->key_type->cipher)
   
   <entry>
     <title type="html"><![CDATA[编写自己的 Web 版 Google Reader 客户端]]></title>
-    <link href="http://glacjay.info/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html"/>
+    <link href="http://glacjay.github.com/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html"/>
     <updated>2011-08-11T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-08-11/编写自己的-web-版-google-reader-客户端</id>
+    <id>http://glacjay.github.com/blog/2011-08-11/编写自己的-web-版-google-reader-客户端</id>
     <content type="html"><![CDATA[<p>最近花在路上的时间明显变多了，手机就成了我打发这些路上时间的利器。小说神马的看太多也会腻，正好 Google Reader 中也积累了大量的未读文章，因此用手机看看订阅文章就成了一个比较好的选择。</p>
 
 <p>但多次使用下来，却也发现了很多 Google 原版 Web 界面的不方便之处。Google 提供了两个版本的 Reader 界面给手机，一个是苹果风格的 <code>/i/</code> 界面，设计得很漂亮，功能也很全，用 Nokia 手机也能看，但太费流量（未证实，只是感觉，大概是因为一次加载了很多的文章吧），而且在网络状况不好的时候，体验不太好。另一个是 <code>/m/</code> 界面，很简洁，选项不多，但也总有些这样那样的细节另我不太满意，下面详述。然后又去找 Nokia 的 S60v3 客户端软件，总之是没一个喜欢啦。作为一个 Geek （至少是自称），在这种情况下，最佳选择自然就是打造一个自己专属的解决方案啦。</p>
@@ -99,9 +99,9 @@ key_type->cipher_length = EVP_CIPHER_key_length (session->opt->key_type->cipher)
   
   <entry>
     <title type="html"><![CDATA[总结一下学到的 LVS 相关知识（ DR 模式）]]></title>
-    <link href="http://glacjay.info/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
+    <link href="http://glacjay.github.com/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
     <updated>2011-03-13T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-03-13/总结一下学到的-lvs-相关知识（-dr-模式）</id>
+    <id>http://glacjay.github.com/blog/2011-03-13/总结一下学到的-lvs-相关知识（-dr-模式）</id>
     <content type="html"><![CDATA[<p>不喜欢看长的 Blog 文间，当然更不喜欢写，所以就分开写啦。另，因为 TUN 模式限制更多，实际很可能用不到，所以不一定会写。</p>
 
 <p>所以这次要讲的是 DR 模式的负载均衡啦。 DR 模式，也就是 Direct Route ，其基本原理就是不对包做任何处理，直接转给所分配的真实服务；回包则由真实服务直接发给客户端而不走负载机。因为不像 NAT 模式那样有相似的架构可以参考，所以这次就上图来说明啦（注，该图偷自<a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.LVS-DR.html">这里</a>）。</p>
@@ -201,9 +201,9 @@ $ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.3:22 -g
   
   <entry>
     <title type="html"><![CDATA[总结一下学到的 LVS 相关知识（ NAT 模式）]]></title>
-    <link href="http://glacjay.info/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
+    <link href="http://glacjay.github.com/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
     <updated>2011-03-12T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-03-12/总结一下学到的-lvs-相关知识（-nat-模式）</id>
+    <id>http://glacjay.github.com/blog/2011-03-12/总结一下学到的-lvs-相关知识（-nat-模式）</id>
     <content type="html"><![CDATA[<p>LVS，即 Linux Virtual Server 的简称，是 Linux 下用来实现负载均衡的一个项目。它支持三种负载模式，分别为 NAT 、 DR 以及 TUN 。</p>
 
 <p>注意，我这里讲的都是针对的 2.6 的内核， 2.4 、 2.2 、 2.0 版内核的实现方法和配置方法都各有不一样的地方。还好我不需要维护历史遗留系统（擦汗）。</p>
@@ -250,9 +250,9 @@ $ sudo ipvsadm -l -n
   
   <entry>
     <title type="html"><![CDATA[发布一个寻找局域网内主机的小工具]]></title>
-    <link href="http://glacjay.info/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html"/>
+    <link href="http://glacjay.github.com/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html"/>
     <updated>2011-03-05T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2011-03-05/发布一个寻找局域网内主机的小工具</id>
+    <id>http://glacjay.github.com/blog/2011-03-05/发布一个寻找局域网内主机的小工具</id>
     <content type="html"><![CDATA[<p>在工作中，经常需要远程登录到机房中的设备上进行调试与开发，走的是工作局域网。由于这些设备的地址也是动态获取的，因此在遇到一些意外事故，如网线松了、网络不稳定之类的，这些地址可能就变了。每当这时，我们就得跑到机房，给设备连上显示器（我们连 KVM 都没有，命苦啊），查看 IP ，然后再跑回去重新连。太麻烦了。</p>
 
 <p>我知道有支持动态地址的 DNS 服务，可是我们没权限操作 DNS 服务器，而且设备也都是不固定的，没必要惊动网络管理员（好吧，我甚至都不知道谁是网络管理员，作为三年的“老”员工，我面壁去了。好吧，其实我就是想写写程序练练手），所以我就写了个小程序，用来查找一台特定设备的 IP 地址。</p>

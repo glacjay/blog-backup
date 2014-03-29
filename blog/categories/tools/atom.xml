@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Tools | Random Stuff from GlacJAY]]></title>
-  <link href="http://glacjay.info/blog/categories/tools/atom.xml" rel="self"/>
-  <link href="http://glacjay.info/"/>
-  <updated>2014-03-30T00:23:29+08:00</updated>
-  <id>http://glacjay.info/</id>
+  <link href="http://glacjay.github.com/blog/categories/tools/atom.xml" rel="self"/>
+  <link href="http://glacjay.github.com/"/>
+  <updated>2014-03-30T00:33:06+08:00</updated>
+  <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[让 Vim 在保存时自动调用外部命令进行格式化]]></title>
-    <link href="http://glacjay.info/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html"/>
+    <link href="http://glacjay.github.com/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html"/>
     <updated>2009-12-13T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2009-12-13/让-vim-在保存时自动调用外部命令进行格式化</id>
+    <id>http://glacjay.github.com/blog/2009-12-13/让-vim-在保存时自动调用外部命令进行格式化</id>
     <content type="html"><![CDATA[<p>肯定有许多人遇到过这个问题，也肯定有许多现成的解决方案被发现，可是我没找到（或者说没耐心找）。无所谓，自己找到的话，得到的就不仅仅是最终结果了。</p>
 
 <p>闲话少说。其实以前也干过类似的事情，就是在保存的时候自动去掉所有的行末空白；不过这个操作使用 Vim 本身的功能就能实现，不需要借助于外部程序，所以只要简单地设一个 <code>BufWrite</code> 时的自动命令就行了。但当需要借助外部程序的时候，在 <code>BufWrite</code> 或者 <code>BufWritePre</code> 或者 <code>FileWritePre</code> 时执行的自动命令就不行了，老是提示说什么文件本身已更改，是否确定写入。我在这上面反覆试了好多次，才发现是自己没有搞清楚底下到底发生了什么。要让外部程序对文件内容进行格式化（或者其他什么操作。我想调的是 gofmt，顺带一提），首先当然得要那个外部程序能看到你做过的，还没有保存的更改，所以说应该是先写入再操作的，即在 <code>BufWritePost</code> 的时候执行自动命令。而我一开始就把基本步骤给搞反了。</p>

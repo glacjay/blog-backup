@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Database | Random Stuff from GlacJAY]]></title>
-  <link href="http://glacjay.info/blog/categories/database/atom.xml" rel="self"/>
-  <link href="http://glacjay.info/"/>
-  <updated>2014-03-30T00:23:29+08:00</updated>
-  <id>http://glacjay.info/</id>
+  <link href="http://glacjay.github.com/blog/categories/database/atom.xml" rel="self"/>
+  <link href="http://glacjay.github.com/"/>
+  <updated>2014-03-30T00:33:06+08:00</updated>
+  <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[通过 ODBC 接口访问 Oracle 数据库 -- Linux 篇]]></title>
-    <link href="http://glacjay.info/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html"/>
+    <link href="http://glacjay.github.com/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html"/>
     <updated>2010-03-03T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2010-03-03/通过-odbc-接口访问-oracle-数据库-linux-篇</id>
+    <id>http://glacjay.github.com/blog/2010-03-03/通过-odbc-接口访问-oracle-数据库-linux-篇</id>
     <content type="html"><![CDATA[<p>首先，你要安装好 UnixODBC 软件包，这个就不多说了。</p>
 
 <p>然后，安装 Oracle 官方客户端，因为我的使用环境为 Fedora 12 ，所以我下载安装的是 <code>oracle-xe-client-10.2.0.1-1.0.i386.rpm</code> 。</p>
@@ -130,9 +130,9 @@ Driver = oracle
   
   <entry>
     <title type="html"><![CDATA[Oracle 建库 SQL 脚本]]></title>
-    <link href="http://glacjay.info/blog/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC.html"/>
+    <link href="http://glacjay.github.com/blog/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC.html"/>
     <updated>2010-03-02T00:00:00+08:00</updated>
-    <id>http://glacjay.info/blog/2010-03-02/oracle-建库-sql-脚本</id>
+    <id>http://glacjay.github.com/blog/2010-03-02/oracle-建库-sql-脚本</id>
     <content type="html"><![CDATA[<p>``` sql
 &mdash; 首先是删除该数据库中该用户名下的所有表、序列与触发器，
 &mdash; 其中触发器是通过表格级联删除的。
