@@ -4,7 +4,7 @@
   <title><![CDATA[Random Stuff from GlacJAY]]></title>
   <link href="http://glacjay.github.com/atom.xml" rel="self"/>
   <link href="http://glacjay.github.com/"/>
-  <updated>2014-03-30T00:33:06+08:00</updated>
+  <updated>2014-03-30T00:33:46+08:00</updated>
   <id>http://glacjay.github.com/</id>
   <author>
     <name><![CDATA[GlacJAY]]></name>
@@ -12,80 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[OpenSSL 与 WinSock2 配合使用时遇到的一个坑]]></title>
-    <link href="http://glacjay.github.com/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html"/>
-    <updated>2014-03-29T23:06:38+08:00</updated>
-    <id>http://glacjay.github.com/blog/2014-03-29/openssl-与-winsock2-配合使用时遇到的一个坑</id>
-    <content type="html"><![CDATA[<p>今天才发现，这里已经两年多没有被照看过了，估计连树都要长出来了吧。</p>
-
-<p>在用 Windows 的 WSAEventSelect 模式进行网络编程时，比较固定的一个模式是这样的：</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="n">WSAEventSelect</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">FD_READ</span><span class="p">);</span>
-</span><span class='line'><span class="p">...</span>
-</span><span class='line'><span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="n">ret</span> <span class="o">=</span> <span class="n">WSAWaitForMultipleEvents</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="n">WSA_WAIT_EVENT_0</span> <span class="o">&amp;&amp;</span> <span class="n">ret</span> <span class="o">&lt;</span> <span class="n">WSA_WAIT_EVENT_0</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">{</span>
-</span><span class='line'>        <span class="n">eventIndex</span> <span class="o">=</span> <span class="n">ret</span> <span class="o">-</span> <span class="n">WSA_WAIT_EVENT_0</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">eventIndex</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">{</span>
-</span><span class='line'>            <span class="n">WSAEnumNetworkEvents</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">networkEvents</span><span class="p">);</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="n">networkEvents</span><span class="p">.</span><span class="n">lNetworkEvents</span> <span class="o">&amp;</span> <span class="n">FD_READ</span><span class="p">)</span>
-</span><span class='line'>            <span class="p">{</span>
-</span><span class='line'>                <span class="p">...</span>
-</span><span class='line'>                <span class="n">recv</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
-</span><span class='line'>                <span class="p">...</span>
-</span><span class='line'>            <span class="p">}</span>
-</span><span class='line'>            <span class="p">...</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="p">...</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="p">...</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="p">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>当要处理的 sock 属于一个 OpenSSL 连接时，只要把当中的 recv 换成 SSL_read 就行了，当然前面还得加上些 readWaitonWrite 之类的标志位检查啥的，这里就不详细列举了，请参考《Network Security with OpenSSL》一书中的 5.2.2.3 小节。</p>
-
-<p>但我在实际使用中（事实上是在压力测试中）发现，当程序运行一段时间之后，WSAWaitForMultipleEvents 就会忽然不再返回可读信号了，从而导致对该 socket 的接收操作完全停止。</p>
-
-<p>经过各种调试手段，甚至是在 OpenSSL 中加入调试输出之后，终于发现问题出在 SSL_read 的实现机制上，貌似 OpenSSL 实现了某种程度的读写缓冲（具体没细看），使得对 SSL_read 的一次调用，并不一定会触发其对底层 socket 的读取操作。而如果没有对底层 socket 的读取操作，那么 windows 的对应 event 对象就不会被 reenable （参考 MSDN 中对 WSAEventSelect 接口的说明文档），从而导致 WSAWaitForMultipleEvents 不再对该事件作检查。</p>
-
-<p>原因找到了，那么相应的解决方法也就不难发现了，对于我的使用场景来说（不完全是像上面的示例片断那么清晰），最简单的作法就是在 SSL_read 之前加一个空的 recv 调用，其传给 recv 的第二、三个参数的值分别是 NULL 和 0 ，这样就能强制触发 windows event 的 reenable ，同时又不会影响到 SSL 对象内部的读取状态了。</p>
-
-<p>PS. 遇到这个问题时，最重要的一步其实是如何能够稳定而快速的复现问题。一开始做压力测试时，只有在连续跑个一天以上时才会不定时的出现，导致效率很低；后来偶然发现，通过虚拟机搭建的受限环境，反而能很快复现问题。想来这也是另一种形式的压力测试吧，正常的压力测试是保持环境不变，加大请求压力；这里则变成了保持请求不变，同时压缩可用环境。</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[修改 OpenVPN 实现加密算法的自动协商]]></title>
@@ -2558,6 +2484,156 @@ if __name__ == &#39;__main__&#39;:
 <p><strong>Update:</strong> 问题解决了，出问题的都是新装的 Fedora 12 机器，后来做了次全系统的更新，再建个链接，就好了。只是不知道倒底是哪个软件包的版本太老，试了 <code>glibc</code> 、 <code>libtool</code> 、 <code>kernel</code> 都不是。</p>
 
 <p><strong>Update 2012-12-31:</strong> 找到问题的原因了，都是 SELinux 惹的祸，关之即可，或者配下相关的策略啥的。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Oracle 建库 SQL 脚本]]></title>
+    <link href="http://glacjay.github.com/blog/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC.html"/>
+    <updated>2010-03-02T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2010-03-02/oracle-建库-sql-脚本</id>
+    <content type="html"><![CDATA[<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="c1">-- 首先是删除该数据库中该用户名下的所有表、序列与触发器，</span>
+</span><span class='line'><span class="c1">-- 其中触发器是通过表格级联删除的。</span>
+</span><span class='line'><span class="k">declare</span>
+</span><span class='line'>  <span class="k">cursor</span> <span class="n">usertables</span> <span class="k">is</span>
+</span><span class='line'>    <span class="k">select</span> <span class="o">*</span>
+</span><span class='line'>    <span class="k">from</span> <span class="n">user_tables</span>
+</span><span class='line'>    <span class="k">where</span> <span class="k">table_name</span> <span class="k">not</span> <span class="k">like</span> <span class="s1">&#39;BIN$%&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">cursor</span> <span class="n">usersequences</span> <span class="k">is</span>
+</span><span class='line'>    <span class="k">select</span> <span class="o">*</span>
+</span><span class='line'>    <span class="k">from</span> <span class="n">user_sequences</span><span class="p">;</span>
+</span><span class='line'><span class="k">begin</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">next_row</span> <span class="k">in</span> <span class="n">usertables</span> <span class="n">loop</span>
+</span><span class='line'>    <span class="k">execute</span> <span class="k">immediate</span>
+</span><span class='line'>      <span class="s1">&#39;drop table &#39;</span> <span class="o">||</span> <span class="n">next_row</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+</span><span class='line'>      <span class="s1">&#39; cascade constraints&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">end</span> <span class="n">loop</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">next_row</span> <span class="k">in</span> <span class="n">usersequences</span> <span class="n">loop</span>
+</span><span class='line'>    <span class="k">execute</span> <span class="k">immediate</span>
+</span><span class='line'>      <span class="s1">&#39;drop sequence &#39;</span> <span class="o">||</span> <span class="n">next_row</span><span class="p">.</span><span class="n">sequence_name</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">end</span> <span class="n">loop</span><span class="p">;</span>
+</span><span class='line'><span class="k">end</span><span class="p">;</span>
+</span><span class='line'><span class="o">/</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">-- 然后，就是一砣……的建表语句啦，</span>
+</span><span class='line'><span class="c1">-- 比方说下面就是两个含外键的表。</span>
+</span><span class='line'><span class="k">create</span> <span class="k">table</span> <span class="ss">&quot;A&quot;</span> <span class="p">(</span>
+</span><span class='line'>  <span class="ss">&quot;ID&quot;</span> <span class="nb">integer</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span>
+</span><span class='line'>  <span class="ss">&quot;NAME&quot;</span> <span class="n">nvarchar2</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span>         <span class="c1">-- nvarchar2类型支持UTF8</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'><span class="c1">-- Oracle中的表名与字段名最好写成这样引号加全大写的形式。</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">create</span> <span class="k">table</span> <span class="ss">&quot;B&quot;</span> <span class="p">(</span>
+</span><span class='line'>  <span class="ss">&quot;ID&quot;</span> <span class="nb">integer</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span>
+</span><span class='line'>  <span class="ss">&quot;A&quot;</span> <span class="nb">integer</span> <span class="k">not</span> <span class="k">null</span> <span class="k">references</span> <span class="ss">&quot;B&quot;</span> <span class="k">on</span> <span class="k">delete</span> <span class="k">cascade</span><span class="p">,</span>
+</span><span class='line'>  <span class="ss">&quot;VALUE&quot;</span> <span class="n">nvarchar2</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span>
+</span><span class='line'><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">-- 接下来是第三部分，为所有的表创建对应的序列和触发器，以实现自增主键。</span>
+</span><span class='line'><span class="k">declare</span>
+</span><span class='line'>  <span class="k">cursor</span> <span class="n">usertables</span> <span class="k">is</span>
+</span><span class='line'>    <span class="k">select</span> <span class="n">cols</span><span class="p">.</span><span class="k">table_name</span><span class="p">,</span> <span class="n">cols</span><span class="p">.</span><span class="k">column_name</span>
+</span><span class='line'>    <span class="k">from</span> <span class="n">all_constraints</span> <span class="n">cons</span><span class="p">,</span> <span class="n">all_cons_columns</span> <span class="n">cols</span>
+</span><span class='line'>    <span class="k">where</span> <span class="n">cols</span><span class="p">.</span><span class="k">owner</span> <span class="o">=</span> <span class="p">(</span>
+</span><span class='line'>      <span class="k">select</span> <span class="n">sys_context</span><span class="p">(</span><span class="s1">&#39;USERENV&#39;</span><span class="p">,</span> <span class="s1">&#39;SESSION_USER&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">from</span> <span class="n">dual</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">and</span> <span class="n">cols</span><span class="p">.</span><span class="k">table_name</span> <span class="k">not</span> <span class="k">like</span> <span class="s1">&#39;BIN$%&#39;</span>
+</span><span class='line'>    <span class="k">and</span> <span class="n">cons</span><span class="p">.</span><span class="n">constraint_type</span> <span class="o">=</span> <span class="s1">&#39;P&#39;</span>
+</span><span class='line'>    <span class="k">and</span> <span class="n">cons</span><span class="p">.</span><span class="k">constraint_name</span> <span class="o">=</span> <span class="n">cols</span><span class="p">.</span><span class="k">constraint_name</span>
+</span><span class='line'>    <span class="k">and</span> <span class="n">cons</span><span class="p">.</span><span class="k">owner</span> <span class="o">=</span> <span class="n">cols</span><span class="p">.</span><span class="k">owner</span>
+</span><span class='line'><span class="k">begin</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">nextrow</span> <span class="k">in</span> <span class="n">usertables</span> <span class="n">loop</span>
+</span><span class='line'>    <span class="c1">-- 1000以下的留作初始测试数据用，见下</span>
+</span><span class='line'>    <span class="k">execute</span> <span class="k">immediate</span>
+</span><span class='line'>      <span class="s1">&#39;create sequence &quot;&#39;</span> <span class="o">||</span> <span class="n">nextrow</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+</span><span class='line'>      <span class="s1">&#39;_PK_SEQ&quot; start with 1000&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">execute</span> <span class="k">immediate</span>
+</span><span class='line'>      <span class="s1">&#39;create or replace trigger &quot;&#39;</span> <span class="o">||</span> <span class="n">nextrow</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+</span><span class='line'>      <span class="s1">&#39;_PK_TRG&quot; before insert on &quot;&#39;</span> <span class="o">||</span> <span class="n">nextrow</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+</span><span class='line'>      <span class="s1">&#39;&quot; for each row begin if :new.&quot;&#39;</span> <span class="o">||</span> <span class="n">nextrow</span><span class="p">.</span><span class="k">column_name</span> <span class="o">||</span>
+</span><span class='line'>      <span class="s1">&#39;&quot; is null then select &quot;&#39;</span> <span class="o">||</span> <span class="n">nextrow</span><span class="p">.</span><span class="k">table_name</span> <span class="o">||</span>
+</span><span class='line'>      <span class="s1">&#39;_PK_SEQ&quot;.nextval into :new.&quot;&#39;</span> <span class="o">||</span> <span class="n">nextrow</span><span class="p">.</span><span class="k">column_name</span> <span class="o">||</span>
+</span><span class='line'>      <span class="s1">&#39;&quot; from dual; end if; end;&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">end</span> <span class="n">loop</span><span class="p">;</span>
+</span><span class='line'><span class="k">end</span><span class="p">;</span>
+</span><span class='line'><span class="o">/</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">-- 最后当然就是测试数据啦。</span>
+</span><span class='line'><span class="k">insert</span> <span class="k">into</span> <span class="ss">&quot;A&quot;</span> <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">NAME</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;first name&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="k">insert</span> <span class="k">into</span> <span class="ss">&quot;B&quot;</span> <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">AID</span><span class="p">,</span> <span class="n">VALUE</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Jay&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="k">insert</span> <span class="k">into</span> <span class="ss">&quot;B&quot;</span> <span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">AID</span><span class="p">,</span> <span class="n">VALUE</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;杰&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
 ]]></content>
   </entry>
   
