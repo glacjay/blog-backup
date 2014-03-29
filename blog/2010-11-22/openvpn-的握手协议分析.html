@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OpenVPN 的握手协议分析 - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="又是好久没来这儿了啊。 最近因为工作需要（其实也没需要那么多），一直在断断续续地看 OpenVPN 的代码，终于大概搞清楚了它的握手是怎么个流程了。简单来说的话其实非常的简单，首先在 reliable 模块中实现了一个可靠的 UDP 报文协议，就是加上超时重传和确认报文的功能；然后用该协议交换一个 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OpenVPN 的握手协议分析</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-11-22T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://glacjay.info">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>又是好久没来这儿了啊。</p>
+
+<p>最近因为工作需要（其实也没需要那么多），一直在断断续续地看 OpenVPN 的代码，终于大概搞清楚了它的握手是怎么个流程了。简单来说的话其实非常的简单，首先在 <code>reliable</code> 模块中实现了一个可靠的 UDP 报文协议，就是加上超时重传和确认报文的功能；然后用该协议交换一个 Hard Reset 命令，开始握手；最后建立 SSL 对象，并且通过内存 <code>BIO</code> 在可靠 UDP 协议的基础上转发 OpenSSL 的握手协议报文，通过这个 SSL 连接交换 OpenVPN 自己的密钥。接下来就是用这些密钥，该干嘛干嘛了。</p>
+
+<p>本来还写了好多，不过太乱，写不下去了，还是简单点吧。具体实现就是，首先在 <code>key_state_init()</code> 函数中，初始化了 <code>ssl</code> 、 <code>ssl_bio</code> 、 <code>ct_in</code> 、 <code>ct_out</code> 这几个相关的成员， <code>ssl</code> 就是普通 SSL 程序里面的 <code>SSL</code> 对象， <code>ssl_bio</code> 是以 <code>BIO</code> 接口来读写这个 <code>ssl</code> 成员而准备的，<code>tls_process()</code> 中通过 <code>ssl_bio</code> 这个成员完成 OpenVPN 自己的密钥交换，完成从 <code>S_START</code> 到 <code>S_GOT_KEY</code> 这几个状态的转换。而 <code>ct_in</code> 和 <code>ct_out</code> 则是这个 <code>ssl</code> 对象的后端，不是通常用的 socket BIO 对象，而是两个 memory BIO 对象，为的就是得到 <code>ssl</code> 对象要发给对端的密文，然后通过可靠 UDP 协议来转发。这样， <code>tls_process()</code> 的主要工作就是操作这几个对象，外加可靠 UDP 模块的那几个队列了。</p>
+
+<p>这里的关键就是通过 OpenSSL 实现提供的 memory BIO 对象抓取密文包的功能。如果是在其他没有这个功能接口的语言实现或封装中，则可以使用 socketpair 这种方法来抓，我今天就试着改了一下 OpenVPN ，这种方法是可行的。具体就是把其中一个 socket 给 ssl 当后端，另一个 socket 就可以用来读写密文了。注意 <code>socketpair()</code> 调用中的 <code>type</code> 参数要加上 <code>SOCK_NONBLOCK</code> 。</p>
+
+<p>不过在 Erlang 这个语言中，甚至就连 <code>socketpair</code> 这个调用都没封。搜了一下它的源码，才发现自己实现一个也非常的简单，怪不得。下面摘自 <code>otp_src_R14B/lib/kernel/test/inet_sockopt_SUITE.erl</code> 文件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='erlang'><span class='line'><span class="nf">create_socketpair</span><span class="p">(</span><span class="nv">ListenOptions</span><span class="p">,</span><span class="nv">ConnectOptions</span><span class="p">)</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">LS</span><span class="p">}</span><span class="o">=</span><span class="nn">gen_tcp</span><span class="p">:</span><span class="n">listen</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nv">ListenOptions</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">Port</span><span class="p">}</span><span class="o">=</span><span class="nn">inet</span><span class="p">:</span><span class="n">port</span><span class="p">(</span><span class="nv">LS</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">CS</span><span class="p">}</span><span class="o">=</span><span class="nn">gen_tcp</span><span class="p">:</span><span class="n">connect</span><span class="p">(</span><span class="n">localhost</span><span class="p">,</span><span class="nv">Port</span><span class="p">,</span><span class="nv">ConnectOptions</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">AS</span><span class="p">}</span><span class="o">=</span><span class="nn">gen_tcp</span><span class="p">:</span><span class="n">accept</span><span class="p">(</span><span class="nv">LS</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="nn">gen_tcp</span><span class="p">:</span><span class="n">close</span><span class="p">(</span><span class="nv">LS</span><span class="p">),</span>
+</span><span class='line'>    <span class="p">{</span><span class="nv">AS</span><span class="p">,</span><span class="nv">CS</span><span class="p">}.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>至于前面的 <code>?line</code> 是啥，咱就不需要关心了。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-11-22T00:00:00+08:00" pubdate data-updated="true"></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html" data-via="" data-counturl="http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html" title="Previous Post: 用 Python 操作虚拟网卡">&laquo; 用 Python 操作虚拟网卡</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html" title="Next Post: OpenVPN 的初始化过程分析">OpenVPN 的初始化过程分析 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html">OpenSSL 与 WinSock2 配合使用时遇到的一个坑</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: What Are You Thinking About?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 Lambda</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html';
+        var disqus_url = 'http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

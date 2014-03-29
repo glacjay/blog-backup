@@ -1,0 +1,1464 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="这是一个国外的编译器达人写的一系列教程，内容为用 Ruby 语言，以自底向上的方式开发一个 Ruby 语言的编译器。这个教程非常适合于实战派的程序员。该教程的入口见这里，其代码见这里。 我会试着翻译一下这个教程。由于这个项目之后又有了很大的进展，而教程本身却又已经很久没有更新了， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.info/blog/page/2/index.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.info" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011-04-10/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html">[翻译] 用 Ruby 写编译器之零</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-04-10T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2011-04-10/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2011-04-10/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>这是一个国外的编译器达人写的一系列教程，内容为用 Ruby 语言，以自底向上的方式开发一个 Ruby 语言的编译器。这个教程非常适合于实战派的程序员。该教程的入口见<a href="http://www.hokstad.com/compiler">这里</a>，其代码见<a href="https://github.com/vidarh/writing-a-compiler-in-ruby">这里</a>。</p>
+
+<p>我会试着翻译一下这个教程。由于这个项目之后又有了很大的进展，而教程本身却又已经很久没有更新了，所以之后我可能也会自己总结一下那些最新的开发工作。</p>
+
+<p>使用版本管理软件的好处之一，就是你可以一步一步的学习一个软件的开发过程。不过这个项目用的是 Git，貌似不支持直接将 Working Tree 检出到历史上的某一个版本，所以我就新建了一个分支，然后将主干上的提交一个一个地 merge 到这个新的分支上，这样就可以一个提交一个提交的按顺序把玩这个编译器了。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html">总结一下学到的 LVS 相关知识（ DR 模式）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-13T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>不喜欢看长的 Blog 文间，当然更不喜欢写，所以就分开写啦。另，因为 TUN 模式限制更多，实际很可能用不到，所以不一定会写。</p>
+
+<p>所以这次要讲的是 DR 模式的负载均衡啦。 DR 模式，也就是 Direct Route ，其基本原理就是不对包做任何处理，直接转给所分配的真实服务；回包则由真实服务直接发给客户端而不走负载机。因为不像 NAT 模式那样有相似的架构可以参考，所以这次就上图来说明啦（注，该图偷自<a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.LVS-DR.html">这里</a>）。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>                           ________
+</span><span class='line'>                          |        |
+</span><span class='line'>                          | client |
+</span><span class='line'>                          |________|
+</span><span class='line'>                          CIP=192.168.1.254
+</span><span class='line'>                              |
+</span><span class='line'>                   CIP-&gt;VIP | |
+</span><span class='line'>                            v |
+</span><span class='line'>                              |
+</span><span class='line'>                           ________
+</span><span class='line'>                          |        |
+</span><span class='line'>                          | router | advertises route to VIP
+</span><span class='line'>                          |________|
+</span><span class='line'>                              |
+</span><span class='line'>                __________    |
+</span><span class='line'>               |          |   |    VIP=192.168.1.110 (eth0:0, arps)
+</span><span class='line'>               | director |---+     DIP=192.168.1.1 (eth0)
+</span><span class='line'>               |__________|   |
+</span><span class='line'>                              |  ^
+</span><span class='line'>MAC_DIP-&gt;MAC_RIP1(CIP-&gt;VIP) | |  |  VIP-&gt;CIP
+</span><span class='line'>                            v |
+</span><span class='line'>                              |
+</span><span class='line'>             +----------------+------------------+
+</span><span class='line'>             |                |                  |
+</span><span class='line'>             |                |                  |
+</span><span class='line'>      RIP1=192.168.1.2  RIP2=192.168.1.3  RIP3=192.168.1.4 (eth0)
+</span><span class='line'>      VIP=192.168.1.110 VIP=192.168.1.110 VIP=192.168.1.110 (all lo:0, non-arping)
+</span><span class='line'>      _____________     _____________      _____________
+</span><span class='line'>     |             |   |             |    |             |
+</span><span class='line'>     |   CIP-&gt;VIP  |   |             |    |             |
+</span><span class='line'>     |   VIP-&gt;CIP  |   |             |    |             |
+</span><span class='line'>     | realserver  |   | realserver  |    | realserver  |
+</span><span class='line'>     |_____________|   |_____________|    |_____________|
+</span><span class='line'></span></code></pre></td></tr></table></div></figure>
+
+
+<p>首先，负载机（即图中的 <code>director</code> ）需要将服务发布地址配置成网卡的从地址 <code>VIP</code>（我还不太清楚为什么不能直接配成第一地址），以便接收来自客户端的 IP 报文。然后，它会根据分配置策略选择一个真实服务器（即图中的 <code>realserver</code> ），并将这个 IP 报文直接转发过去，而这就需要真实服务器也有一个从地址配置成 <code>VIP</code> （一般都配到 <code>lo</code> 网口上）。可是，大家都是在一个网段的，如果没有什么措施的话，那一开始来自客户端的目的地址为 <code>VIP</code> 的 IP 报文就不知道要由谁来处理了。所以，在真实服务器上都要把 <code>lo</code> 这个网卡的 ARP 广播与响应功能给禁掉，让客户端不知道真实服务器也有 <code>VIP</code> 这个地址。而负载机则是通过真实服务器的真实地址（非 <code>VIP</code> ）得知它的 MAC 地址，进而进行转发的。</p>
+
+<p>而当真实服务器需要往回发报文的时候，因为与客户端之间并不像 NAT 那样不在同一网段，也没有被负载机隔来，所以回应报文就通过正常途径直接到了客户端的手（网口？）中。</p>
+
+<p>这样一来，相比 NAT 模式而言，其额外的配置工作主要就是 <code>VIP</code> 从地址的配置以及 ARP 相关功能的禁用了。让我们一步一步来吧。首先是负载机的 <code>VIP</code> 配置（真实地址的配置就跟正常的一样，不写了）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ifconfig eth0:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+</span><span class='line'>$ sudo route add -host 192.168.1.110 eth0:0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后是真实服务器的 <code>VIP</code> 配置：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ifconfig lo:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+</span><span class='line'>$ sudo route add -host 192.168.1.110 eth0:0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>与负载机唯一不同的就是要把地址配到 <code>lo</code> 上。接下来是禁掉这个网卡的 ARP 相关的功能（这里就用不了 <code>sudo</code> 了，必须直接用 <code>root</code> 用户，不知道为嘛）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+</span><span class='line'># echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+</span><span class='line'># echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+</span><span class='line'># echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然更好的办法是修改 <code>/etc/sysctl.conf</code> 文件，然后执行 <code>sysctl -p</code> 命令来使修改生效。这样做的好处是配置被保存下来了，下次开机还有效，而且也可以用 <code>sudo</code> 来做。</p>
+
+<p>地址配完了，最后就是 ipvsadm 本身的配置了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ipvsadm -A -t 192.168.1.110:22 -s rr
+</span><span class='line'>$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.2:22 -g
+</span><span class='line'>$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.3:22 -g
+</span><span class='line'>...</span></code></pre></td></tr></table></div></figure>
+
+
+<p>嗯，跟 NAT 模式唯一的不同就是 <code>-g</code> 选项，表示 DR 模式。因为是默认选项，所以不写 <code>-g</code> 也可以。</p>
+
+<p>TCP 服务的话这样就可以了，可是 UDP 服务却还有一些问题需要解决。正如上面所说，服务端发给客户端的回包是不经过负载的，这样的话，如果这个服务程序没有绑定到特定网卡的话，这个回包的源地址默认就是服务器本身的真实地址（如 <code>192.168.1.2</code> ）了，而这样的回包一般是不会被客户端所接受的，因为客户端当初可是往 <code>VIP</code> 这个地址发的请求包。而最通用的解决方法就是将该服务显式绑定到 <code>VIP</code> 这个地址上，强迫其回包的源地址为 <code>VIP</code> ，而这正是客户端所希望看到的。</p>
+
+<p>由上可知，DR 模式相对 NAT 模式而言，对真实服务器来说就是侵入式的配置方式，增加了不少配置工作和限制，而其性能方面的优势据说在现在也大大降低了。因此一般应用的话，直接用 NAT 模式就可以了。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html">总结一下学到的 LVS 相关知识（ NAT 模式）</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-12T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>LVS，即 Linux Virtual Server 的简称，是 Linux 下用来实现负载均衡的一个项目。它支持三种负载模式，分别为 NAT 、 DR 以及 TUN 。</p>
+
+<p>注意，我这里讲的都是针对的 2.6 的内核， 2.4 、 2.2 、 2.0 版内核的实现方法和配置方法都各有不一样的地方。还好我不需要维护历史遗留系统（擦汗）。</p>
+
+<p>首先是最简单的 NAT 模式。这种模式跟普通的 NAT 防火墙的原理差不多，只不过它会根据指定的分配策略，为每一个新的客户端连接选择一个不同的真实服务，而不是像 NAT 防火墙那样只映射到后台的同一个真实服务。</p>
+
+<p>这种模式下最常用的部署方式为，负载均衡机器上分别启用两块网卡，一块外网，一块内网。当然一块网卡也可以，然后在这块网卡上配两个地址。这里假设外网地址为 <code>192.168.0.1</code> ，内网地址为 <code>192.168.1.1</code> 。两个真实服务器的地址分别为 <code>192.168.1.2</code> 以及 <code>192.168.1.3</code> 。</p>
+
+<p>这样，要对两台服务器的 SSH 服务进行负载均衡的话，负载机器上要执行的命令如下（当然你得先安装 <code>ipvsadm</code> 这个命令才行。负载功能的实现还是在内核中做的，跟 <code>iptables</code> 一样）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ipvsadm -A -t 192.168.0.1:22 -s rr</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>-A</code> 表示增加一个新的负载均衡服务，一台负载均衡器上可以同时对多个服务进行负载； <code>-t</code> 表示这是一个 TCP 服务； <code>-s rr</code> 表示选择 Round Robin 分配策略。 Round Robin 是最简单的一种分配策略，表示在每台真实服务器间进行轮流选择；其他还有最少连接等策略。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ipvsadm -a -t 192.168.0.1:22 -r 192.168.1.2:22 -m</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>-a</code> 表示为指定的负载服务增加一个新的真实服务； <code>-t</code> 同上； <code>-r</code> 指定真实服务的地址和端口； <code>-m</code> 则表示这个真实服务采用的是 NAT 模式的负载均衡。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ipvsadm -a -t 192.168.0.1:22 -r 192.168.1.3:22 -m</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样负载均衡服务就配置好了。当然，记得还要打开系统的 IP 转发功能，不管你用的是哪种负载均衡。真实服务器上则还需要配置路由规则，把回给客户端的路由通过 <code>192.168.1.1</code> 这个网关进行发送（不指定网关地址，只指定网口是不行的）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo route add -net 192.168.0.0/24 gw 192.168.1.1</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这种模式的优点，当然就在于配置简单啦，跟配置 NAT 防火墙基本相同，缺点是有对网络报文的额外处理（替换目的地址）的开销。不过据说 2.6 的内核其开销已经很小了。</p>
+
+<p>用如下命令可以查看当前的负载状态：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sudo ipvsadm -l -n</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这里有一点要说的是，当负载的是 UDP 服务（如 OpenVPN ）时，建立起来的连接会显示在“非活动连接”那一栏，不知道为什么。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html">发布一个寻找局域网内主机的小工具</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-05T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在工作中，经常需要远程登录到机房中的设备上进行调试与开发，走的是工作局域网。由于这些设备的地址也是动态获取的，因此在遇到一些意外事故，如网线松了、网络不稳定之类的，这些地址可能就变了。每当这时，我们就得跑到机房，给设备连上显示器（我们连 KVM 都没有，命苦啊），查看 IP ，然后再跑回去重新连。太麻烦了。</p>
+
+<p>我知道有支持动态地址的 DNS 服务，可是我们没权限操作 DNS 服务器，而且设备也都是不固定的，没必要惊动网络管理员（好吧，我甚至都不知道谁是网络管理员，作为三年的“老”员工，我面壁去了。好吧，其实我就是想写写程序练练手），所以我就写了个小程序，用来查找一台特定设备的 IP 地址。</p>
+
+<p>原理其实很简单啦。客户端（也就是我的笔记本）发个 UDP 广播报文，里面有要找的主机的名字。服务端呢，启动时则指定一个主机名字。当服务端收到一个 UDP 广播报文，并且发现找的就是自己呢，就返回一个 <code>bingo</code> 报文。这样，客户端就知道这个主机的 IP 地址啦。</p>
+
+<p>现在用的服务端口是 <code>5460</code> （取自某本网络小说 :-），应该没有哪个知名服务用这个端口吧。当然，因为这个工具确实太简单了，所以就没有考虑冲突的情况啦。请大家在使用的时候，给主机取个有个性的名字哟。</p>
+
+<p>我通过这个程序学到的新知识就是，要发送 UDP 的广播报文，只是指定一个全 <code>1</code> 的地址是不够的，还要设置 socket 选项 <code>SO_BROADCAST</code> （我继续面壁去了）。</p>
+
+<p>下面是代码（好撑篇幅啊，又没人给我稿费的说）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="cp">#include &lt;stdio.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;errno.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;string.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;sys/socket.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;netinet/in.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;pthread.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;unistd.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;arpa/inet.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#define PORT 5460</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">char</span> <span class="o">*</span><span class="n">progname</span><span class="p">;</span>
+</span><span class='line'><span class="k">static</span> <span class="kt">int</span> <span class="n">sock</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="nf">usage</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span>
+</span><span class='line'>            <span class="s">&quot;Usage: %s options</span><span class="se">\n</span><span class="s">&quot;</span>
+</span><span class='line'>            <span class="s">&quot;where options must be one of:</span><span class="se">\n</span><span class="s">&quot;</span>
+</span><span class='line'>            <span class="s">&quot;  -s         Running as a  named server.</span><span class="se">\n</span><span class="s">&quot;</span>
+</span><span class='line'>            <span class="s">&quot;  -c         Asking for &#39;s address.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+</span><span class='line'>            <span class="n">progname</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">int</span> <span class="nf">udp_socket</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">PF_INET</span><span class="p">,</span> <span class="n">SOCK_DGRAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">sock</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Cannot open a new socket: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">sock</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="nf">server</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">listen_addr</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">listen_addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">listen_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">INADDR_ANY</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">listen_addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">PORT</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">bind</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">listen_addr</span><span class="p">,</span>
+</span><span class='line'>             <span class="k">sizeof</span><span class="p">(</span><span class="n">listen_addr</span><span class="p">))</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;Cannot bind to the UDP port %d: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+</span><span class='line'>                <span class="n">PORT</span><span class="p">,</span> <span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span>
+</span><span class='line'>        <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">BUFSIZ</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>        <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">addr</span><span class="p">;</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">addrlen</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">received</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">received</span> <span class="o">=</span> <span class="n">recvfrom</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>                            <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span> <span class="p">(</span><span class="n">socklen_t</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">addrlen</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">received</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">continue</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">buf</span><span class="p">[</span><span class="n">received</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">sendto</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="s">&quot;bingo&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span> <span class="n">addrlen</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="o">*</span><span class="nf">waiton_response</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">arg</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="n">arg</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">BUFSIZ</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>        <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">addr</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">socklen_t</span> <span class="n">addrlen</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="p">);</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="n">received</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">received</span> <span class="o">=</span> <span class="n">recvfrom</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>                            <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">addrlen</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">received</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">continue</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">buf</span><span class="p">[</span><span class="n">received</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="s">&quot;bingo&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Got. %s&#39;s address is %s.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+</span><span class='line'>                   <span class="n">name</span><span class="p">,</span> <span class="n">inet_ntoa</span><span class="p">(</span><span class="n">addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">));</span>
+</span><span class='line'>            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">static</span> <span class="kt">void</span> <span class="nf">client</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">bcast</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">pthread_t</span> <span class="n">tid</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">pthread_attr_t</span> <span class="n">attr</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">addr</span><span class="p">;</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">setsockopt</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">SO_BROADCAST</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bcast</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">bcast</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">pthread_attr_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">attr</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">pthread_attr_setdetachstate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">attr</span><span class="p">,</span> <span class="n">PTHREAD_CREATE_DETACHED</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="mh">0xffffffff</span><span class="p">;</span>
+</span><span class='line'>    <span class="n">addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">PORT</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Searching...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">sendto</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">strlen</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>               <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="p">));</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">pthread_create</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">attr</span><span class="p">,</span> <span class="n">waiton_response</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="n">name</span><span class="p">);</span>
+</span><span class='line'>        <span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Cannot find the machine.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="n">pthread_attr_destroy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">attr</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="n">progname</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'>    <span class="n">sock</span> <span class="o">=</span> <span class="n">udp_socket</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">usage</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&quot;-s&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">server</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+</span><span class='line'>    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">&quot;-c&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">client</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>        <span class="n">usage</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>PS. 最近 gist.github.com 好像不是很给力，用它贴代码的话，不翻墙就看不到，只好直接贴这里了。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html">Linux 下有关环境变量与换行符的一个小问题</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-05T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>最近在工作中，老是遇到一个莫名其妙的问题。我有一个用来设置一些环境变量的脚本，结果经常发现这个脚本设过的环境变量乱七八糟的，像 PATH 这种，就是之前的值跟后面添加的值重叠在了一起。直到后来才发现，原来是换行符搞的鬼。</p>
+
+<p>这样说还不太清楚，上代码吧。编辑文本文件 <code>test.sh</code> 如下，记得以 DOS 换行符的模式来保存：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Save this file using DOS&#39;s CR/LF.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">export </span><span class="nv">VAR1</span><span class="o">=</span>blahblahblah
+</span><span class='line'><span class="nb">export </span><span class="nv">VAR2</span><span class="o">=</span>hello
+</span><span class='line'><span class="nb">export </span><span class="nv">VAR1</span><span class="o">=</span><span class="nv">$VAR1</span>:<span class="nv">$VAR2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，执行一下命令：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ . ./test.sh</span></code></pre></td></tr></table></div></figure>
+
+
+<p>来使环境变量生效，并看一下结果：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ echo $VAR1
+</span><span class='line'>:helloahblah</span></code></pre></td></tr></table></div></figure>
+
+
+<p>当然，Shell 看到的还不是这个样子，而是会把多出来的那个 CR 回车符也看作是路径（或者其他什么值）的一部分，最后当然也会导致所作的设置不生效啦。</p>
+
+<p>至于为什么会变成这种换行符，我倒是还没有搞明白，因为我的源文件确实是 Unix 风格的换行符。也许是因为是在 Windows 下用 ClearCase 来进行源码控制的关系？</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html">OpenVPN 的并发测试方法</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-19T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>由于 OpenVPN 本身协议的特殊性，用一般的方法不太好测它的并发。看过 LoadRunner ，但也最多只支持标准的 SSL/TLS 协议（当然，我也没细看这个）。于是动手改了其客户端的实现，最终完成任务。</p>
+
+<p>其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。貌似装十个左右的虚拟网卡驱动之后，机器就不行了。于是解决办法也很简单，把虚拟网卡相关的功能跳过就可以了。根据<a href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">上篇</a>的说明，只要在 <code>incoming_push_message()</code> 函数中，把对 <code>do_up()</code> 的调用直接换成 <code>initialization_sequence_completed()</code> 就 OK 了。</p>
+
+<p>当然，这样一来，流量的来源也就没有了，而没有数据流量也就无所谓测试了，最多测下并发接入的性能。要流量也很简单，改下 <code>io_wait()</code> 、 <code>read_tun()</code> 、 <code>write_tun()</code> 这几个函数的实现，手工组个 Ping 请求的 IP 报文给 OpenVPN 去发就行了。</p>
+
+<p>在这个过程中我也终于搞清楚那个 <code>checksum</code> 到底是怎么回事儿，原来在累加一遍求出一个和之后，如果这个和本身超过了 <code>16</code> 位，那么还要把这个和继续按 <code>16</code> 位来切分求和，这样才是最终结果。之前看 WikiPedia 上的那个例子，一直就没搞明白那个 <code>2</code> 到底是打哪儿来的。</p>
+
+<p>最后，就是要把起客户端这个过程给自动化了。于是又去研究 Windows 的 Batch 脚本，<code>for</code> 是循环， <code>start</code> 是后台运行， <code>ping</code> 用来模拟 <code>sleep</code> ， <code>taskkill</code> 是强制杀掉，搞了个 <code>1000</code> 客户端连了断、断了连的自动化测试出来。丢在那边跑了两天，服务端表示很淡定。</p>
+
+<p>以上。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">OpenVPN 的初始化过程分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-18T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>题外话：Eclipse CDT 很给力，至少在我用起来，比 gVim + Cscope 或者 SourceInsight 要来得给力，推荐一下。</p>
+
+<p>更准确的来说，是 OpenVPN 的客户端与服务端之间，从协商密钥、到推送配置，以及最后的网卡与路由配置生效，开始进行 IP 报文的传递，这整个的过程。</p>
+
+<p>完了。嗯，整个过程就像上面说的，这几个步骤而已。</p>
+
+<p>不过重点当然还是代码啦。以前一直以为 OpenVPN 的点对点模式下，两端会进行一个决定谁是客户端，谁是服务端的协商过程，一直都想知道是怎么做的。后来才知道，原来通过配置信息，就已经决定好这个了。当然，我下面说的是客户端-服务器模式。</p>
+
+<p>那么先来看客户端的初始化。客户端进入的还是点对点模式，进入点，也是其事件循环的入口为 <code>tunnel_point_to_point()</code> 。然后是 <code>init_instance()</code> ，在这个函数中进行客户端自身的初始化，包括各种数据结构的建立，像分片啦、压缩啦、socket 啦、MTU 啦等。其中代码量最多的是 SSL 模块的初始化（ <code>do_init_crypto</code> 和 <code>do_init_frame_tls</code> ），要调很多的 OpenSSL 的函数；还有对 socket 的初始化，分为两个阶段，第一个阶段解析域名，第二个阶段发起连接（如果是 TCP 的话）。我一直搞不十分清楚的是 MTU ，也就是 <code>frame</code> 模块，因为太细节而且太分散了。</p>
+
+<p>然后通过 <code>pre_select()</code> 函数进入 <code>check_tls()</code> 过程。因为是客户端，这时就会准备好发送第一个握手报文，命令码为 <code>P_CONTROL_HARD_RESET_CLIENT_V1/2</code> 。按照<a href="/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html">上篇</a>所说与服务器交换好了密钥之后，会在 <code>tls_process()</code> 函数的 <code>3852</code> 行，设置连接成功建立的标志 <code>connection_established</code> 。</p>
+
+<p>之后，还是在 <code>pre_select()</code> 的 <code>check_connection_established()</code> 函数中，初始化 <code>push_request_interval</code> 定时器，由客户端开始发送推送配置的请求报文。推送配置功能的报文走的是和交换密钥相同的 SSL 隧道，按理说蛮可靠的，不过还是实现了重传，不知道是基于什么考虑。通过 <code>check_incoming_control_channel()</code> 函数收到服务器推过来的额外配置之后，调用 <code>process_incoming_push_msg()</code> 函数解析一下收到的配置字符串，就要根据这些配置，调用 <code>do_up()</code> 函数进行最终的初始化工作了。</p>
+
+<p>在 <code>do_up()</code> 中，先调用 <code>do_open_tun()</code> ，根据由服务器发过来的所分配置的虚拟 IP 地址把虚拟网卡给起了，然后把 <code>route_wakeup</code> 定时器给激活一下，告诉 <code>check_add_routes()</code> 函数加一下路由，完了之后就是 <code>initialization_sequence_completed()</code> 了。</p>
+
+<p>服务器嘛，也就是顺序不一样。首先，虚拟网卡和系统路由可以先建起来，因为不需要等其他人推配置。然后就等着客户端发过来第一个报文了，然后握手，然后把配置推过去，然后就完了。</p>
+
+<p>然后就是在虚拟网卡跟物理网卡之间当搬运工啦。因为服务器要服务多个客户端，所以还用二叉树实现了一个调度器。</p>
+
+<p>就这样。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html">OpenVPN 的握手协议分析</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-11-22T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>又是好久没来这儿了啊。</p>
+
+<p>最近因为工作需要（其实也没需要那么多），一直在断断续续地看 OpenVPN 的代码，终于大概搞清楚了它的握手是怎么个流程了。简单来说的话其实非常的简单，首先在 <code>reliable</code> 模块中实现了一个可靠的 UDP 报文协议，就是加上超时重传和确认报文的功能；然后用该协议交换一个 Hard Reset 命令，开始握手；最后建立 SSL 对象，并且通过内存 <code>BIO</code> 在可靠 UDP 协议的基础上转发 OpenSSL 的握手协议报文，通过这个 SSL 连接交换 OpenVPN 自己的密钥。接下来就是用这些密钥，该干嘛干嘛了。</p>
+
+<p>本来还写了好多，不过太乱，写不下去了，还是简单点吧。具体实现就是，首先在 <code>key_state_init()</code> 函数中，初始化了 <code>ssl</code> 、 <code>ssl_bio</code> 、 <code>ct_in</code> 、 <code>ct_out</code> 这几个相关的成员， <code>ssl</code> 就是普通 SSL 程序里面的 <code>SSL</code> 对象， <code>ssl_bio</code> 是以 <code>BIO</code> 接口来读写这个 <code>ssl</code> 成员而准备的，<code>tls_process()</code> 中通过 <code>ssl_bio</code> 这个成员完成 OpenVPN 自己的密钥交换，完成从 <code>S_START</code> 到 <code>S_GOT_KEY</code> 这几个状态的转换。而 <code>ct_in</code> 和 <code>ct_out</code> 则是这个 <code>ssl</code> 对象的后端，不是通常用的 socket BIO 对象，而是两个 memory BIO 对象，为的就是得到 <code>ssl</code> 对象要发给对端的密文，然后通过可靠 UDP 协议来转发。这样， <code>tls_process()</code> 的主要工作就是操作这几个对象，外加可靠 UDP 模块的那几个队列了。</p>
+
+<p>这里的关键就是通过 OpenSSL 实现提供的 memory BIO 对象抓取密文包的功能。如果是在其他没有这个功能接口的语言实现或封装中，则可以使用 socketpair 这种方法来抓，我今天就试着改了一下 OpenVPN ，这种方法是可行的。具体就是把其中一个 socket 给 ssl 当后端，另一个 socket 就可以用来读写密文了。注意 <code>socketpair()</code> 调用中的 <code>type</code> 参数要加上 <code>SOCK_NONBLOCK</code> 。</p>
+
+<p>不过在 Erlang 这个语言中，甚至就连 <code>socketpair</code> 这个调用都没封。搜了一下它的源码，才发现自己实现一个也非常的简单，怪不得。下面摘自 <code>otp_src_R14B/lib/kernel/test/inet_sockopt_SUITE.erl</code> 文件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='erlang'><span class='line'><span class="nf">create_socketpair</span><span class="p">(</span><span class="nv">ListenOptions</span><span class="p">,</span><span class="nv">ConnectOptions</span><span class="p">)</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">LS</span><span class="p">}</span><span class="o">=</span><span class="nn">gen_tcp</span><span class="p">:</span><span class="n">listen</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nv">ListenOptions</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">Port</span><span class="p">}</span><span class="o">=</span><span class="nn">inet</span><span class="p">:</span><span class="n">port</span><span class="p">(</span><span class="nv">LS</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">CS</span><span class="p">}</span><span class="o">=</span><span class="nn">gen_tcp</span><span class="p">:</span><span class="n">connect</span><span class="p">(</span><span class="n">localhost</span><span class="p">,</span><span class="nv">Port</span><span class="p">,</span><span class="nv">ConnectOptions</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="nv">AS</span><span class="p">}</span><span class="o">=</span><span class="nn">gen_tcp</span><span class="p">:</span><span class="n">accept</span><span class="p">(</span><span class="nv">LS</span><span class="p">),</span>
+</span><span class='line'>    <span class="o">?</span><span class="n">line</span> <span class="nn">gen_tcp</span><span class="p">:</span><span class="n">close</span><span class="p">(</span><span class="nv">LS</span><span class="p">),</span>
+</span><span class='line'>    <span class="p">{</span><span class="nv">AS</span><span class="p">,</span><span class="nv">CS</span><span class="p">}.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>至于前面的 <code>?line</code> 是啥，咱就不需要关心了。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html">用 Python 操作虚拟网卡</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-09-18T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>在我的 <a href="/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html">XTunnel</a> 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。</p>
+
+<p>在 Linux 内核中，特别是在现在的发行版中，应该都已经有了 <code>TUN/TAP</code> 虚拟网卡的驱动程序，看一下有没有 <code>/dev/net/tun</code> 这个文件就可以知道了。如果没有，就执行一下 <code>sudo modprobe tun</code> 这个命令吧。如果还是没有，那就 Google 之吧。下面上代码：</p>
+
+<div><script src='https://gist.github.com/585369.js'></script>
+<noscript><pre><code>import fcntl
+import os
+import struct
+import subprocess
+
+
+# Some constants used to ioctl the device file. I got them by a simple C
+# program.
+TUNSETIFF = 0x400454ca
+TUNSETOWNER = TUNSETIFF + 2
+IFF_TUN = 0x0001
+IFF_TAP = 0x0002
+IFF_NO_PI = 0x1000
+
+# Open TUN device file.
+tun = open(&#39;/dev/net/tun&#39;, &#39;r+b&#39;)
+# Tall it we want a TUN device named tun0.
+ifr = struct.pack(&#39;16sH&#39;, &#39;tun0&#39;, IFF_TUN | IFF_NO_PI)
+fcntl.ioctl(tun, TUNSETIFF, ifr)
+# Optionally, we want it be accessed by the normal user.
+fcntl.ioctl(tun, TUNSETOWNER, 1000)
+
+# Bring it up and assign addresses.
+subprocess.check_call(&#39;ifconfig tun0 192.168.7.1 pointopoint 192.168.7.2 up&#39;,
+        shell=True)
+
+while True:
+    # Read an IP packet been sent to this TUN device.
+    packet = list(os.read(tun.fileno(), 2048))
+
+    # Modify it to an ICMP Echo Reply packet.
+    #
+    # Note that I have not checked content of the packet, but treat all packets
+    # been sent to our TUN device as an ICMP Echo Request.
+
+    # Swap source and destination address.
+    packet[12:16], packet[16:20] = packet[16:20], packet[12:16]
+
+    # Under Linux, the code below is not necessary to make the TUN device to
+    # work. I don&#39;t know why yet, but if you run tcpdump, you can see the
+    # difference.
+    if True:
+        # Change ICMP type code to Echo Reply (0).
+        packet[20] = chr(0)
+        # Clear original ICMP Checksum field.
+        packet[22:24] = chr(0), chr(0)
+        # Calculate new checksum.
+        checksum = 0
+        # for every 16-bit of the ICMP payload:
+        for i in range(20, len(packet), 2):
+            half_word = (ord(packet[i]) &lt;&lt; 8) + ord(packet[i+1])
+            checksum += half_word
+        # Get one&#39;s complement of the checksum.
+        checksum = ~(checksum + 4) &amp; 0xffff
+        # Put the new checksum back into the packet.
+        packet[22] = chr(checksum &gt;&gt; 8)
+        packet[23] = chr(checksum &amp; ((1 &lt;&lt; 8) -1))
+
+    # Write the reply packet into TUN device.
+    os.write(tun.fileno(), &#39;&#39;.join(packet))
+</code></pre></noscript></div>
+
+
+<p>简而言之，就是首先打开对应的设备文件，然后通过 <code>ioctl</code> 系统调用告诉它我们想要的网卡类型和名称，同时还可以告诉它我们想以普通用户的身份来对它进行操作。之后通过 <code>ifconfig</code> 命令将新建的网卡拉起来，就可以开始读写了。</p>
+
+<p>当你以 root 身份运行这个脚本的时候，可以 <code>ping</code> 一下 <code>192.168.7.2</code> 这个地址试试，看看是不是能 <code>ping</code> 得通。</p>
+
+<p>下面的代码则在 Mac 环境中实现了同样的功能（不过还没有设置用户身份的功能）：</p>
+
+<div><script src='https://gist.github.com/586860.js'></script>
+<noscript><pre><code>import os
+import subprocess
+
+
+# Open file corresponding to the TUN device.
+tun = open(&#39;/dev/tun0&#39;, &#39;r+b&#39;)
+
+# Bring it up and assign addresses.
+subprocess.check_call(&#39;ifconfig tun0 192.168.7.1 192.168.7.2 up&#39;, shell=True)
+
+while True:
+    # Read an IP packet been sent to this TUN device.
+    packet = list(os.read(tun.fileno(), 2048))
+
+    # Modify it to an ICMP Echo Reply packet.
+    #
+    # Note that I have not checked content of the packet, but treat all packets
+    # been sent to our TUN device as an ICMP Echo Request.
+
+    # Swap source and destination address.
+    packet[12:16], packet[16:20] = packet[16:20], packet[12:16]
+    # Change ICMP type code to Echo Reply (0).
+    packet[20] = chr(0)
+    # Clear original ICMP Checksum field.
+    packet[22:24] = chr(0), chr(0)
+    # Calculate new checksum.
+    checksum = 0
+    # for every 16-bit of the ICMP payload:
+    for i in range(20, len(packet), 2):
+        half_word = (ord(packet[i]) &lt;&lt; 8) + ord(packet[i+1])
+        checksum += half_word
+    # Get one&#39;s complement of the checksum.
+    checksum = ~(checksum + 4) &amp; 0xffff
+    # Put the new checksum back into the packet.
+    packet[22] = chr(checksum &gt;&gt; 8)
+    packet[23] = chr(checksum &amp; ((1 &lt;&lt; 8) - 1))
+
+    # Write the reply packet into TUN device.
+    os.write(tun.fileno(), &#39;&#39;.join(packet))</code></pre></noscript></div>
+
+
+<p>当然要运行上面的代码，你首先要到<a href="http://tuntaposx.sourceforge.net/">这里</a>下载并安装 Mac 下的 <code>TUN/TAP</code> 设备驱动程序才行。安装之后，在系统的 <code>/dev</code> 目录中就会分别有 16 个 <code>/dev/tunX</code> 以及 <code>/dev/tapX</code> （ <code>X</code> 表示网卡序号）字符设备文件，分别对应于 <code>16</code> 个同名的 <code>TUN/TAP</code> 虚拟网卡。当然，在运行这个脚本之前，你是看不到这些网卡的。不不，用 <code>ifconfig -a</code> 也不行。</p>
+
+<p>因为与 Linux 下的驱动的实现方法不同，这里是用的文件名来标识网卡类型与名称，所以就不需要 Linux 版本中的第一个 <code>ioctl</code> 调用了。</p>
+
+<p>也不记得一开始是在哪边看到的一个讲 <code>TUN/TAP</code> 编程的文章，说要实现对 <code>ping</code> 报文的处理，只要简单地将读到的 IP 报文中的源地址与目的地址对换一下，再写回去就可以了。在 Linux 系统中也确实是如此，因此我也就没有深究。直到后来才发现，同样的招数在 Mac 下居然没用。于是赶紧上网翻 ICMP 的报文格式，改报文中的 <code>type</code> 码，并重新计算 <code>checksum</code> ，这才搞定。这时也才发现，用 Python 来操作原始的字节流还是没有 C 这种底层语言直观啊。</p>
+
+<p>可是 Linux 下为什么不需要这么麻烦呢？于是回去抓了抓包，这才发现，相对于 Mac 下的一问（ <code>ping</code> 命令）一答（ Python 脚本），在 Linux 下居然是两问两答，一问是 <code>ping</code> 命令，一问是我们的那个 Python 脚本。这也不奇怪，我连 <code>ICMP</code> 中的 <code>type</code> 码都没改，发过来的是 <code>request</code> ，那再发出去的当然还是 <code>request</code> 。至于应答，大概就是 Linux 的 <code>TUN/TAP</code> 驱动搞的鬼了。</p>
+
+<p>最后，当然也有 Windows 的实现版本啦，不过代码被我丢到公司的 Windows 工作用机上了，所以，就请您且听下回分解了。</p>
+
+<hr />
+
+<p><strong>Update 2011-04-26:</strong> Windows 下的实现代码如下：</p>
+
+<div><script src='https://gist.github.com/586892.js?file=tun-ping-win.py'></script>
+<noscript><pre><code>import _winreg as reg
+import win32file
+
+
+adapter_key = r&#39;SYSTEM\CurrentControlSet\Control\Class\{4D36E972-E325-11CE-BFC1-08002BE10318}&#39;
+
+
+def get_device_guid():
+    with reg.OpenKey(reg.HKEY_LOCAL_MACHINE, adapter_key) as adapters:
+        try:
+            for i in xrange(10000):
+                key_name = reg.EnumKey(adapters, i)
+                with reg.OpenKey(adapters, key_name) as adapter:
+                    try:
+                        component_id = reg.QueryValueEx(adapter, &#39;ComponentId&#39;)[0]
+                        if component_id == &#39;tap0801&#39;:
+                            return reg.QueryValueEx(adapter, &#39;NetCfgInstanceId&#39;)[0]
+                    except WindowsError, err:
+                        pass
+        except WindowsError, err:
+            pass
+
+def CTL_CODE(device_type, function, method, access):
+    return (device_type &lt;&lt; 16) | (access &lt;&lt; 14) | (function &lt;&lt; 2) | method;
+
+def TAP_CONTROL_CODE(request, method):
+    return CTL_CODE(34, request, method, 0)
+
+TAP_IOCTL_CONFIG_POINT_TO_POINT = TAP_CONTROL_CODE(5, 0)
+TAP_IOCTL_SET_MEDIA_STATUS = TAP_CONTROL_CODE(6, 0)
+TAP_IOCTL_CONFIG_TUN = TAP_CONTROL_CODE(10, 0)
+
+
+if __name__ == &#39;__main__&#39;:
+    guid = get_device_guid()
+    handle = win32file.CreateFile(r&#39;\\.\Global\%s.tap&#39; % guid,
+                                  win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                                  win32file.FILE_SHARE_READ | win32file.FILE_SHARE_WRITE,
+                                  None, win32file.OPEN_EXISTING,
+                                  win32file.FILE_ATTRIBUTE_SYSTEM, # | win32file.FILE_FLAG_OVERLAPPED,
+                                  None)
+    print(handle.handle)
+    if False:
+        win32file.DeviceIoControl(handle, TAP_IOCTL_CONFIG_POINT_TO_POINT,
+                                  &#39;\xc0\xa8\x11\x01\xc0\xa8\x11\x10&#39;, None);
+    else:
+        win32file.DeviceIoControl(handle, TAP_IOCTL_SET_MEDIA_STATUS, &#39;\x01\x00\x00\x00&#39;, None)
+        win32file.DeviceIoControl(handle, TAP_IOCTL_CONFIG_TUN,
+                                  &#39;\x0a\x03\x00\x01\x0a\x03\x00\x00\xff\xff\xff\x00&#39;, None)
+    while True:
+        l, p = win32file.ReadFile(handle, 2000)
+        q = p[:12] + p[16:20] + p[12:16] + p[20:]
+        win32file.WriteFile(handle, q)
+        print(p, q)
+    win32file.CloseHandle(handle)
+</code></pre></noscript></div>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html">通过 ODBC 接口访问 Oracle 数据库 &#8211; Linux 篇</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-03-03T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html#disqus_thread"
+             data-disqus-identifier="http://glacjay.info/blog/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93-linux-%E7%AF%87.html">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>首先，你要安装好 UnixODBC 软件包，这个就不多说了。</p>
+
+<p>然后，安装 Oracle 官方客户端，因为我的使用环境为 Fedora 12 ，所以我下载安装的是 <code>oracle-xe-client-10.2.0.1-1.0.i386.rpm</code> 。</p>
+
+<p>装好之后，要设置一些环境变量，我是用的一个 Shell 脚本来完成这项工作的，你可以把它放在 <code>/etc/profile.d/</code> 目录下并加上可执行权限来让其在系统启动时自动执行，也可以直接运行这个脚本来使其立即生效。脚本如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># File: oracle.sh</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">ORACLE_HOME</span><span class="o">=</span>/usr/lib/oracle/xe/app/oracle/product/10.2.0/client
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$ORACLE_HOME</span>/bin
+</span><span class='line'><span class="nb">export </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:<span class="nv">$ORACLE_HOME</span>/lib
+</span><span class='line'><span class="nb">export </span><span class="nv">TNS_ADMIN</span><span class="o">=</span><span class="nv">$ORACLE_HOME</span>/network/admin
+</span><span class='line'><span class="nb">export </span><span class="nv">TWO_TASK</span><span class="o">=</span><span class="nb">test</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">NLS_LANG</span><span class="o">=</span>”Simplified Chinese_china.UTF8”
+</span><span class='line'><span class="nb">export </span><span class="nv">NLS_DATE_FORMAT</span><span class="o">=</span><span class="s2">&quot;YYYY-MM-DD HH24:MI:SS&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中 <code>TWO_TASK</code> 变量的值应设为 <code>tnsnames.ora</code> 文件中的那个键名（下面再讲）， <code>NLS_LANG</code> 是为了 UTF-8 编码，而 <code>NLS_DATE_FORMAT</code> 设的是 <code>DATE</code> 类型的数据在插入和显示时所用的格式，这里设的是我比较习惯的一种。</p>
+
+<p>然后在 <code>$ORACLE_HOME</code> 目录中建一个子目录 <code>network/admin</code> ，并在其中新建两个文本文件如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># File: sqlnet.ora
+</span><span class='line'>SQLNET.AUTHENTICATION_SERVICES = (NTS)
+</span><span class='line'>NAMES.DIRECTORY_PATH = (TNSNAMES, EZCONNECT)</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个文件中的都是一些固定的配置，其中 <code>TNSNAMES</code> 和 <code>EZCONNECT</code> 分别为我所用到的两种指定连接目标的方式。另一个文件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># File: tnsnames.ora
+</span><span class='line'>test =
+</span><span class='line'>  (DESCRIPTION =
+</span><span class='line'>    (ADDRESS =
+</span><span class='line'>      (PROTOCOL = TCP)
+</span><span class='line'>      (HOST = 192.168.0.2)
+</span><span class='line'>      (PORT = 1521)
+</span><span class='line'>    )
+</span><span class='line'>    (CONNECT_DATA =
+</span><span class='line'>      (SID = test)
+</span><span class='line'>    )
+</span><span class='line'>  )</span></code></pre></td></tr></table></div></figure>
+
+
+<p>第二行中的 <code>test</code> 就是 <code>TWO_TASK</code> 环境变量的值， <code>SID</code> 就是数据库名，其它的就不需要说明了。当然，在这个文件中可以配置多个数据库连接，用不同的名称来标识（ <code>TWO_TASK</code> 就是用来选择的），这个例子中只有一个配置。</p>
+
+<p>以上的步骤主要是 Oracle 相关，都完成了之后，可以先测一下 Oracle 客户端是不是能正常使用了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sqlplus username/password@test</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这个命令可以连接数据库。这种参数格式就是上面提到的 <code>TNSNAMES</code> 方式，而 <code>EZCONNECT</code> 方式则是下面的样子（这种方式就不需要在 <code>tnsnames.ora</code> 文件中进行配置了）：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ sqlplus username/password@192.168.0.2:1521/test</span></code></pre></td></tr></table></div></figure>
+
+
+<p>成功之后可以试试下面的 SQL 语句：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt; select * from some_table;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接下来就是配置 UnixODBC 了。首先是 <code>odbcinst.ini</code> 文件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="k">[oracle]</span>
+</span><span class='line'><span class="na">Driver</span> <span class="o">=</span> <span class="s">/usr/lib/oracle/xe/app/oracle/product/10.2.0/client/lib/libsqora.so.10.1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后是 <code>odbc.ini</code> 文件：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ini'><span class='line'><span class="k">[oracle]</span>
+</span><span class='line'><span class="na">Driver</span> <span class="o">=</span> <span class="s">oracle</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>都没什么可配的。</p>
+
+<p>最后就是程序了，跟其它的 ODBC 程序没什么不同，除了连接字符串，需要写成这个样子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>"DSN=oracle;UID=username;PWD=password"</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>DSN</code> 就是 ODBC Data Source 名，也就是上面 <code>odbc.ini</code> 文件中方括号内的名字； <code>UID</code> 就是用户名， <code>PWD</code> 就是密码。</p>
+
+<p>好了，就这么多。</p>
+
+<p>PS. 我和另一位同事分别碰到过一次一个特别令人头痛的问题，就是在连接时， UnixODBC 说 <code>libsqora.so.10.1</code> （就是在 <code>odbcinst.ini</code> 文件中指定的那个）找不到，虽然这个文件明明就在那边；用 <code>ldd</code> 命令查看该文件的结果是说“这不是一个动态可执行文件”。更不幸的是，我不知怎么在我的机器上把这个问题给莫名其妙地解决了，却想破头都不知道是怎么解决的。太失败了。</p>
+
+<hr />
+
+<p><strong>Update:</strong> 问题解决了，出问题的都是新装的 Fedora 12 机器，后来做了次全系统的更新，再建个链接，就好了。只是不知道倒底是哪个软件包的版本太老，试了 <code>glibc</code> 、 <code>libtool</code> 、 <code>kernel</code> 都不是。</p>
+
+<p><strong>Update 2012-12-31:</strong> 找到问题的原因了，都是 SELinux 惹的祸，关之即可，或者配下相关的策略啥的。</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+      <a class="prev" href="/blog/page/3/">&larr; Older</a>
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html">OpenSSL 与 WinSock2 配合使用时遇到的一个坑</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: What Are You Thinking About?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 Lambda</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

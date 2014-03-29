@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Programming | Random Stuff from GlacJAY]]></title>
+  <link href="http://glacjay.info/blog/categories/programming/atom.xml" rel="self"/>
+  <link href="http://glacjay.info/"/>
+  <updated>2014-03-30T00:23:29+08:00</updated>
+  <id>http://glacjay.info/</id>
+  <author>
+    <name><![CDATA[GlacJAY]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[修改 OpenVPN 实现加密算法的自动协商]]></title>
+    <link href="http://glacjay.info/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html"/>
+    <updated>2011-09-17T00:00:00+08:00</updated>
+    <id>http://glacjay.info/blog/2011-09-17/修改-openvpn-实现加密算法的自动协商</id>
+    <content type="html"><![CDATA[<p>由<a href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">另一篇博</a>中的分析可知，OpenVPN 中有两个加解密通道。一条是标准的 SSL 协议通道，被 OpenVPN 用于协商自己所用的密钥。这个通道的加密算法当然也是通过 SSL 协议来进行协商的，可以通过 <code>--tls-cipher</code> 选项来进行配置。另一条是 OpenVPN 自己的加解密通道，用于交换实际的数据，也就是虚拟网卡抓到的 IP 报文。这个通道的加密算法则是通过 <code>--cipher</code> 和 <code>--auth</code> 两个选项，分别在通调两端指定的。</p>
+
+<p>对于第二条通道的加密算法，必须要同时在两端分别指定一致的选项，有时候不是很方便（当然，我研究的还是 2.1.1 版本的 OpenVPN ，不知道最新的版本还是不是这样）。比如说，我想通过在服务端修改配置，指定加密算法，然后让连接我的客户端自动用同一个算法。最简单的修改思路，就是借用第一条通道中的算法协商机制，从 SSL 对象中取得协商出来的算法。</p>
+
+<p>具体做法就是：</p>
+
+<p>首先，在函数 <code>do_init_crypto_tls_c1()</code> 中，去掉对函数 <code>init_key_type()</code> 的调用。这个调用就是根据 <code>--cipher</code> 和 <code>--auth</code> 选项进行算法配置的地方，我们要动态协商，自然是不需要这个了。</p>
+
+<p>但同时，这会引起接下来一个步骤的错误。在函数 <code>crypto_adjust_frame_parameters()</code> 中，会根据之前配置的算法进行报文中密钥空间的分配。现在还不知道算法，怎么知道要分配多少空间呢？就只能改成最大值了。分别改为 <code>MAX_CIPHER_KEY_LENGTH</code> 和 <code>MAX_HMAC_KEY_LENGTH</code> 就行了。当然，这样改不仅浪费空间，而且也不够严谨，因为 key length 和 IV length 不是一回事，却只能都用 <code>MAX_CIPHER_KEY_LENGTH</code> 来初始化。</p>
+
+<p>最后就是在 SSL 协商好之后，从里面取加密算法了。具体位置在 <code>key_method_2_write()</code> 和 <code>key_method_2_read()</code> 两个函数中，对 <code>generate_key_expansion()</code> 函数的调用之处了。在调用之前，初始化一下 <code>key_type</code> 就行了：</p>
+
+<p>``` c
+struct key_type <em>key_type = (struct key_type </em>) session->opt->key_type;
+key_type->cipher = ks->ssl->enc_read_ctx->cipher;
+key_type->cipher_length = EVP_CIPHER_key_length (session->opt->key_type->cipher);</p>
+
+<h1>if OPENSSL_VERSION_NUMBER >= 0x010000000L</h1>
+
+<p>key_type->digest = ks->ssl->read_hash->digest;</p>
+
+<h1>else</h1>
+
+<p>key_type->digest = ks->ssl->read_hash;</p>
+
+<h1>endif</h1>
+
+<p>key_type->hmac_length = EVP_MD_size (session->opt->key_type->digest);
+```</p>
+
+<p>这样就行了。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[编写自己的 Web 版 Google Reader 客户端]]></title>
+    <link href="http://glacjay.info/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html"/>
+    <updated>2011-08-11T00:00:00+08:00</updated>
+    <id>http://glacjay.info/blog/2011-08-11/编写自己的-web-版-google-reader-客户端</id>
+    <content type="html"><![CDATA[<p>最近花在路上的时间明显变多了，手机就成了我打发这些路上时间的利器。小说神马的看太多也会腻，正好 Google Reader 中也积累了大量的未读文章，因此用手机看看订阅文章就成了一个比较好的选择。</p>
+
+<p>但多次使用下来，却也发现了很多 Google 原版 Web 界面的不方便之处。Google 提供了两个版本的 Reader 界面给手机，一个是苹果风格的 <code>/i/</code> 界面，设计得很漂亮，功能也很全，用 Nokia 手机也能看，但太费流量（未证实，只是感觉，大概是因为一次加载了很多的文章吧），而且在网络状况不好的时候，体验不太好。另一个是 <code>/m/</code> 界面，很简洁，选项不多，但也总有些这样那样的细节另我不太满意，下面详述。然后又去找 Nokia 的 S60v3 客户端软件，总之是没一个喜欢啦。作为一个 Geek （至少是自称），在这种情况下，最佳选择自然就是打造一个自己专属的解决方案啦。</p>
+
+<p>正好蹭着同学的一个 PHP 空间（其实也有 Python 和 Ruby 可选啦，但总觉得会很折腾，还是 PHP 好点，虽然折腾也少不了，见下），于是花了几天时间，连复习 PHP （以前只学过没用过，主要还是看 w3schools 的教程和查 php.net 的函数文档）、研究 OAuth （参见<a href="http://www.ioncannon.net/programming/1443/google-oauth-for-installed-apps-php-example/">这篇文章</a>，不过 Web 应用稍有不同）、研究 Google Reader API （参见<a href="http://blog.martindoms.com/2009/08/15/using-the-google-reader-api-part-1/">这系列文章</a>）、编写代码，终于搞定了一个很阳春的 Google Reader Mobile 版，刚刚满足我的手机阅读需要。</p>
+
+<p>以下就是我针对 Google 原版所做的，针对我个人的改进：</p>
+
+<ul>
+<li><strong>保存期限的问题</strong>：以前也有感觉，这次趁着做这个东东，又确认了一下：Google 只会保存 30 天内的未读文章，超过 30 天的就自动标记成已读了。我希望能保存下来慢慢看，所以就搞了一个简单的 SQLite 数据库，定时把曾经是未读文章的 <code>id</code> 号都给保存下来，直到我通过这个界面读过之后再删除。嗯，这个功能是最重要的。</li>
+<li><strong>先看最老的文章</strong>：当然，通过这两天对 API 的研究，我已经知道怎么在 Google 的 <code>/m/</code> 界面中实现这个功能了，不过为了上一个功能，打造自己的界面还是必要的。</li>
+<li><strong>重复载入的问题</strong>：当我要给一篇文章加星的时候，我一般都希望能直接看到下一篇文章，而不是再看一次被加星的这篇。这也是一个很小的改进啦，不过用起来很舒服，既节省了流量，也节省了时间。</li>
+<li><strong>加载文章的时候先不要标记为已读</strong>：由于手机的网络状况通常不太好，当我浏览完一篇，想加个星标的时候，结果页面却打不开了，这种情况经常发生。所以，我就把标记为已读的这个步骤，挪到了看一下篇之前，或者加星标之后。这样，就比再去已读文章里面找要来得方便。</li>
+<li><strong>去掉 <code>/m/</code> 的所有其他功能</strong>：当然，这不是一个改进啦，只是我不需要而已。既然是用手机来看，当然就没有那么多需要啦，只要能实现浏览与加星标就好了。需要细看的，就加个标，等有电脑的时候再慢慢看。本来， Google Reader 的星标功能，除了作为 ToRead 列表外，就没什么其他用处了（当然，以后也许会跟搜索整合，然后优先显示神马的，那就不管了）。不过话说回来，功能的简化其实也是一种改进啦，最近刚好看到 InstaPaper 的作者也这么说来着。</li>
+<li><strong>功×夫×网</strong>：不过其实 Google Reader 并没有被封的很严，倒是我自己的实现招来了这个问题，见下。</li>
+</ul>
+
+
+<p>简单来说，就是按顺序，对所有文章，看，（可选地）加星标，然后下一篇。需求往往就这么简单啊。</p>
+
+<p>当然，在做的时候，还是遇到过各种稀奇古怪的问题（ Neta ：编程好难啊），这里也一并记录下。</p>
+
+<p>先是在自己机器上 OK 了，等部署到空间的时候却报错： an error occured while processing this directive 。同样的脚本，放到其他目录就没事，还以为是 Apache 的权限问题，也没找到有什么特别的配置。直到有机会查看 Apache 的错误日志，才发现原来就是因为新加的这个目录有组的写权限，而 Apache 不允许这样，真是吐血。话说加上组的写权限，也是为了 SQLite 来着，因为 SQLite 会在数据库所在目录中写事务日志文件。</p>
+
+<p>然后就是发现，我用的 SQLite3 的 PHP 接口，在空间的 PHP 5.2 版本中还没有呢。真是悲剧。然后又吭哧吭哧地用 PDO 接口重写了数据库的代码。</p>
+
+<p>等到好不容易改好啦，用电脑访问也一切正常，结果用手机访问的时候，看不了两个页面，就会出现“连接被远程服务器关闭”的错误。一开始还没有往功×夫×网的方向想，只以为又是服务器的权限问题（我为什么要加“又”？），来回地看日志，切换测试，不停地折腾。直到在电脑上偶然看到，该网页需要翻×墙的标志，再一看 URL 才恍然，原来是我传的一个 GET 参数，是该文章的订阅源 URL ，而有些文章是从 Feed×Burner 订阅的，这才触发了功×夫×网。真是躺着也中枪啊，赶急加一个 Base64 编码搞定。</p>
+
+<p>不管怎样，一个简陋的阅读器就这样被实现出来了。鉴于我近期还不想烧钱换手机，这个东东应该还是很有用武之地的吧。不知道 Google 出的 Android 客户端有没有 30 天的限制。</p>
+
+<p>最后的最后，该版本仅限我个人使用，因为我没有实现多用户的功能，所以大家（如果有的话）也就不要去尝试访问了。我之后会把代码给开源的，到时随你（如果有的话，嗯）折腾。</p>
+
+<hr />
+
+<p><strong>Update:</strong> 代码已<a href="https://github.com/glacjay/mreader">上传</a>。</p>
+
+<p><strong>Update 2012-12-31:</strong> 现在有了 Android 手机，已经开始用 gReader 这个客户端了，除了“延迟标记已读”这个功能还没有之外，其他所需功能已经都有了，而且还是离线阅读哦（我自己的版本就没有实现离线阅读这个功能，因为太麻烦）。不过我的数据库里面已经存了 7000 多篇文章没看了……囧</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[总结一下学到的 LVS 相关知识（ DR 模式）]]></title>
+    <link href="http://glacjay.info/blog/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-dr-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
+    <updated>2011-03-13T00:00:00+08:00</updated>
+    <id>http://glacjay.info/blog/2011-03-13/总结一下学到的-lvs-相关知识（-dr-模式）</id>
+    <content type="html"><![CDATA[<p>不喜欢看长的 Blog 文间，当然更不喜欢写，所以就分开写啦。另，因为 TUN 模式限制更多，实际很可能用不到，所以不一定会写。</p>
+
+<p>所以这次要讲的是 DR 模式的负载均衡啦。 DR 模式，也就是 Direct Route ，其基本原理就是不对包做任何处理，直接转给所分配的真实服务；回包则由真实服务直接发给客户端而不走负载机。因为不像 NAT 模式那样有相似的架构可以参考，所以这次就上图来说明啦（注，该图偷自<a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.LVS-DR.html">这里</a>）。</p>
+
+<p>``` plain</p>
+
+<pre><code>                       ________
+                      |        |
+                      | client |
+                      |________|
+                      CIP=192.168.1.254
+                          |
+               CIP-&gt;VIP | |
+                        v |
+                          |
+                       ________
+                      |        |
+                      | router | advertises route to VIP
+                      |________|
+                          |
+            __________    |
+           |          |   |    VIP=192.168.1.110 (eth0:0, arps)
+           | director |---+     DIP=192.168.1.1 (eth0)
+           |__________|   |
+                          |  ^
+</code></pre>
+
+<p>MAC_DIP->MAC_RIP1(CIP->VIP) | |  |  VIP->CIP</p>
+
+<pre><code>                        v |
+                          |
+         +----------------+------------------+
+         |                |                  |
+         |                |                  |
+  RIP1=192.168.1.2  RIP2=192.168.1.3  RIP3=192.168.1.4 (eth0)
+  VIP=192.168.1.110 VIP=192.168.1.110 VIP=192.168.1.110 (all lo:0, non-arping)
+  _____________     _____________      _____________
+ |             |   |             |    |             |
+ |   CIP-&gt;VIP  |   |             |    |             |
+ |   VIP-&gt;CIP  |   |             |    |             |
+ | realserver  |   | realserver  |    | realserver  |
+ |_____________|   |_____________|    |_____________|
+</code></pre>
+
+<p>```</p>
+
+<p>首先，负载机（即图中的 <code>director</code> ）需要将服务发布地址配置成网卡的从地址 <code>VIP</code>（我还不太清楚为什么不能直接配成第一地址），以便接收来自客户端的 IP 报文。然后，它会根据分配置策略选择一个真实服务器（即图中的 <code>realserver</code> ），并将这个 IP 报文直接转发过去，而这就需要真实服务器也有一个从地址配置成 <code>VIP</code> （一般都配到 <code>lo</code> 网口上）。可是，大家都是在一个网段的，如果没有什么措施的话，那一开始来自客户端的目的地址为 <code>VIP</code> 的 IP 报文就不知道要由谁来处理了。所以，在真实服务器上都要把 <code>lo</code> 这个网卡的 ARP 广播与响应功能给禁掉，让客户端不知道真实服务器也有 <code>VIP</code> 这个地址。而负载机则是通过真实服务器的真实地址（非 <code>VIP</code> ）得知它的 MAC 地址，进而进行转发的。</p>
+
+<p>而当真实服务器需要往回发报文的时候，因为与客户端之间并不像 NAT 那样不在同一网段，也没有被负载机隔来，所以回应报文就通过正常途径直接到了客户端的手（网口？）中。</p>
+
+<p>这样一来，相比 NAT 模式而言，其额外的配置工作主要就是 <code>VIP</code> 从地址的配置以及 ARP 相关功能的禁用了。让我们一步一步来吧。首先是负载机的 <code>VIP</code> 配置（真实地址的配置就跟正常的一样，不写了）：</p>
+
+<p><code>
+$ sudo ifconfig eth0:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+$ sudo route add -host 192.168.1.110 eth0:0
+</code></p>
+
+<p>然后是真实服务器的 <code>VIP</code> 配置：</p>
+
+<p><code>
+$ sudo ifconfig lo:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+$ sudo route add -host 192.168.1.110 eth0:0
+</code></p>
+
+<p>与负载机唯一不同的就是要把地址配到 <code>lo</code> 上。接下来是禁掉这个网卡的 ARP 相关的功能（这里就用不了 <code>sudo</code> 了，必须直接用 <code>root</code> 用户，不知道为嘛）：</p>
+
+<p>```</p>
+
+<h1>echo 1 > /proc/sys/net/ipv4/conf/lo/arp_ignore</h1>
+
+<h1>echo 2 > /proc/sys/net/ipv4/conf/lo/arp_announce</h1>
+
+<h1>echo 1 > /proc/sys/net/ipv4/conf/all/arp_ignore</h1>
+
+<h1>echo 2 > /proc/sys/net/ipv4/conf/all/arp_announce</h1>
+
+<p>```</p>
+
+<p>当然更好的办法是修改 <code>/etc/sysctl.conf</code> 文件，然后执行 <code>sysctl -p</code> 命令来使修改生效。这样做的好处是配置被保存下来了，下次开机还有效，而且也可以用 <code>sudo</code> 来做。</p>
+
+<p>地址配完了，最后就是 ipvsadm 本身的配置了：</p>
+
+<p><code>
+$ sudo ipvsadm -A -t 192.168.1.110:22 -s rr
+$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.2:22 -g
+$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.3:22 -g
+...
+</code></p>
+
+<p>嗯，跟 NAT 模式唯一的不同就是 <code>-g</code> 选项，表示 DR 模式。因为是默认选项，所以不写 <code>-g</code> 也可以。</p>
+
+<p>TCP 服务的话这样就可以了，可是 UDP 服务却还有一些问题需要解决。正如上面所说，服务端发给客户端的回包是不经过负载的，这样的话，如果这个服务程序没有绑定到特定网卡的话，这个回包的源地址默认就是服务器本身的真实地址（如 <code>192.168.1.2</code> ）了，而这样的回包一般是不会被客户端所接受的，因为客户端当初可是往 <code>VIP</code> 这个地址发的请求包。而最通用的解决方法就是将该服务显式绑定到 <code>VIP</code> 这个地址上，强迫其回包的源地址为 <code>VIP</code> ，而这正是客户端所希望看到的。</p>
+
+<p>由上可知，DR 模式相对 NAT 模式而言，对真实服务器来说就是侵入式的配置方式，增加了不少配置工作和限制，而其性能方面的优势据说在现在也大大降低了。因此一般应用的话，直接用 NAT 模式就可以了。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[总结一下学到的 LVS 相关知识（ NAT 模式）]]></title>
+    <link href="http://glacjay.info/blog/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%EF%BC%88-nat-%E6%A8%A1%E5%BC%8F%EF%BC%89.html"/>
+    <updated>2011-03-12T00:00:00+08:00</updated>
+    <id>http://glacjay.info/blog/2011-03-12/总结一下学到的-lvs-相关知识（-nat-模式）</id>
+    <content type="html"><![CDATA[<p>LVS，即 Linux Virtual Server 的简称，是 Linux 下用来实现负载均衡的一个项目。它支持三种负载模式，分别为 NAT 、 DR 以及 TUN 。</p>
+
+<p>注意，我这里讲的都是针对的 2.6 的内核， 2.4 、 2.2 、 2.0 版内核的实现方法和配置方法都各有不一样的地方。还好我不需要维护历史遗留系统（擦汗）。</p>
+
+<p>首先是最简单的 NAT 模式。这种模式跟普通的 NAT 防火墙的原理差不多，只不过它会根据指定的分配策略，为每一个新的客户端连接选择一个不同的真实服务，而不是像 NAT 防火墙那样只映射到后台的同一个真实服务。</p>
+
+<p>这种模式下最常用的部署方式为，负载均衡机器上分别启用两块网卡，一块外网，一块内网。当然一块网卡也可以，然后在这块网卡上配两个地址。这里假设外网地址为 <code>192.168.0.1</code> ，内网地址为 <code>192.168.1.1</code> 。两个真实服务器的地址分别为 <code>192.168.1.2</code> 以及 <code>192.168.1.3</code> 。</p>
+
+<p>这样，要对两台服务器的 SSH 服务进行负载均衡的话，负载机器上要执行的命令如下（当然你得先安装 <code>ipvsadm</code> 这个命令才行。负载功能的实现还是在内核中做的，跟 <code>iptables</code> 一样）：</p>
+
+<p><code>plain
+$ sudo ipvsadm -A -t 192.168.0.1:22 -s rr
+</code></p>
+
+<p><code>-A</code> 表示增加一个新的负载均衡服务，一台负载均衡器上可以同时对多个服务进行负载； <code>-t</code> 表示这是一个 TCP 服务； <code>-s rr</code> 表示选择 Round Robin 分配策略。 Round Robin 是最简单的一种分配策略，表示在每台真实服务器间进行轮流选择；其他还有最少连接等策略。</p>
+
+<p><code>
+$ sudo ipvsadm -a -t 192.168.0.1:22 -r 192.168.1.2:22 -m
+</code></p>
+
+<p><code>-a</code> 表示为指定的负载服务增加一个新的真实服务； <code>-t</code> 同上； <code>-r</code> 指定真实服务的地址和端口； <code>-m</code> 则表示这个真实服务采用的是 NAT 模式的负载均衡。</p>
+
+<p><code>
+$ sudo ipvsadm -a -t 192.168.0.1:22 -r 192.168.1.3:22 -m
+</code></p>
+
+<p>这样负载均衡服务就配置好了。当然，记得还要打开系统的 IP 转发功能，不管你用的是哪种负载均衡。真实服务器上则还需要配置路由规则，把回给客户端的路由通过 <code>192.168.1.1</code> 这个网关进行发送（不指定网关地址，只指定网口是不行的）：</p>
+
+<p><code>
+$ sudo route add -net 192.168.0.0/24 gw 192.168.1.1
+</code></p>
+
+<p>这种模式的优点，当然就在于配置简单啦，跟配置 NAT 防火墙基本相同，缺点是有对网络报文的额外处理（替换目的地址）的开销。不过据说 2.6 的内核其开销已经很小了。</p>
+
+<p>用如下命令可以查看当前的负载状态：</p>
+
+<p><code>
+$ sudo ipvsadm -l -n
+</code></p>
+
+<p>这里有一点要说的是，当负载的是 UDP 服务（如 OpenVPN ）时，建立起来的连接会显示在“非活动连接”那一栏，不知道为什么。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[发布一个寻找局域网内主机的小工具]]></title>
+    <link href="http://glacjay.info/blog/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7.html"/>
+    <updated>2011-03-05T00:00:00+08:00</updated>
+    <id>http://glacjay.info/blog/2011-03-05/发布一个寻找局域网内主机的小工具</id>
+    <content type="html"><![CDATA[<p>在工作中，经常需要远程登录到机房中的设备上进行调试与开发，走的是工作局域网。由于这些设备的地址也是动态获取的，因此在遇到一些意外事故，如网线松了、网络不稳定之类的，这些地址可能就变了。每当这时，我们就得跑到机房，给设备连上显示器（我们连 KVM 都没有，命苦啊），查看 IP ，然后再跑回去重新连。太麻烦了。</p>
+
+<p>我知道有支持动态地址的 DNS 服务，可是我们没权限操作 DNS 服务器，而且设备也都是不固定的，没必要惊动网络管理员（好吧，我甚至都不知道谁是网络管理员，作为三年的“老”员工，我面壁去了。好吧，其实我就是想写写程序练练手），所以我就写了个小程序，用来查找一台特定设备的 IP 地址。</p>
+
+<p>原理其实很简单啦。客户端（也就是我的笔记本）发个 UDP 广播报文，里面有要找的主机的名字。服务端呢，启动时则指定一个主机名字。当服务端收到一个 UDP 广播报文，并且发现找的就是自己呢，就返回一个 <code>bingo</code> 报文。这样，客户端就知道这个主机的 IP 地址啦。</p>
+
+<p>现在用的服务端口是 <code>5460</code> （取自某本网络小说 :-），应该没有哪个知名服务用这个端口吧。当然，因为这个工具确实太简单了，所以就没有考虑冲突的情况啦。请大家在使用的时候，给主机取个有个性的名字哟。</p>
+
+<p>我通过这个程序学到的新知识就是，要发送 UDP 的广播报文，只是指定一个全 <code>1</code> 的地址是不够的，还要设置 socket 选项 <code>SO_BROADCAST</code> （我继续面壁去了）。</p>
+
+<p>下面是代码（好撑篇幅啊，又没人给我稿费的说）：</p>
+
+<p>``` c</p>
+
+<h1>include &lt;stdio.h></h1>
+
+<h1>include &lt;stdlib.h></h1>
+
+<h1>include &lt;errno.h></h1>
+
+<h1>include &lt;string.h></h1>
+
+<h1>include &lt;sys/socket.h></h1>
+
+<h1>include &lt;netinet/in.h></h1>
+
+<h1>include &lt;pthread.h></h1>
+
+<h1>include &lt;unistd.h></h1>
+
+<h1>include &lt;arpa/inet.h></h1>
+
+<h1>define PORT 5460</h1>
+
+<p>static char *progname;
+static int sock;</p>
+
+<p>static void usage(void)
+{</p>
+
+<pre><code>fprintf(stderr,
+        "Usage: %s options\n"
+        "where options must be one of:\n"
+        "  -s         Running as a  named server.\n"
+        "  -c         Asking for 's address.\n",
+        progname);
+exit(1);
+</code></pre>
+
+<p>}</p>
+
+<p>static int udp_socket(void)
+{</p>
+
+<pre><code>int sock = socket(PF_INET, SOCK_DGRAM, 0);
+if (sock == -1) {
+    fprintf(stderr, "Cannot open a new socket: %s\n", strerror(errno));
+    exit(1);
+}
+return sock;
+</code></pre>
+
+<p>}</p>
+
+<p>static void server(const char *name)
+{</p>
+
+<pre><code>struct sockaddr_in listen_addr;
+
+listen_addr.sin_family = AF_INET;
+listen_addr.sin_addr.s_addr = INADDR_ANY;
+listen_addr.sin_port = htons(PORT);
+
+if (bind(sock, (struct sockaddr *) &amp;listen_addr,
+         sizeof(listen_addr)) == -1)
+{
+    fprintf(stderr, "Cannot bind to the UDP port %d: %s\n",
+            PORT, strerror(errno));
+    exit(1);
+}
+
+while (1) {
+    char buf[BUFSIZ+1];
+    struct sockaddr_in addr;
+    int addrlen = sizeof(addr);
+    int received;
+
+    received = recvfrom(sock, buf, sizeof(buf)-1, 0,
+                        (struct sockaddr *) &amp;addr, (socklen_t *) &amp;addrlen);
+    if (received == -1)
+        continue;
+
+    buf[received] = 0;
+    if (strcmp(buf, name) == 0)
+        sendto(sock, "bingo", 5, 0, (struct sockaddr *) &amp;addr, addrlen);
+}
+</code></pre>
+
+<p>}</p>
+
+<p>static void <em>waiton_response(void </em>arg)
+{</p>
+
+<pre><code>char *name = (char *) arg;
+
+while (1) {
+    char buf[BUFSIZ+1];
+    struct sockaddr_in addr;
+    socklen_t addrlen = sizeof(addr);
+    int received;
+
+    received = recvfrom(sock, buf, sizeof(buf)-1, 0,
+                        (struct sockaddr *) &amp;addr, &amp;addrlen);
+    if (received == -1)
+        continue;
+    buf[received] = 0;
+    if (strcmp(buf, "bingo") == 0) {
+        printf("Got. %s's address is %s.\n",
+               name, inet_ntoa(addr.sin_addr));
+        exit(0);
+    }
+}
+
+return NULL;
+</code></pre>
+
+<p>}</p>
+
+<p>static void client(const char *name)
+{</p>
+
+<pre><code>int bcast = 1;
+pthread_t tid;
+pthread_attr_t attr;
+struct sockaddr_in addr;
+int i;
+
+setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &amp;bcast, sizeof(bcast));
+
+pthread_attr_init(&amp;attr);
+pthread_attr_setdetachstate(&amp;attr, PTHREAD_CREATE_DETACHED);
+
+addr.sin_family = AF_INET;
+addr.sin_addr.s_addr = 0xffffffff;
+addr.sin_port = htons(PORT);
+
+for (i = 0; i &lt; 6; i++) {
+    printf("Searching...\n");
+
+    sendto(sock, name, strlen(name), 0,
+           (struct sockaddr *) &amp;addr, sizeof(addr));
+    if (i == 0)
+        pthread_create(&amp;tid, &amp;attr, waiton_response, (void *) name);
+    sleep(5);
+}
+
+printf("Cannot find the machine.\n");
+pthread_attr_destroy(&amp;attr);
+</code></pre>
+
+<p>}</p>
+
+<p>int main(int argc, char **argv)
+{</p>
+
+<pre><code>progname = argv[0];
+sock = udp_socket();
+
+if (argc != 3)
+    usage();
+if (strcmp(argv[1], "-s") == 0)
+    server(argv[2]);
+else if (strcmp(argv[1], "-c") == 0)
+    client(argv[2]);
+else
+    usage();
+
+return 0;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>PS. 最近 gist.github.com 好像不是很给力，用它贴代码的话，不翻墙就看不到，只好直接贴这里了。</p>
+]]></content>
+  </entry>
+  
+</feed>
