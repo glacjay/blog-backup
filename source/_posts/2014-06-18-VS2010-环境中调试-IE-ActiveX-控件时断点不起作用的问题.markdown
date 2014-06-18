@@ -10,4 +10,4 @@ tags:
 
 又是惯例的长了好长时间的草，今天先来篇短的。
 
-在使用 VS2010 开发调试 IE ActiveX 插件时，默认条件下下的断点不起作用，这是因为选错了调试器，在工程属性 - Debugging 中的 Debugger to launch 项，选择 Web Browser Debugger ，然后在 HTTP URL 项填本地 HTML 文件的绝对路径，以 file:/// 打头就可以了。
+工作需要，在使用 VS2010 开发调试 IE ActiveX 插件时，默认条件下下的断点不起作用，这是因为选错了调试器，在工程属性 - Debugging 中的 Debugger to launch 项，选择 Web Browser Debugger ，然后在 HTTP URL 项填本地 HTML 文件的绝对路径，以 file:/// 打头就可以了。
