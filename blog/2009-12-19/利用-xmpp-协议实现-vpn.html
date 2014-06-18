@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>利用 XMPP 协议实现 VPN - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="这主意是我一同学想到的（至少是他告诉我的），基于一种实际的需要。假设你有两台内网机，都没有公网地址，你想从一台机器访问另一台机器的服务，这时要怎么办呢？当然很可能是我无知了，就我所知，网上倒是有一些提供这类服务的网站，但都是基于 Windows 的远程桌面的，至于 Linux ，我没找过。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">利用 XMPP 协议实现 VPN</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-19T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://glacjay.github.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>这主意是我<a href="http://chenyufei.info">一同学</a>想到的（至少是他告诉我的），基于一种实际的需要。假设你有两台内网机，都没有公网地址，你想从一台机器访问另一台机器的服务，这时要怎么办呢？当然很可能是我无知了，就我所知，网上倒是有一些提供这类服务的网站，但都是基于 Windows 的远程桌面的，至于 Linux ，我没找过。</p>
+
+<p>于是那家伙联想到了 IM Bot 这种东西。现在网上有各种各样的 IM Bot ，可以通过与之聊天执行各种各样的自动化任务，那为什么不能让它把发过去的命令交给另一台机器的 Shell 执行，并把结果返回呢？这不就实现了一个简单的 Telnet 了吗？这就是最初的想法了（我没去找现成实现，因为我也该练练手了）。而我刚好才折腾过 OpenVPN ，于是就有了标题所说的这个最终想法。这样的话，就能一下子从只支持一种应用协议到支持几乎所有的应用协议了，而且实现的工作量也同时减到了最低。真是好主意啊，自我夸奖一下 :&ndash;)</p>
+
+<p>其实真正解释起来是很简单的想法啦，就是把从虚拟网卡读到的 IP 包，base64 一下，当聊天内容发给对端就万事 OK 。</p>
+
+<p>选择 XMPP 当然不仅是因为它的开放性，最重要的原因就是有一个现成的冤大头给我们利用，就是 Google 啦，而且还有在线的聊天记录供调试用，何乐而不为呢 :&ndash;)</p>
+
+<p>实现这个想法的关键就两点，一是 XMPP 协议库，Python 的有好几个；二是对虚拟网卡的读写，Linux 下有现成的虚拟网卡，Windows 也有，不过要另装，而 Python 的标准库就完全能实现对其的读写了。不愧是胶水语言啊。</p>
+
+<p>目前来说，一个还只支持 Linux 的阳春版已经实现出来啦，在<a href="http://code.google.com/p/xtunnel">这里</a>，欢迎大牛们前去参观。</p>
+
+<p>之后的开发可能会转向 C 也可能不会，就看 Python 在 Windows 下的表现啦（当然也可能是应用户需求）。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-12-19T00:00:00+08:00" pubdate data-updated="true"></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96.html" title="Previous Post: 让 Vim 在保存时自动调用外部命令进行格式化">&laquo; 让 Vim 在保存时自动调用外部命令进行格式化</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC.html" title="Next Post: Oracle 建库 SQL 脚本">Oracle 建库 SQL 脚本 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html">OpenSSL 与 WinSock2 配合使用时遇到的一个坑</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: What Are You Thinking About?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 Lambda</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

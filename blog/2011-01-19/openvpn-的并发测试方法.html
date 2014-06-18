@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OpenVPN 的并发测试方法 - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="由于 OpenVPN 本身协议的特殊性，用一般的方法不太好测它的并发。看过 LoadRunner ，但也最多只支持标准的 SSL/TLS 协议（当然，我也没细看这个）。于是动手改了其客户端的实现，最终完成任务。 其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OpenVPN 的并发测试方法</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-19T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://glacjay.github.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>由于 OpenVPN 本身协议的特殊性，用一般的方法不太好测它的并发。看过 LoadRunner ，但也最多只支持标准的 SSL/TLS 协议（当然，我也没细看这个）。于是动手改了其客户端的实现，最终完成任务。</p>
+
+<p>其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。貌似装十个左右的虚拟网卡驱动之后，机器就不行了。于是解决办法也很简单，把虚拟网卡相关的功能跳过就可以了。根据<a href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html">上篇</a>的说明，只要在 <code>incoming_push_message()</code> 函数中，把对 <code>do_up()</code> 的调用直接换成 <code>initialization_sequence_completed()</code> 就 OK 了。</p>
+
+<p>当然，这样一来，流量的来源也就没有了，而没有数据流量也就无所谓测试了，最多测下并发接入的性能。要流量也很简单，改下 <code>io_wait()</code> 、 <code>read_tun()</code> 、 <code>write_tun()</code> 这几个函数的实现，手工组个 Ping 请求的 IP 报文给 OpenVPN 去发就行了。</p>
+
+<p>在这个过程中我也终于搞清楚那个 <code>checksum</code> 到底是怎么回事儿，原来在累加一遍求出一个和之后，如果这个和本身超过了 <code>16</code> 位，那么还要把这个和继续按 <code>16</code> 位来切分求和，这样才是最终结果。之前看 WikiPedia 上的那个例子，一直就没搞明白那个 <code>2</code> 到底是打哪儿来的。</p>
+
+<p>最后，就是要把起客户端这个过程给自动化了。于是又去研究 Windows 的 Batch 脚本，<code>for</code> 是循环， <code>start</code> 是后台运行， <code>ping</code> 用来模拟 <code>sleep</code> ， <code>taskkill</code> 是强制杀掉，搞了个 <code>1000</code> 客户端连了断、断了连的自动化测试出来。丢在那边跑了两天，服务端表示很淡定。</p>
+
+<p>以上。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-19T00:00:00+08:00" pubdate data-updated="true"></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html" data-via="" data-counturl="http://glacjay.github.com/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90.html" title="Previous Post: OpenVPN 的初始化过程分析">&laquo; OpenVPN 的初始化过程分析</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98.html" title="Next Post: Linux 下有关环境变量与换行符的一个小问题">Linux 下有关环境变量与换行符的一个小问题 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html">OpenSSL 与 WinSock2 配合使用时遇到的一个坑</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: What Are You Thinking About?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 Lambda</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

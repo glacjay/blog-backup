@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Haskell 中的可变长参数列表 - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="说实话，我之前有就这个题目很有激情地写了很长很罗嗦的一篇草稿的，哦，确切来说是大半篇，直到被打断，激情不再，这篇草稿也就此躺了两个多月。好吧，其实是我还不是八卦那块料，就不卖弄了，直接总结。 要在 Haskell 中实现可变长参数列表，就是利用其 Typeclass 系统， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Haskell 中的可变长参数列表</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-05-06T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://glacjay.github.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>说实话，我之前有就这个题目很有激情地写了很长很罗嗦的一篇草稿的，哦，确切来说是大半篇，直到被打断，激情不再，这篇草稿也就此躺了两个多月。好吧，其实是我还不是八卦那块料，就不卖弄了，直接总结。</p>
+
+<p>要在 Haskell 中实现可变长参数列表，就是利用其 Typeclass 系统，对函数进行最终结果类型和中间函数类型之间的重载，然后利用 Haskell 的类型推导机制为我们自动调用合适的重载版本。嗯，就这么简单。下面是一个最简单的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">class</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="n">r</span> <span class="o">|</span> <span class="n">r</span> <span class="ow">-&gt;</span> <span class="n">a</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildList&#39;</span> <span class="ow">::</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="n">r</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildList&#39;</span> <span class="ow">=</span> <span class="n">id</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildList&#39;</span> <span class="n">as</span> <span class="ow">=</span> <span class="nf">\</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">buildList&#39;</span> <span class="o">$</span> <span class="n">as</span> <span class="o">++</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">buildList</span> <span class="ow">::</span> <span class="kt">BuildList</span> <span class="n">a</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="n">r</span>
+</span><span class='line'><span class="nf">buildList</span> <span class="ow">=</span> <span class="n">buildList&#39;</span> <span class="kt">[]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>好吧，这个例子我是从<a href="http://okmij.org/ftp/Haskell/vararg-fn.lhs">这里</a>看到的，或者说我就是从这里学到这个东东的。在此友情提醒那些和我一样不怎么有耐心的家伙一句，原理解释在后面。</p>
+
+<p>按照我的想法，上面这个例子应该还可以进一步简化以去掉对两个语言扩展的依赖的，就是写一个 <code>buildIntList</code> 的特化版本，结果不幸地失败了。有知道的大大告诉我一声，在下洗耳恭听。</p>
+
+<hr />
+
+<p><strong>Update</strong>: 不需要大大们来告诉我了，我已经知道该怎么简化上面的这个 <code>buildList</code> 了，不过简化后的版本是 <code>buildCharList</code> ，也就是 <code>buildString</code> 啦，而不是原先说的 <code>buildIntList</code> 。先看实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="kr">class</span> <span class="kt">BuildString</span> <span class="n">r</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildString&#39;</span> <span class="ow">::</span> <span class="kt">String</span> <span class="ow">-&gt;</span> <span class="n">r</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildString</span> <span class="p">[</span><span class="kt">Char</span><span class="p">]</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildString&#39;</span> <span class="ow">=</span> <span class="n">id</span>             <span class="c1">-- or whatever you want</span>
+</span><span class='line'>
+</span><span class='line'><span class="kr">instance</span> <span class="kt">BuildString</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="kt">BuildString</span> <span class="p">(</span><span class="kt">Char</span> <span class="ow">-&gt;</span> <span class="n">r</span><span class="p">)</span> <span class="kr">where</span>
+</span><span class='line'>    <span class="n">buildString&#39;</span> <span class="n">cs</span> <span class="ow">=</span> <span class="nf">\</span><span class="n">c</span> <span class="ow">-&gt;</span> <span class="n">buildString&#39;</span> <span class="o">$</span> <span class="n">cs</span> <span class="o">++</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">buildString</span> <span class="ow">::</span> <span class="kt">BuildString</span> <span class="n">r</span> <span class="ow">=&gt;</span> <span class="n">r</span>
+</span><span class='line'><span class="nf">buildString</span> <span class="ow">=</span> <span class="n">buildString&#39;</span> <span class="kt">[]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样就把对 <code>MultiParameterTypeClass</code> 和 <code>FunctionalDependency</code> 的依赖给简化掉了，可是又同时增加了对 <code>-XFlexibleInstances</code> 选项的需要（因为 <code>instance BuildString [Char] where</code> 这一行；如果你想把 <code>[Char]</code> 写成 <code>String</code> 的话，就还要再加上个 <code>-XTypeSynonymInstances</code>），暂时想不到更好的办法了。</p>
+
+<p>另外，关于我在这里为什么要用 <code>Char</code> 而不是 <code>Int</code> 呢，是因为 <code>'a'</code> 的类型很明确，就是 <code>Char</code> ，而 <code>5</code> 的类型就不明确了，因此，你可以这样调用 <code>buildString</code> ：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="o">*</span><span class="kt">TestVarargs</span><span class="o">&gt;</span> <span class="n">buildString</span> <span class="n">&#39;a&#39;</span> <span class="n">&#39;b&#39;</span> <span class="n">&#39;c&#39;</span> <span class="ow">::</span> <span class="kt">String</span>
+</span><span class='line'><span class="s">&quot;abc&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可是却必须这样调用 <code>buildIntList</code> ：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='haskell'><span class='line'><span class="o">*</span><span class="kt">TestVarargs</span><span class="o">&gt;</span> <span class="n">buildIntList</span> <span class="p">(</span><span class="mi">1</span><span class="ow">::</span><span class="kt">Int</span><span class="p">)</span> <span class="p">(</span><span class="mi">2</span><span class="ow">::</span><span class="kt">Int</span><span class="p">)</span> <span class="p">(</span><span class="mi">3</span><span class="ow">::</span><span class="kt">Int</span><span class="p">)</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span>
+</span><span class='line'><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>虽然在我看来，GHC 应该可以倒推出每个参数的类型的，可他就是不认，我暂时也没什么办法。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2009-05-06T00:00:00+08:00" pubdate data-updated="true"></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html" data-via="" data-counturl="http://glacjay.github.com/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009-04-08/%E6%9C%89%E5%85%B3-cc-%E4%B8%AD%E7%9A%84-do-while-0-%E6%83%AF%E7%94%A8%E6%B3%95.html" title="Previous Post: 有关 C/C++ 中的 do { ... } while (0) 惯用法">&laquo; 有关 C/C++ 中的 do { ... } while (0) 惯用法</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0.html" title="Next Post: 在 Haskell 中实现 Generic zip 函数">在 Haskell 中实现 Generic zip 函数 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html">OpenSSL 与 WinSock2 配合使用时遇到的一个坑</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: What Are You Thinking About?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 Lambda</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

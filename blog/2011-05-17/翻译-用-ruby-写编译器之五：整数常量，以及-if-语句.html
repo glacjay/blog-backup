@@ -1,0 +1,617 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句 - Random Stuff from GlacJAY</title>
+  <meta name="author" content="GlacJAY">
+
+  
+  <meta name="description" content="原文链接：http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html 上次我承诺会发布的更快一些，不过还是失败了⋯⋯作为补偿，这章的内容将会是原计划中的第 5，6，7 章内容的合并，因为这三章确实都很短。闲话少叙 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Random Stuff from GlacJAY" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Random Stuff from GlacJAY</a></h1>
+  
+    <h2>about programming</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:glacjay.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-17T00:00:00+08:00" pubdate data-updated="true"></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://glacjay.github.com">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html</a></p>
+
+<p>上次我承诺会发布的更快一些，不过还是失败了⋯⋯作为补偿，这章的内容将会是原计划中的第 5，6，7 章内容的合并，因为这三章确实都很短。闲话少叙：</p>
+
+<h2>处理数字常量</h2>
+
+<p>到目前为止，我们只处理了一些实现所必须的数字常量，也就是当一个外部函数的返回值是数字的情况，而且没有做任何形式的类型检查。</p>
+
+<p>那么，就让我们来看一下 gcc 在 C 语言中是怎样处理各种类型（包括 <code>long long</code> 等）的整数的吧。当然，这次还是针对 32 位的 x86 架构：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">foo1</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">foo2</span><span class="p">(</span><span class="kt">signed</span> <span class="kt">short</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">foo3</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">foo4</span><span class="p">(</span><span class="kt">signed</span> <span class="kt">int</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">foo5</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">foo6</span><span class="p">(</span><span class="kt">signed</span> <span class="kt">long</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">foo7</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">foo8</span><span class="p">(</span><span class="kt">signed</span> <span class="kt">long</span> <span class="kt">long</span> <span class="n">a</span><span class="p">)</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="n">foo1</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">foo2</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">foo3</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">foo4</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">foo5</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">foo6</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">foo7</span><span class="p">(</span><span class="mi">7</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我略掉了大部分 gcc 所生成的代码，如果愿意，你可以自己执行 <code>gcc -S</code> 命令来看。有趣的部分是对各个函数的调用，其生成的代码如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='nasm'><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo1</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo2</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo3</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo4</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">5</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo5</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">6</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo6</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">movl</span>    <span class="kc">$</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">(</span><span class="o">%</span><span class="nb">esp</span><span class="p">)</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo7</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>换句话说，至少在处理函数调用的时候，gcc 都会把各种整数类型统一作为 32 位的整型来处理，除了 <code>long long</code> 类型之外。因此，我们可以暂时忘掉 <code>long long</code> 类型，而只处理 32 位以内的整数值，这样我们就可以忽略类型处理相关的东西了。</p>
+
+<p>懒惰还真是一种病啊。</p>
+
+<p>我们同时也会略过浮点型。为什么呢？因为只要有整数运算，你就可以实现一个完整的编译器了，所以现在就加入对浮点型的支持完全只是浪费时间而已。当然这个东西以后总归是要做的。</p>
+
+<p>另外，当<strong>我</strong>还年轻时，我们连 FPU 是啥都还不知道呢。尽管如此，我们依然可以用整数来模拟各种定点运算，一样可以完成很多事情。</p>
+
+<p>那么，我们真正要做的修改有哪些呢？</p>
+
+<p>在方法 <code>#get_arg</code> 中，在处理字符串常量之前，加入如下代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">return</span> <span class="o">[</span><span class="ss">:int</span><span class="p">,</span> <span class="n">a</span><span class="o">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">is_a?</span><span class="p">(</span><span class="no">Fixnum</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>在方法 <code>#compile_exp</code> 中，我们用如下代码来处理 <code>#get_arg</code> 的返回值：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">elsif</span> <span class="n">atype</span> <span class="o">==</span> <span class="ss">:int</span> <span class="k">then</span> <span class="n">param</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">#{</span><span class="n">aparam</span><span class="si">}</span><span class="s2">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后，就完事了。就这么简单。</p>
+
+<p>然后就是测试啦：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">prog</span> <span class="o">=</span> <span class="o">[</span><span class="ss">:do</span><span class="p">,</span>
+</span><span class='line'>  <span class="o">[</span><span class="ss">:printf</span><span class="p">,</span><span class="s2">&quot;&#39;hello world&#39; takes %ld bytes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="o">[</span><span class="ss">:strlen</span><span class="p">,</span> <span class="s2">&quot;hello world&quot;</span><span class="o">]]</span><span class="p">,</span>
+</span><span class='line'>  <span class="o">[</span><span class="ss">:printf</span><span class="p">,</span><span class="s2">&quot;The above should show _%ld_ bytes</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="mi">11</span><span class="o">]</span>
+</span><span class='line'><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>插曲：针对原生数据类型的一些思考</h2>
+
+<p>“纯”面向对象类型的语言很棒，但并不是对底层的代码生成器而言的，我想。不管你是否想要实现一个纯的面向对象语言，我仍然坚信，首先实现原生的数据类型和其操作，是非常有价值的。你可以在后面的阶段再来考虑是否要对用户隐藏它们，或者是让它们看起来像是对象，或者是透明地在它们和对象之间执行自动转换的操作，等等。</p>
+
+<p>要注意的是，Matz 的 Ruby 解释器（Matz Ruby Interpreter，简称MRI）就是这样实现的：里面的数字就跟“真正的”对象神马的完全不一样，但是解释器本身却尽其所能的对用户隐藏这一事实。不过我个人认为 MRI 做的还是不够。</p>
+
+<h2><code>If ... then ... else</code></h2>
+
+<p>如果没有某种形式的条件逻辑支持的话，我们的语言是没有太大用处的。几乎所有有用的语言都支持某种形式的 <code>if .. then .. else</code> 构造。现在，我们要实现的是像 <code>[:if, condition, if-arm, else-arm]</code> 这样的构造，而且是以 C 语言的形式来实现。也就是说， <code>0</code> 和空指针都表示假，其他值则都为真。</p>
+
+<p>仍然是一个简单的例子：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">void</span> <span class="nf">bar</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="n">baz</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">foo</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">bar</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>相关的汇编输出：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='nasm'><span class='line'>    <span class="nf">call</span>    <span class="nv">baz</span>
+</span><span class='line'>    <span class="nf">testl</span>   <span class="o">%</span><span class="nb">eax</span><span class="p">,</span> <span class="o">%</span><span class="nb">eax</span>
+</span><span class='line'>    <span class="nf">je</span>      <span class="nv">.L6</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">foo</span>
+</span><span class='line'>    <span class="nf">jmp</span>     <span class="nv">.L10</span>
+</span><span class='line'><span class="nl">.L6:</span>
+</span><span class='line'>    <span class="nf">call</span>    <span class="nv">bar</span>
+</span><span class='line'><span class="nl">.L10:</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对于大多数的语言和架构来说，这都是一个编译 <code>if .. then .. else</code> 时会采用的通用模板：</p>
+
+<ul>
+<li>计算条件表达式。</li>
+<li>对结果进行测试（这里用的是 <code>testl</code> 指令 &mdash; 在其他架构中比较通用的还有 <code>cmp</code> 指令，或者对寄存器进行自减）。 <code>testl</code> 指令比较它的左右两个操作数，并进行相应的标志位设置。</li>
+<li>然后，条件跳转到 <strong><code>else</code> 语句处。这里，我们检查条件表达式的值是否不为真。在这种情况下我们用的是 <code>je</code> 指令，即“相等时跳转”（ jump on equal ），也就是当结果相等时跳转（要注意的是，在大多数的 CPU 架构中，很多指令都会设置条件码，而不仅仅是显示的测试指令）。</strong></li>
+<li>然后执行 <code>then</code> 子句。</li>
+<li>跳过 <code>else</code> 子句，继续执行整个 <code>if</code> 语句之后的部分。</li>
+<li>生成 <code>else</code> 子句的标号，以及其中的指令序列。</li>
+<li>生成 <code>if</code> 语句的结束标号。</li>
+</ul>
+
+
+<p>其他还有很多不同的变种，比如根据条件表达式取值的概率，或者某个架构中是否跳转的执行代价，进而调整两个子句的顺序等。不过就目前来说，上面的方法已经足够了。</p>
+
+<p>总之，编译的方法还是很简单的，应该说就是以上所述流程的直译：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="k">def</span> <span class="nf">ifelse</span> <span class="n">cond</span><span class="p">,</span> <span class="n">if_arg</span><span class="p">,</span><span class="n">else_arm</span>
+</span><span class='line'>    <span class="n">compile_exp</span><span class="p">(</span><span class="n">cond</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">testl</span><span class="se">\t</span><span class="s2">%eax, %eax&quot;</span>
+</span><span class='line'>    <span class="vi">@seq</span> <span class="o">+=</span> <span class="mi">2</span>
+</span><span class='line'>    <span class="n">else_arm_seq</span> <span class="o">=</span> <span class="vi">@seq</span> <span class="o">-</span> <span class="mi">1</span>
+</span><span class='line'>    <span class="n">end_if_arm_seq</span> <span class="o">=</span> <span class="vi">@seq</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">je</span><span class="se">\t</span><span class="s2">.L</span><span class="si">#{</span><span class="n">else_arm_seq</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="n">compile_exp</span><span class="p">(</span><span class="n">if_arm</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">jmp</span><span class="se">\t</span><span class="s2">.L</span><span class="si">#{</span><span class="n">end_if_arm_seq</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;.L</span><span class="si">#{</span><span class="n">else_arm_seq</span><span class="si">}</span><span class="s2">:&quot;</span>
+</span><span class='line'>    <span class="n">compile_exp</span><span class="p">(</span><span class="n">else_arm</span><span class="p">)</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;.L</span><span class="si">#{</span><span class="n">end_if_arm_seq</span><span class="si">}</span><span class="s2">:&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这段代码应该很易懂的，其实就是对所有子句 &mdash; 条件， <code>then</code> 子句，以及 <code>else</code> 子句 &mdash; 分别调用 <code>#compile_exp</code> 方法，并在其间插入所需的辅助指令，同时用 <code>@seq</code> 成员来生成所需的标号。</p>
+
+<p>为了使其生效，我们在 <code>#compile_exp</code> 方法中的 <code>return defun ...</code> 之后插入如下代码：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">return</span> <span class="n">ifelse</span><span class="p">(</span><span class="o">*</span><span class="n">exp</span><span class="o">[</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">exp</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span> <span class="o">==</span> <span class="ss">:if</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>下面是一个简单的测试：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">prog</span> <span class="o">=</span> <span class="o">[</span><span class="ss">:do</span><span class="p">,</span>
+</span><span class='line'>  <span class="o">[</span><span class="ss">:if</span><span class="p">,</span> <span class="o">[</span><span class="ss">:strlen</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>    <span class="o">[</span><span class="ss">:puts</span><span class="p">,</span> <span class="s2">&quot;IF: The string was not empty&quot;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>    <span class="o">[</span><span class="ss">:puts</span><span class="p">,</span> <span class="s2">&quot;ELSE: The string was empty&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">]</span><span class="p">,</span>
+</span><span class='line'>  <span class="o">[</span><span class="ss">:if</span><span class="p">,</span> <span class="o">[</span><span class="ss">:strlen</span><span class="p">,</span><span class="s2">&quot;Test&quot;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>    <span class="o">[</span><span class="ss">:puts</span><span class="p">,</span> <span class="s2">&quot;Second IF: The string was not empty&quot;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>    <span class="o">[</span><span class="ss">:puts</span><span class="p">,</span> <span class="s2">&quot;Second IF: The string was empty&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">]</span>
+</span><span class='line'><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://www.hokstad.com/static/compiler/step5.rb">这里是最终结果</a>。</p>
+
+<p>如往常般，执行的方法如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ ruby step5.rb &gt;step5.s
+</span><span class='line'>$ make step5
+</span><span class='line'>cc   step5.s   -o step5
+</span><span class='line'>$ ./step5
+</span><span class='line'>ELSE: The string was empty
+</span><span class='line'>Second IF: The string was not empty
+</span><span class='line'>$</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>有关循环的一些思考</h2>
+
+<p>非条件循环是很容易实现的，不过我们需要实现它吗？显然不需要。我们已经可以用递归来实现循环了，又何必要乱加东西呢？</p>
+
+<p>不过，要令它工作良好，我们还需要实现尾递归优化，可是我现在还没有做好准备。尾递归优化，或者更一般的形式 &mdash; 尾调用优化 &mdash; 所说的情况是，在一个函数的末尾，调用了一个需要相同或者更少个数参数的函数，并返回它所返回的值。在这种情况下，你可以将当前函数的调用栈，复用给被调用的函数来使用，并且是通过 <code>jmp</code> 而不是 <code>call</code> 来调用这个函数。 <code>jmp</code> 指令不会在堆栈中压入一个新的返回地址，因此当这个被调用的函数返回，返回到的就是当前函数的调用者那里，而不是当前的这个函数。</p>
+
+<p>这就同时完成了几件事情：首先，也是最重要的，就是堆栈不再会随着调用而增长了。其次，我们能够省掉几个指令周期。有了尾调用优化，再配合其他几个优化之后，你就可以这样来写循环，而不用担心堆栈溢出的问题了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="o">[</span><span class="ss">:defun</span><span class="p">,</span> <span class="ss">:loop</span><span class="p">,</span> <span class="o">[]</span><span class="p">,</span> <span class="o">[</span><span class="ss">:do</span><span class="p">,</span>
+</span><span class='line'>  <span class="o">[</span><span class="ss">:puts</span><span class="p">,</span> <span class="s2">&quot;I am all loopy&quot;</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>  <span class="o">[</span><span class="ss">:loop</span><span class="o">]</span>
+</span><span class='line'><span class="o">]</span><span class="p">,</span>
+</span><span class='line'><span class="o">[</span><span class="ss">:loop</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>换句话说，尾调用优化意味着，对任何形如 <code>(defun foo () (do bar foo))</code> 的函数来说，堆栈的使用率都会从原来的成比例增长减少为定值了。</p>
+
+<p>当前的版本已经可以编译上面的代码了，不过它会很快用完堆栈并且崩溃掉的。不是很令人满意啊。</p>
+
+<p>果然（原文： I sense a disturbance in the force ），两位读到这篇文章的极客都指出了堆栈增长的问题。</p>
+
+<p>现在，让我们先忽略这个问题吧，同时注意下对堆栈空间的使用好了。之后，我们会实现一个专门的循环结构的。目前就这样吧 &mdash; 如果以后我实现了尾调用优化的话，我们还可以重新考虑在运行时库中实现一个循环构造的方案。</p>
+
+<p>不管怎样，我们现在可以写出一个无限循环了⋯⋯不是太有用，不是吗？</p>
+
+<p>当然，我们其实也已经可以写 <code>while</code> 循环了：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='cl'><span class='line'><span class="p">(</span><span class="nb">defun</span> <span class="nv">some-while-loop</span> <span class="p">()</span> <span class="p">(</span><span class="k">if</span> <span class="kt">condition</span> <span class="p">(</span><span class="nv">some-while-loop</span><span class="p">)</span> <span class="p">()))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>看起来不是太好，不过确实可以工作。但看起来总归还是太丑了，所以我们总归还是要实现一个正尔八经的 <code>while</code> 循环的。</p>
+
+<p>我不是一个 Lisp 程序员。我没办法处理那么多的括号⋯⋯不过 Lisp 的语法确实很适合于一门还没有语法的语言。到了一定的阶段之后，我会实现一个完整的解析器的。也许是出于偶然，我已经实现的和将要实现的很多东西在某种程度上来说都是取自于 Lisp 的，至少看起来是这样的。如果你能适应 Lisp 的语法的话，这个语言还是非常强大的。就算你不打算用它来开发你的程序，好好地学一下这门语言也是非常值得的。</p>
+
+<p>在我想来，很多看起来像是从 Lisp 中得来的点子，大概都是来自于我花在学习 Lisp 的有限经验。</p>
+
+<p>下一篇：匿名函数，也许不止。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">GlacJAY</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-17T00:00:00+08:00" pubdate data-updated="true"></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/compiler/'>Compiler</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html" data-via="" data-counturl="http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%8C%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81.html" title="Previous Post: [翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持">&laquo; [翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html" title="Next Post: [翻译] 用 Ruby 写编译器之六：匿名函数 lambda">[翻译] 用 Ruby 写编译器之六：匿名函数 lambda &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91.html">OpenSSL 与 WinSock2 配合使用时遇到的一个坑</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86.html">修改 OpenVPN 实现加密算法的自动协商</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF.html">编写自己的 Web 版 Google Reader 客户端</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html">[转载] Compilers: What Are You Thinking About?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html">[翻译] 用 Ruby 写编译器之六：匿名函数 Lambda</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/glacjay">@glacjay</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'glacjay',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/102848119991336110895?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - GlacJAY -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'glacjay';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html';
+        var disqus_url = 'http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

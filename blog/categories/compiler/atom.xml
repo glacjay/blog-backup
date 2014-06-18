@@ -1,0 +1,834 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Compiler | Random Stuff from GlacJAY]]></title>
+  <link href="http://glacjay.github.com/blog/categories/compiler/atom.xml" rel="self"/>
+  <link href="http://glacjay.github.com/"/>
+  <updated>2014-03-30T01:01:05+08:00</updated>
+  <id>http://glacjay.github.com/</id>
+  <author>
+    <name><![CDATA[GlacJAY]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[[转载] Compilers: what are you thinking about?]]></title>
+    <link href="http://glacjay.github.com/blog/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about.html"/>
+    <updated>2011-07-26T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2011-07-26/转载-compilers-what-are-you-thinking-about</id>
+    <content type="html"><![CDATA[<p>最近在翻看以前加星的 Google Reader 文章，把有用的整理出来打标签，然后就看到了这篇。原文作者的博客现在不知道被丢到哪边去了，搜也搜不到，转到这里，权当保存一下吧。</p>
+
+<p>原文链接：<a href="http://www.onebadseed.com/blog/?p=119">Compilers: what are you thinking about?</a>。当然，已经打不开了。</p>
+
+<hr />
+
+<h2>Compilers: what are you thinking about?</h2>
+
+<p>Author: Rotten Cotton</p>
+
+<p>My recent post <a href="http://www.onebadseed.com/blog/?p=103">Compiler bibliography</a>, a motley list of compiler papers that had been sitting in a box in my attic, generated a surprising amount of traffic: over a thousand unique visitors. But no comments. For those of you interested in compiler design, I ask, what are you trying to understand? What are you trying to do?</p>
+
+<p>I imagine some of you are interested in understanding how compilers work and, more importantly, how to build them. The first step in learning to design compilers is to build one. (Tautologous, no?) To start, I recommend following the syllabus of a compiler design course. Googling “<a href="http://www.google.com/search?hl=en&amp;q=compiler+syllabus&amp;aq=f&amp;oq=&amp;aqi=g1">compiler syllabus</a>” returns a massive list of syllabi for compiler for compiler classes. The first link, a <a href="http://web.cecs.pdx.edu/~harry/compilers/syllabus.html">compiler design</a> class, at Portand State University, follows Louden’s book <a href="http://www.amazon.com/gp/product/0534939724?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0534939724">Compiler Construction</a> to build a SPARC compiler for a toy programming language, <a href="http://web.cecs.pdx.edu/~harry/compilers/PCATLangSpec.pdf">PCAT</a> (pdf). MIT’s compiler design class, <a href="http://ocw.mit.edu/OcwWeb/Electrical-Engineering-and-Computer-Science/6-035Fall-2005/CourseHome/">6.035</a>, is on <a href="http://ocw.mit.edu/">OCW</a>. Following one of these classes will teach you the basic challenges involved in designing a compiler and the organizational principles that have emerged to solve these problems. If you’re ambitious, start with a free C front end and build a C compiler for your favorite architecture. There is <a href="http://www.smlnj.org/doc/ckit/index.html">ckit</a> for ML, <a href="http://www.sivity.net/projects/language.c/">Language.C</a> for Haskell or <a href="http://clang.llvm.org/">clang</a> (part of the <a href="http://llvm.org/">LLVM</a> project) written in, I think, C++. There are others, no doubt. This way, you won’t have to write a front-end and you will have a huge source of potential examples on which to test your compiler and, when your start to design optimizations (the fun part), explore your compiler’s performance.</p>
+
+<p>For a few years after I first took 6.035, whenever the course was taught again and the project (toy language) for that semester was announced, I would spend a long caffeine-fueled weekend hacking out a new compiler. I must have build three or four compilers this way, targeting different architectures and exploring various design choices. This was a very valuable experience.</p>
+
+<p>Once you understand the basics of compiler design, what’s next? There are a number of directions you can go.</p>
+
+<p>You can study programming language features and their implementation in a compiler and runtime. For this, I recommend a book like Scott’s <a href="http://www.amazon.com/gp/product/0123745144?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0123745144">Programming Language Pragmatics</a> or Turbak and Gifford’s <a href="http://www.amazon.com/gp/product/0262201755?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0262201755">Design Concepts in Programming Languages</a>. I used a draft version of the latter in MIT’s Programming Languages class, 6.821. This will move beyond compiling the standard C- or Pascal-like toy languages standard in most first-year compiler courses. Learn about semantics: denotational, operational and axiomatic. This is important if you (a) want to build a correct compiler, and (b) as a theoretical foundation for program analysis.</p>
+
+<p>At the other end of the spectrum are computer architectures. Go learn about computer architecture: instruction set architectures and micro-architectures, their implementation. There are many interesting architectures out there to study. Write assembly language programs by hand. Learn to extract maximal performance form an architecture on small examples. Pay attention to the techniques used to extract performance when hand-coding. These will be the basis for compiler optimizations. The standard text for computer architecture is probably Hennessy and Patterson’s text, <a href="http://www.amazon.com/gp/product/0123704901?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0123704901">Computer Architecture: A Quantitative Approach</a>.</p>
+
+<p>A deep understanding of both the semantics of your input programming language and your target (micro-)architectures is essential to building a compiler that generates high-performance code. Program analysis and optimization is the bridge between the input program and assembly language. Start with a book on advanced compiler design like Muchnick’s <a href="http://www.amazon.com/gp/product/1558603204?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1558603204">Advanced Compiler Design and Implementation</a> (or maybe the new dragon book, I haven’t looked at it) or start diving into the literature or program analysis and optimization.</p>
+
+<p>What are you trying to understand about compilers?</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之六：匿名函数 lambda]]></title>
+    <link href="http://glacjay.github.com/blog/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%EF%BC%9A%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda.html"/>
+    <updated>2011-05-21T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2011-05-21/翻译-用-ruby-写编译器之六：匿名函数-lambda</id>
+    <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html</a></p>
+
+<p>既然上次已经提到说，我们其实是在从 Lisp、Scheme 还有类似的其他语言中借鉴各种要实现的功能（我没想过要把这个项目做成原创的⋯⋯或者至少也要等到以后再说吧），那么现在也<strong>是时候</strong>实现一些更加强大的功能了。</p>
+
+<h2>那就来做延迟求值以及匿名函数吧</h2>
+
+<p>Lambda ，又名匿名函数，可以像普通的数值或者字符串类型那样被当作函数参数来到处传递，也可以在需要的时候才调用（当然不调也可以）。同时，外层函数（也就是定义匿名函数的函数）作为它们的运行环境，在其中定义的局部变量可以被这些匿名函数所访问。这就形成了<a href="http://en.wikipedia.org/wiki/Closure_(computer_science)">一个闭包</a>。我们这次<strong>并不是</strong>要实现完整的闭包功能，只是开头的一小步而已，完整的实现要等到再后面了。</p>
+
+<p>其实说到底，正如编程语言中的其他很多功能一样，闭包也只是又一种语法糖而已。比如说，你可以认为这样其实是定义了一个类，这个类中有唯一一个需要被调用的方法，还有一些作为运行环境的成员变量（或者你也可以反过来<a href="http://strlen.com/bla/index.html">用闭包来实现面向对象系统</a> &mdash; 这是由 <a href="http://strlen.com/">Wouter van Oortmerssen</a> 所提出来的观点。自从我发现 <a href="http://strlen.com/e/index.html">Amiga E</a> 这个项目之后，作为作者的他就成了我的偶像。如果你是一个编程语言方面的极客的话，那你就一定要去看看 Wouter 所做过的东西） &mdash; 有很多功能其实都是相互正交的。</p>
+
+<p>（ blah blah blah ⋯⋯这个人在说自己很啰嗦之类的，就不翻了）</p>
+
+<p>那么，为了避免定义很多具名小函数的麻烦，同时降低函数重名的概率， lambda 允许你在任何需要它们的地方进行定义，并且返回一个表示所定义函数的值。</p>
+
+<p>我们现在所要增加的是像下面这样的东西：</p>
+
+<p><code>cl
+(lambda (args) body)
+(call f (args))
+</code></p>
+
+<p>第一个表达式会返回所定义的函数（目前来说，其实就是这个函数的起始地址），而不是去执行这个函数。而 <code>call</code> ，当然就是以指定的参数列表，来调用传给它的那个函数地址。</p>
+
+<p>那么，这跟“真正”的闭包又有什么区别呢？</p>
+
+<p>最重要的一点就是，当你在 lambda 中引用了外层作用域中的某个变量后，那么，当以后对同一个 lambda 进行调用时，这个变量还是可以访问的。这样的变量与 lambda 绑定在了一起。当然，只是得到一个函数的地址的话，肯定是实现不了这个功能的。让我们来看一种实现闭包的技术吧，这样你就能够了解大概所要做的工作了（工作量不大，但也不小）：</p>
+
+<ul>
+<li>我们可以创建一个“环境”，一个存放那些被引用到的外部变量的地方，以使得当外层函数返回之后，它们也可以继续存在。这个环境必须是在堆中，而且每次对外层函数的调用，都需要创建一个新的环境。</li>
+<li>我们必须返回一个可以用来访问这个环境的东西。你可以返回一个对象，其中的成员变量就是被 lambda 引用到的那些变量。或者你也可以用一个 thunk （中文叫啥呢？），也就是自动生成出来的一个包含有指向这个对象指针的小函数，它会在调用我们的 lambda 之前将这个对象加载到预先指定的地方。或者你也可以用什么其他的办法。</li>
+<li>你必须决定有哪些变量需要放入这个环境中。可以是外层函数中的所有局部变量，当然也可以只是那些被引用到的变量。后一种作法可以节省一定的内存空间，但是需要作更多的工作。</li>
+</ul>
+
+
+<p>好吧，还是让我们先来把匿名函数本身给弄出来吧。就像以前一样，我会一步一步地说明所要做的修改，但我同时也会对之前的代码做一些整理。这些整理的部分我就不一一说明了。</p>
+
+<p>首先是对 lambda 表达式本身进行处理的方法：</p>
+
+<p>``` ruby
+  def compile_lambda args, body</p>
+
+<pre><code>name = "lambda__#{@seq}"
+@seq += 1
+compile_defun(name, args,body)
+puts "\tmovl\t$#{name},%eax"
+return [:subexpr]
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>这个实现应该是很容易理解的吧。我们在这里做的，就是给要定义的匿名函数，生成一个形如 <code>lambda__[number]</code> 的函数名，然后就把它当作一个普通函数来处理了。虽然你也可以就把它生成到外层函数的函数体中，但我发现那样做的话，就会显得很乱的样子，所以我现在还是就把它作为单独的函数来处理了。然后我们调用 <code>#compile_defun</code> 方法来处理这个函数，这样的话，这个函数其实也就只有对用户来说，才是真正匿名的了。然后我们把这个函数的地址保存在寄存器 <code>%eax</code> 中，这里同时也是我们存放子表达式结果的地方。当然，这是一种很懒的作法啦，我们迟早需要为复杂的表达式，实现更加强大的处理机制的。但寄存器分配果然还是很麻烦的一件事情，所以现在就先这样吧（将所有的中间结果压入栈中也是一种可行的作法啦，不过那样比较慢）。</p>
+
+<p>最后，我们返回一个 <code>[:subexpr]</code> ，来告拆调用者到哪边可以得到这个 lambda 的值。</p>
+
+<p>之后是一些重构。你也许已经注意到了， <code>#compile_exp</code> 中的代码有点乱，因为要处理不同类型的参数。让我们把这部分代码给提取出来：</p>
+
+<p>``` ruby
+  def compile_eval_arg arg</p>
+
+<pre><code>atype, aparam = get_arg(arg)
+return "$.LC#{aparam}" if atype == :strconst
+return "$#{aparam}" if atype == :int
+return aparam.to_s if atype == :atom
+return "%eax"
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>要注意的是，这里又出现了一个新的 <code>:atom</code> 类型。借助于此，我们就可以把一个 C 函数的地址传给 <code>:call</code> 指令了。反正实现起来也很简单。当然，我们还要在 <code>#get_arg</code> 方法中加上如下代码，以使其生效：</p>
+
+<p>``` ruby</p>
+
+<pre><code>return [:atom, a] if (a.is_a?(Symbol))
+</code></pre>
+
+<p>```</p>
+
+<p>然后，作为重构的一部分，对 <code>:call</code> 的处理被分离了出来，成为一个单独的方法：</p>
+
+<p>``` ruby
+  def compile_call func, args</p>
+
+<pre><code>stack_adjustment = PTR_SIZE + (((args.length+0.5)*PTR_SIZE/(4.0*PTR_SIZE)).round) * (4*PTR_SIZE)
+puts "\tsubl\t$#{stack_adjustment}, %esp"
+args.each_with_index do |a,i|
+  param = compile_eval_arg(a)
+  puts "\tmovl\t#{param}, #{i&gt;0 ? i*4 : ""}(%esp)"
+end
+
+res = compile_eval_arg(func)
+res = "*%eax" if res == "%eax" # Ugly. Would be nicer if retain some knowledge of what res contains.
+puts "\tcall\t#{res}"
+puts "\taddl\t#{stack_adjustment}, %esp"
+return [:subexpr]
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>看起来很熟悉对不对？因为它就是原来的 <code>#compile_exp</code> 方法，只不过是用 <code>#compile_eval_arg</code> 替换掉了其中的一些代码。另外有改动的地方，就是同时也用 <code>#compile_eval_arg</code> 方法来得到要调用的函数，并对可能得到的 <code>%eax</code> 做了些手脚，在前面加了个星号。</p>
+
+<p>如果你知道这是怎么回事的话，你也许已经开始寻思其他的点子了，而不管那是真正的好事，还只是开枪打自己的脚。上面的代码其实就相当于，你把任意一个表达式的值当作指向一段代码的指针，然后也不做任何的检查，就直接跳过去执行它。如果是往一个随机的地址进行跳转的话，你最有可能得到的就是一个段错误了。当然，你也可以很容易地通过这项技术，来实现面向对象系统中的虚函数跳转表，或者其他的什么东西。因此，安全性将会是以后必须要考虑的东西。还有就是，要实现对一个地址（而不是函数名）的间接调用，你必须要在这个地址前面加上星号。</p>
+
+<p>那么，现在的 <code>#compile_exp</code> 方法变成什么样子了呢？简单来说就是，变得整齐多了：</p>
+
+<p>``` ruby
+  def compile_do(*exp)</p>
+
+<pre><code>exp.each { |e| compile_exp(e) }
+return [:subexpr]
+</code></pre>
+
+<p>  end
+  def compile_exp(exp)</p>
+
+<pre><code>return if !exp || exp.size == 0
+return compile_do(*exp[1..-1]) if exp[0] == :do
+return compile_defun(*exp[1..-1]) if exp[0] == :defun
+return compile_ifelse(*exp[1..-1]) if exp[0] == :if
+return compile_lambda(*exp[1..-1]) if exp[0] == :lambda
+return compile_call(exp[1], exp[2]) if exp[0] == :call
+return compile_call(exp[0], *exp[1..-1])
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>看起来很不错，不是吗？<code>#compile_call</code> 几乎跟之前的 <code>#compile_exp</code> 一模一样，只不过是把一些代码给提取出来，成为了辅助方法而已。</p>
+
+<p>那么就来简单地测试一下吧：</p>
+
+<p><code>ruby
+prog = [:do,
+  [:call, [:lambda, [], [:puts, "Test"]], [] ]
+]
+</code></p>
+
+<p>（看起来也没那么糟不是吗？）</p>
+
+<p>编译运行之：</p>
+
+<p><code>plain
+$ ruby step6.rb &gt;step6.s
+$ make step6
+cc      step6.s  -o step6
+$ ./step6
+Test
+$
+</code></p>
+
+<p>这篇的代码在<a href="http://www.hokstad.com/static/compiler/step6.rb">这里</a>。</p>
+
+<h2>之后的部分</h2>
+
+<p>因为我合并了几篇文章，下面就列一下更新过后的，“已经写完但还需要整理的”文章列表。因为我肯定还会合并下面的某些部分的，所以我想我需要找时间开始写一些新的部分了（为了完成我所定下的 30 篇的计划）。</p>
+
+<ul>
+<li>步骤七：再看用匿名函数实现循环，以及对函数参数的访问</li>
+<li>步骤八：实现赋值语句以及简单的四则运算</li>
+<li>步骤九：一个更简洁的 <code>while</code> 循环语句</li>
+<li>步骤十：测试这个语言：实现一个简单的输入转换模块</li>
+<li>步骤十一：重构代码生成器，分离架构相关的部分</li>
+<li>步骤十二：对某些功能点的讨论，以及未来的前进方向</li>
+<li>步骤十三：实现数组</li>
+<li>步骤十四：局部变量以及多重作用域</li>
+<li>步骤十五：访问变长参数列表</li>
+<li>步骤十六：再看输入转换模块，重构以支持新功能，并用其解析它自己</li>
+<li>步骤十七：总结实现自举所需要的功能点</li>
+<li>步骤十八：开始实现真正的解析器</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句]]></title>
+    <link href="http://glacjay.github.com/blog/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%EF%BC%9A%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%EF%BC%8C%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5.html"/>
+    <updated>2011-05-17T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2011-05-17/翻译-用-ruby-写编译器之五：整数常量，以及-if-语句</id>
+    <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html</a></p>
+
+<p>上次我承诺会发布的更快一些，不过还是失败了⋯⋯作为补偿，这章的内容将会是原计划中的第 5，6，7 章内容的合并，因为这三章确实都很短。闲话少叙：</p>
+
+<h2>处理数字常量</h2>
+
+<p>到目前为止，我们只处理了一些实现所必须的数字常量，也就是当一个外部函数的返回值是数字的情况，而且没有做任何形式的类型检查。</p>
+
+<p>那么，就让我们来看一下 gcc 在 C 语言中是怎样处理各种类型（包括 <code>long long</code> 等）的整数的吧。当然，这次还是针对 32 位的 x86 架构：</p>
+
+<p>``` c
+void foo1(unsigned short a) {}
+void foo2(signed short a) {}
+void foo3(unsigned int a) {}
+void foo4(signed int a) {}
+void foo5(unsigned long a) {}
+void foo6(signed long a) {}
+void foo7(unsigned long long a) {}
+void foo8(signed long long a) {}</p>
+
+<p>int main()
+{
+  foo1(1);
+  foo2(2);
+  foo3(3);
+  foo4(4);
+  foo5(5);
+  foo6(6);
+  foo7(7);
+}
+```</p>
+
+<p>我略掉了大部分 gcc 所生成的代码，如果愿意，你可以自己执行 <code>gcc -S</code> 命令来看。有趣的部分是对各个函数的调用，其生成的代码如下：</p>
+
+<p>``` nasm</p>
+
+<pre><code>    movl    $1, (%esp)
+    call    foo1
+    movl    $2, (%esp)
+    call    foo2
+    movl    $3, (%esp)
+    call    foo3
+    movl    $4, (%esp)
+    call    foo4
+    movl    $5, (%esp)
+    call    foo5
+    movl    $6, (%esp)
+    call    foo6
+    movl    $7, (%esp)
+    movl    $0, 4(%esp)
+    call    foo7
+</code></pre>
+
+<p>```</p>
+
+<p>换句话说，至少在处理函数调用的时候，gcc 都会把各种整数类型统一作为 32 位的整型来处理，除了 <code>long long</code> 类型之外。因此，我们可以暂时忘掉 <code>long long</code> 类型，而只处理 32 位以内的整数值，这样我们就可以忽略类型处理相关的东西了。</p>
+
+<p>懒惰还真是一种病啊。</p>
+
+<p>我们同时也会略过浮点型。为什么呢？因为只要有整数运算，你就可以实现一个完整的编译器了，所以现在就加入对浮点型的支持完全只是浪费时间而已。当然这个东西以后总归是要做的。</p>
+
+<p>另外，当<strong>我</strong>还年轻时，我们连 FPU 是啥都还不知道呢。尽管如此，我们依然可以用整数来模拟各种定点运算，一样可以完成很多事情。</p>
+
+<p>那么，我们真正要做的修改有哪些呢？</p>
+
+<p>在方法 <code>#get_arg</code> 中，在处理字符串常量之前，加入如下代码：</p>
+
+<p>``` ruby</p>
+
+<pre><code>return [:int, a] if (a.is_a?(Fixnum))
+</code></pre>
+
+<p>```</p>
+
+<p>在方法 <code>#compile_exp</code> 中，我们用如下代码来处理 <code>#get_arg</code> 的返回值：</p>
+
+<p>``` ruby</p>
+
+<pre><code>elsif atype == :int then param = "$#{aparam}"
+</code></pre>
+
+<p>```</p>
+
+<p>然后，就完事了。就这么简单。</p>
+
+<p>然后就是测试啦：</p>
+
+<p><code>ruby
+prog = [:do,
+  [:printf,"'hello world' takes %ld bytes\n",[:strlen, "hello world"]],
+  [:printf,"The above should show _%ld_ bytes\n",11]
+]
+</code></p>
+
+<h2>插曲：针对原生数据类型的一些思考</h2>
+
+<p>“纯”面向对象类型的语言很棒，但并不是对底层的代码生成器而言的，我想。不管你是否想要实现一个纯的面向对象语言，我仍然坚信，首先实现原生的数据类型和其操作，是非常有价值的。你可以在后面的阶段再来考虑是否要对用户隐藏它们，或者是让它们看起来像是对象，或者是透明地在它们和对象之间执行自动转换的操作，等等。</p>
+
+<p>要注意的是，Matz 的 Ruby 解释器（Matz Ruby Interpreter，简称MRI）就是这样实现的：里面的数字就跟“真正的”对象神马的完全不一样，但是解释器本身却尽其所能的对用户隐藏这一事实。不过我个人认为 MRI 做的还是不够。</p>
+
+<h2><code>If ... then ... else</code></h2>
+
+<p>如果没有某种形式的条件逻辑支持的话，我们的语言是没有太大用处的。几乎所有有用的语言都支持某种形式的 <code>if .. then .. else</code> 构造。现在，我们要实现的是像 <code>[:if, condition, if-arm, else-arm]</code> 这样的构造，而且是以 C 语言的形式来实现。也就是说， <code>0</code> 和空指针都表示假，其他值则都为真。</p>
+
+<p>仍然是一个简单的例子：</p>
+
+<p>``` c
+void foo() {}
+void bar() {}
+int main()
+{
+  if (baz()) {</p>
+
+<pre><code>foo();
+</code></pre>
+
+<p>  } else {</p>
+
+<pre><code>bar();
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<p>相关的汇编输出：</p>
+
+<p>``` nasm</p>
+
+<pre><code>    call    baz
+    testl   %eax, %eax
+    je      .L6
+    call    foo
+    jmp     .L10
+</code></pre>
+
+<p>.L6:</p>
+
+<pre><code>    call    bar
+</code></pre>
+
+<p>.L10:
+```</p>
+
+<p>对于大多数的语言和架构来说，这都是一个编译 <code>if .. then .. else</code> 时会采用的通用模板：</p>
+
+<ul>
+<li>计算条件表达式。</li>
+<li>对结果进行测试（这里用的是 <code>testl</code> 指令 &mdash; 在其他架构中比较通用的还有 <code>cmp</code> 指令，或者对寄存器进行自减）。 <code>testl</code> 指令比较它的左右两个操作数，并进行相应的标志位设置。</li>
+<li>然后，条件跳转到 <strong><code>else</code> 语句处。这里，我们检查条件表达式的值是否不为真。在这种情况下我们用的是 <code>je</code> 指令，即“相等时跳转”（ jump on equal ），也就是当结果相等时跳转（要注意的是，在大多数的 CPU 架构中，很多指令都会设置条件码，而不仅仅是显示的测试指令）。</strong></li>
+<li>然后执行 <code>then</code> 子句。</li>
+<li>跳过 <code>else</code> 子句，继续执行整个 <code>if</code> 语句之后的部分。</li>
+<li>生成 <code>else</code> 子句的标号，以及其中的指令序列。</li>
+<li>生成 <code>if</code> 语句的结束标号。</li>
+</ul>
+
+
+<p>其他还有很多不同的变种，比如根据条件表达式取值的概率，或者某个架构中是否跳转的执行代价，进而调整两个子句的顺序等。不过就目前来说，上面的方法已经足够了。</p>
+
+<p>总之，编译的方法还是很简单的，应该说就是以上所述流程的直译：</p>
+
+<p>``` ruby
+  def ifelse cond, if_arg,else_arm</p>
+
+<pre><code>compile_exp(cond)
+puts "\ttestl\t%eax, %eax"
+@seq += 2
+else_arm_seq = @seq - 1
+end_if_arm_seq = @seq
+puts "\tje\t.L#{else_arm_seq}"
+compile_exp(if_arm)
+puts "\tjmp\t.L#{end_if_arm_seq}"
+puts ".L#{else_arm_seq}:"
+compile_exp(else_arm)
+puts ".L#{end_if_arm_seq}:"
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>这段代码应该很易懂的，其实就是对所有子句 &mdash; 条件， <code>then</code> 子句，以及 <code>else</code> 子句 &mdash; 分别调用 <code>#compile_exp</code> 方法，并在其间插入所需的辅助指令，同时用 <code>@seq</code> 成员来生成所需的标号。</p>
+
+<p>为了使其生效，我们在 <code>#compile_exp</code> 方法中的 <code>return defun ...</code> 之后插入如下代码：</p>
+
+<p>``` ruby</p>
+
+<pre><code>return ifelse(*exp[1..-1]) if (exp[0] == :if)
+</code></pre>
+
+<p>```</p>
+
+<p>下面是一个简单的测试：</p>
+
+<p>``` ruby
+prog = [:do,
+  [:if, [:strlen,&ldquo;&rdquo;],</p>
+
+<pre><code>[:puts, "IF: The string was not empty"],
+[:puts, "ELSE: The string was empty"]
+</code></pre>
+
+<p>  ],
+  [:if, [:strlen,&ldquo;Test&rdquo;],</p>
+
+<pre><code>[:puts, "Second IF: The string was not empty"],
+[:puts, "Second IF: The string was empty"]
+</code></pre>
+
+<p>  ]
+]
+```</p>
+
+<p><a href="http://www.hokstad.com/static/compiler/step5.rb">这里是最终结果</a>。</p>
+
+<p>如往常般，执行的方法如下：</p>
+
+<p><code>plain
+$ ruby step5.rb &gt;step5.s
+$ make step5
+cc   step5.s   -o step5
+$ ./step5
+ELSE: The string was empty
+Second IF: The string was not empty
+$
+</code></p>
+
+<h2>有关循环的一些思考</h2>
+
+<p>非条件循环是很容易实现的，不过我们需要实现它吗？显然不需要。我们已经可以用递归来实现循环了，又何必要乱加东西呢？</p>
+
+<p>不过，要令它工作良好，我们还需要实现尾递归优化，可是我现在还没有做好准备。尾递归优化，或者更一般的形式 &mdash; 尾调用优化 &mdash; 所说的情况是，在一个函数的末尾，调用了一个需要相同或者更少个数参数的函数，并返回它所返回的值。在这种情况下，你可以将当前函数的调用栈，复用给被调用的函数来使用，并且是通过 <code>jmp</code> 而不是 <code>call</code> 来调用这个函数。 <code>jmp</code> 指令不会在堆栈中压入一个新的返回地址，因此当这个被调用的函数返回，返回到的就是当前函数的调用者那里，而不是当前的这个函数。</p>
+
+<p>这就同时完成了几件事情：首先，也是最重要的，就是堆栈不再会随着调用而增长了。其次，我们能够省掉几个指令周期。有了尾调用优化，再配合其他几个优化之后，你就可以这样来写循环，而不用担心堆栈溢出的问题了：</p>
+
+<p><code>ruby
+[:defun, :loop, [], [:do,
+  [:puts, "I am all loopy"],
+  [:loop]
+],
+[:loop]
+</code></p>
+
+<p>换句话说，尾调用优化意味着，对任何形如 <code>(defun foo () (do bar foo))</code> 的函数来说，堆栈的使用率都会从原来的成比例增长减少为定值了。</p>
+
+<p>当前的版本已经可以编译上面的代码了，不过它会很快用完堆栈并且崩溃掉的。不是很令人满意啊。</p>
+
+<p>果然（原文： I sense a disturbance in the force ），两位读到这篇文章的极客都指出了堆栈增长的问题。</p>
+
+<p>现在，让我们先忽略这个问题吧，同时注意下对堆栈空间的使用好了。之后，我们会实现一个专门的循环结构的。目前就这样吧 &mdash; 如果以后我实现了尾调用优化的话，我们还可以重新考虑在运行时库中实现一个循环构造的方案。</p>
+
+<p>不管怎样，我们现在可以写出一个无限循环了⋯⋯不是太有用，不是吗？</p>
+
+<p>当然，我们其实也已经可以写 <code>while</code> 循环了：</p>
+
+<p><code>cl
+(defun some-while-loop () (if condition (some-while-loop) ()))
+</code></p>
+
+<p>看起来不是太好，不过确实可以工作。但看起来总归还是太丑了，所以我们总归还是要实现一个正尔八经的 <code>while</code> 循环的。</p>
+
+<p>我不是一个 Lisp 程序员。我没办法处理那么多的括号⋯⋯不过 Lisp 的语法确实很适合于一门还没有语法的语言。到了一定的阶段之后，我会实现一个完整的解析器的。也许是出于偶然，我已经实现的和将要实现的很多东西在某种程度上来说都是取自于 Lisp 的，至少看起来是这样的。如果你能适应 Lisp 的语法的话，这个语言还是非常强大的。就算你不打算用它来开发你的程序，好好地学一下这门语言也是非常值得的。</p>
+
+<p>在我想来，很多看起来像是从 Lisp 中得来的点子，大概都是来自于我花在学习 Lisp 的有限经验。</p>
+
+<p>下一篇：匿名函数，也许不止。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持]]></title>
+    <link href="http://glacjay.github.com/blog/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%EF%BC%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%EF%BC%8C%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81.html"/>
+    <updated>2011-05-09T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2011-05-09/翻译-用-ruby-写编译器之四：自定义函数，以及运行时支持</id>
+    <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html</a></p>
+
+<p>抱歉，又拖了很长时间。要忙的事情实在很多。正如上一篇文章末尾提到的那样，这次要讲的是自定义函数，以及一个简单的“运行时库”。</p>
+
+<h2>自定义函数</h2>
+
+<p>一门编程语言如果连函数和方法都没有的话，那也就不能算是一门语言了。而且，实践表明，一门面向对象语言中的所有特性都可以通过过程式的语言要素来实现：一个方法也只不过是以一个对象为额外参数的函数而已。因此，增加对函数的支持就是实现一门语言的核心所在。</p>
+
+<p>其实，这个东东也是很简单的啦。跟以前一样，还是让我们来看一下 C 语言中的函数是怎么实现的吧：</p>
+
+<p><code>c
+void foo()
+{
+  puts("Hello world");
+}
+</code></p>
+
+<p>gcc 生成的汇编代码是这个样子滴：</p>
+
+<p>``` nasm
+.globl foo</p>
+
+<pre><code>    .type   foo, @function
+</code></pre>
+
+<p>foo:</p>
+
+<pre><code>    pushl   %ebp
+    movl    %esp, %ebp
+    subl    $8, %esp
+    movl    $.LC0, (%esp)
+    call    puts
+    leave
+    ret
+    .size   foo, .-foo
+</code></pre>
+
+<p>```</p>
+
+<p>其中的函数调用现在应该很容易认了吧。剩下的就是简单的样板代码了：</p>
+
+<p>在函数的开头，首先是将寄存器 <code>%ebp</code> 压入堆栈，然后拷贝寄存器 <code>%esp</code> 到 <code>%ebp</code> 。而在函数的最后， <code>leave</code> 指令就是前面两条指令的逆操作，而 <code>ret</code> 指令则是从堆栈中弹出要返回到的指令地址（也就是调用该函数的那条指令的下一条指令）并跳转。为什么在这里要将 <code>%esp</code> （也就是堆栈指针）拷到 <code>%ebp</code> 呢？嘛，一个很明显的好处就是你可以尽情的申请堆栈空间，然后在完事时简单地将 <code>%ebp</code> 拷回给 <code>%esp</code> 就行了。从上面就可以看到， GCC 已经充分利用了这一点，直接用 <code>leave</code> 指令来处理调用函数时对参数所申请的空间 &mdash; 反正手工释放也只是浪费时间而已。</p>
+
+<p>这么说来的话，要做的事情应该就很简单了啊。</p>
+
+<p>首先需要修改方法 <code>Compiler#initialize</code> ，创建一个用来保存所有函数定义的哈希：</p>
+
+<p>``` ruby
+  def initialize</p>
+
+<pre><code>@global_functions = {}
+</code></pre>
+
+<p>```</p>
+
+<p>然后增加一个输出所有函数定义的方法：</p>
+
+<p>``` ruby
+  def output_functions</p>
+
+<pre><code>@global_functions.each do |name,data|
+  puts ".globl #{name}"
+  puts ".type   #{name}, @function"
+  puts "#{name}:"
+  puts "\tpushl   %ebp"
+  puts "\tmovl    %esp, %ebp"
+  compile_exp(data[1])
+  puts "\tleave"
+  puts "\tret"
+  puts "\t.size   #{name}, .-#{name}"
+  puts
+end
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>可以看到，这里也同时包括了 <code>.globl</code> 与 <code>.type</code> 与 <code>.size</code> 之类的东西。 <code>.globl</code> 的意思就是你想让这个函数也能够从其他文件（也就是编译单元）中调用，这在链接多个目标文件的时候是很重要的。我想 <code>.type</code> 和 <code>.size</code> 主要是用在调试的时候，分别用来表示一个符号对应的是一个函数，以及这个函数的大小。</p>
+
+<p>除了这些之外，这个方法就很简单啦 &mdash; 它会通过调用 <code>#compile_exp</code> 方法来完成实际的工作。</p>
+
+<p>我们再来增加一个用来定义函数的辅助方法：</p>
+
+<p>``` ruby
+  def defun name, args, body</p>
+
+<pre><code>@global_functions[name] = [args, body]
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>然后在方法 <code>#compile_exp</code> 中增加如下的几行代码：</p>
+
+<p>``` ruby</p>
+
+<pre><code>return if !exp || exp.size == 0
+return defun(*exp[1..-1]) if (exp[0] == :defun)
+</code></pre>
+
+<p>```</p>
+
+<p>之所以要增加第一行代码，一方面是出于健壮性的考虑，同时这也允许我们用 <code>nil</code> 和空数组来表示“啥也不做”的意思，当你要定义一个空函数的时候就会用到这一点了。这样一来，第二行代码就不需要去检查将要定义的是不是一个空函数了。</p>
+
+<p>不知道你注意到了没有，我们其实已经实现了对函数的递归定义。像 <code>[:defun,:foo,[:defun, :bar, []]]</code> 这样的代码完全是合法的。同时你也许会注意到，这个实现会导致两个函数其实都是可以从别处调用的。好吧，现在是没关系的啦，我们以后会处理这个的（要么不允许编写这样的代码，要么就只允许外层函数来调用内层函数 &mdash; 我还没有决定到底要做哪个啦）。</p>
+
+<p>剩下的事情就是输出这些函数的定义了，因此我们在方法 <code>#compile</code> 中对 <code>#output_constants</code> 的调用之前增加如下的一行：</p>
+
+<p>``` ruby</p>
+
+<pre><code>output_functions
+</code></pre>
+
+<p>```</p>
+
+<h2>增加对一个运行时库的支持</h2>
+
+<p>首先，让我们将现在的 <code>#compile</code> 方法重命名为 <code>#compile_main</code> ，然后重新定义 <code>#compile</code> 方法如下：</p>
+
+<p>``` ruby
+  def compile(exp)</p>
+
+<pre><code>compile_main([:do, DO_BEFORE, exp, DO_AFTER])
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>之后是对常量 <code>DO_BEFORE</code> 和 <code>DO_AFTER</code> 的定义（如果愿意的话，你也可以把它们放在一个单独的文件中，我现在就直接把它们放在开头好了）：</p>
+
+<p><code>ruby
+DO_BEFORE= [:do,
+  [:defun, :hello_world,[], [:puts, "Hello World"]]
+]
+DO_AFTER= []
+</code></p>
+
+<p>你得承认，你想看到的应该是更加高级一些的东东，但那样就违背我们最初的目标了。上面的代码对于实现一个运行时库来说已经足够了。当然，你也可以用一些只能通过 C 或者汇编才能实现的东西，只要把包含那些函数实现的目标文件给链接进来就可以了，因为我们一直都是在按照 C 语言的调用规则来办事的嘛。</p>
+
+<p>让我们来测试一下吧。在 <code>Compiler.new.compile(prog)</code> 的前面加入下面的代码：</p>
+
+<p><code>ruby
+prog = [:hello_world]
+</code></p>
+
+<p>然后编译运行：</p>
+
+<p><code>plain
+$ ruby step4.rb &gt;step4.s
+$ make step4
+cc    step4.s   -o step4
+$ ./step4
+Hello World
+$
+</code></p>
+
+<p>你可以在<a href="http://www.hokstad.com/static/compiler/step4.rb">这里</a>找到今天的成果。</p>
+
+<h2>对函数参数的访问吗？</h2>
+
+<p>今天还遗留了一个任务：实现对函数参数的访问。这个的工作量可是不小的。放心，我不会忘了这个的，这将会是第八篇文章的主题。我也不会让你等太久的啦，这次一定 :&ndash;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式]]></title>
+    <link href="http://glacjay.github.com/blog/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%EF%BC%9A%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F.html"/>
+    <updated>2011-05-02T00:00:00+08:00</updated>
+    <id>http://glacjay.github.com/blog/2011-05-02/翻译-用-ruby-写编译器之三：语句序列，以及子表达式</id>
+    <content type="html"><![CDATA[<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up&mdash;-step-3.html</a></p>
+
+<p><strong>我本来是想要早点发表的，可是我这周又不行了 &mdash; 虽然整理一篇旧文只需要半个小时。不管怎样，这是第三章，而且我会在末尾大概列一下之后的大纲。由于我会试着把一些小的步骤组合成更有内容的章节（下面就有个这样的例子），因此原来的 30 篇文章已经被我给减到了 20 篇左右（当然，这只是我已经完成了的，后面还有新的呢）。</strong></p>
+
+<h2>用 do 语句将表达式给串起来</h2>
+
+<p>到目前为止，<a href="http://www.hokstad.com/static/compiler/step2b.rb">上次的第二版程序</a>只能编译一个单独的表达式。只是这样的话，并不是非常的有用啊。因此我决定实现一种支持顺序执行的结构，就像函数体那样的。当然，如你所想，这是很简单的。我会增加一个关键字 <code>do</code> ，而其作用就是顺序执行传给它的每一个（个数不限哦，或者说，只受限于内存的大小）参数表达式。看起来就像这样：</p>
+
+<p><code>ruby
+prog = [:do,
+  [:printf,"Hello"],
+  [:printf," "],
+  [:printf,"World\n"]
+]
+</code></p>
+
+<p>要实现这个是非常简单的。我们只需要在函数 <code>#compile_exp</code> 的开头加入下列代码：</p>
+
+<p>``` ruby</p>
+
+<pre><code>if exp[0] == :do
+  exp[1..-1].each { |e| compile_exp(e) }
+  return
+end
+</code></pre>
+
+<p>```</p>
+
+<p>递归在这里的作用很重要哦 &mdash; 毕竟你是在处理一个树形结构，那也就需要在越来越深层的树结点之上调用实现编译的核心函数，而这当然也包括我们的下一个目标，即对子表达式的处理。</p>
+
+<h2>子表达式，步骤一</h2>
+
+<p>先来给出一个我们想要支持的用例：</p>
+
+<p><code>ruby
+prog = [:printf,"‘hello world’ takes %ld bytes\n",[:strlen, “hello world"]]
+</code></p>
+
+<p>第一个需要改变的地方，在函数 <code>#get_arg</code> 中，我们在其开头加入如下的代码：</p>
+
+<p>``` ruby</p>
+
+<pre><code># Handle strings or subexpressions
+if a.is_a?(Array)
+  compile_exp(a)
+  return nil # What should we return?
+end
+</code></pre>
+
+<p>```</p>
+
+<p>如果你这时已经试着用上面的代码来编译测试用例了的话，gcc 会报错给你的，因为我们现在只处理了 <code>#get_arg</code> 的返回值是一个字符串常量对应的序列号的情况，而这对子表达式来说显然是不适用的。</p>
+
+<h2>子表达式，步骤二：返回值</h2>
+
+<p>那么 gcc 是怎么处理这个的呢。让我们来看看下面这段代码：</p>
+
+<p><code>c
+int main()
+{
+  printf("'Hello world' takes %ld bytes\n",foo("Hello world"));
+}
+</code></p>
+
+<p>所产生的汇编吧（只截取 <code>main</code> 中相关的部分）：</p>
+
+<p>``` nasm</p>
+
+<pre><code>subl    $20, %esp
+movl    $.LC0, (%esp)
+call    foo
+movl    %eax, 4(%esp)
+movl    $.LC1, (%esp)
+call    printf
+addl    $20, %esp
+</code></pre>
+
+<p>```</p>
+
+<p>应该说还是很直观的吧。gcc 首先会去调用子表达式（ <code>foo</code> ），并且希望这个函数能够把它的返回值放入寄存器 <code>%eax</code> 中，然后就会把这个值作为参数拷到堆栈上，而不是什么字符串常量的地址。</p>
+
+<p>首先是要调整 <code>#get_arg</code> 函数：</p>
+
+<p>``` ruby
+  def get_arg(a)</p>
+
+<pre><code># Handle strings and subexpressions
+if a.is_a?(Array)
+  compile_exp(a)
+  return [:subexpr]
+end
+seq = @string_constants[a]
+return seq if seq
+seq = @seq
+@seq += 1
+@string_constants[a] = seq
+return [:strconst,seq]
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>唯一需要改动的地方就是返回值了，我们增加了一个表示返回值类型的标识 &mdash; 以后还会加入其他类型的。</p>
+
+<p>剩下的工作就是改写 <code>#compile_exp</code> 函数中的相关部分了。这时就不能直接收集 <code>#get_arg</code> 的返回值了，而是需要对每个参数都做相应的处理并直接输出（而这同时也是 <code>stack_adjustment</code> 需要修改的原因，因为已经没有 <code>args</code> 数组了）：</p>
+
+<p>``` ruby</p>
+
+<pre><code>stack_adjustment = PTR_SIZE + (((exp.length-1+0.5)*PTR_SIZE/(4.0*PTR_SIZE)).round) * (4*PTR_SIZE)
+puts "\tsubl\t$#{stack_adjustment}, %esp" if exp[0] != :do
+
+exp[1..-1].each_with_index do |a,i|
+  atype, aparam = get_arg(a)
+  if exp[0] != :do
+    if atype == :strconst
+      param = "$.LC#{aparam}"
+    else
+      param = "%eax"
+    end
+    puts "\tmovl\t#{param},#{i&gt;0 ? i*4 : ""}(%esp)"
+  end
+end
+</code></pre>
+
+<p>```</p>
+
+<p>如你所见，并不是什么复杂的更改。我们只是检查了 <code>#get_arg</code> 所返回的类型信息，并相应的输出字符串常量或者寄存器 <code>%eax</code> 而已。随着我们加入更多要处理的情况，这个部分代码还会继续扩充的。</p>
+
+<p><a href="http://www.hokstad.com/static/compiler/step3.rb">你可以在这里找到最新版本的代码</a>。</p>
+
+<h2>之后的计划</h2>
+
+<p>这里只列出的基本完成的部分。我的计划是，当我开始着手写新的部分时，我会将重心放在一个简单的解析器上，以尽快实现编译器的自举（即，编译它自己）。</p>
+
+<ul>
+<li>步骤四：运行时，以及函数的定义</li>
+<li>步骤五：处理其他类型的常量值</li>
+<li>步骤六：条件表达式 <code>if ... then ... else</code></li>
+<li>步骤七：循环语句</li>
+<li>步骤八：匿名函数（ <code>lambda</code> ）</li>
+<li>步骤九：用匿名函数来实现循环，以及对函数参数的处理</li>
+<li>步骤十：赋值，以及简单的代数运算</li>
+<li>步骤十一：更简结的 <code>while</code> 循环</li>
+<li>步骤十二：测试我们的语言：开发一个简单的输入转换模块</li>
+<li>步骤十三：重构代码生成模块，并抽象出平台相关的部分</li>
+<li>步骤十四：对一些概念的讨论，以及今后的前进方向</li>
+<li>步骤十五：数组</li>
+<li>步骤十六：局部变量以及多种作用域</li>
+<li>步骤十七：可变长参数列表</li>
+<li>步骤十八：再看输入转换模块：测试新的功能点，以及自我转换</li>
+<li>步骤十九：确定自举所需要实现的功能</li>
+<li>步骤二十：开始实现真正的解析器</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
