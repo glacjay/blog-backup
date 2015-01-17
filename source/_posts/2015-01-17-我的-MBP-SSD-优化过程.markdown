@@ -1,0 +1,106 @@
+---
+layout: post
+title: "我的 MBP SSD 优化过程"
+date: 2015-01-17 16:40:49 +0800
+comments: true
+tags:
+  - mac
+  - ssd
+---
+
+嗯，这次的标题终于没那么长了 ;-)
+
+给我的 MBP 换 SSD 已经是很久之前的事了，当时就已经折腾过一次优化了，不过没有相应的记录。最近发现了新装的 Yosemite 的一些老是搞不定而且连原因都不知道的问题（其中一个可以参见[我在 AskDifferent 上的提问](http://apple.stackexchange.com/questions/163500/when-i-want-to-install-teamviewer-10-why-cant-i-select-my-system-disk-as-the-d "AskDifferent: When I want to install TeamViewer 10, why can't I select my system disk as the distination?")），一怒之下重装之，自然对 SSD 的优化也要重新搞一遍。搞的过程中发现有的手段能用，有的却不行，特此记录。
+
+优化手段的主要来源是[朋友的一篇博文](http://chenyufei.info/blog/2011-09-06/13-%E5%AF%B8-macbook-pro-%E6%8B%86%E5%85%89%E9%A9%B1%E6%9B%B4%E6%8D%A2-ssd/ "13 寸 Macbook Pro 拆光驱更换 SSD")及其中的链接。
+
+**注意：操作有风险，动手须谨慎哟。因为我是不（lan）会（de）做太多解释的，所以你一定要在操作前搞清楚那些个命令的作用哟，特别是像 `rm` 啦 `mv` 啦之类的危险命令哟，可别说我没提醒你哟 -\_-**
+
+# Firefox 缓存设置
+
+虽然 Firefox 不是我的主役浏览器，但有时还会用用，姑且改之。总之就是打开 `about:config` 页面，修改如下设置：
+
+* 将 `browser.cache.disk.enable` 改为 `false`
+* 将 `browser.cache.memory.enable` 改为 `true`
+
+这样 Firefox 就只会把缓存的东西都放在内存而不是硬盘（也就是 SSD）上了（应该吧）。
+
+# 关掉根文件系统的「上一次读取时间」特性
+
+「上一次读取时间」指的虽然是文件上次被读取的时间，但这个信息是会写到硬盘上文件的元数据中的。想想系统文件还不是整天被读过来读过去的，但这个时间信息又没什么用，果断禁之！以 root 身份创建（如果之前没有的话）并编辑文件 `/etc/fstab`，增加如下一行（或者修改原有配置，增加 `noatime` 挂载属性）：
+
+```
+/dev/disk2 / hfs rw,noatime
+```
+
+其中的 `/dev/disk2` 自然要换成你的 SSD 对应的磁盘文件路径啦。
+
+# 禁用冬眠模式
+
+执行如下命令即可：
+
+```
+$ sudo pmset -a hibernatemode 0
+$ sudo rm /var/vm/sleepimage
+```
+
+PS. 冬眠模式是为了在电池耗尽时能保存机器的运行状态，防止意外丢失数据的。一般认为电池耗尽这种情况很少会发生，毕竟当你发现电池快用光时肯定就会到处找插座了嘛。结果我最近偏偏碰到了一次，而且还是在插着电源的时候！一开始还怀疑难道我的电源线又挂了？！结果后来试着把电脑端反过来接就好了。真是莫名，看来这根电源线也大限将至么……不管怎样，有问题的时候电脑端的 LED 指示灯虽然亮着但是很暗几乎看不出来，难道这表示电压不足？有知道的人么？（不过首先，得有能看到我这篇博的人（泪奔
+
+# 减少临时文件的读写
+
+## RAMDisk
+
+我在试了网上的方法之后，发现如果用了 RAMDisk，则系统很快就会卡死。据[陈同学](https://twitter.com/cyfdecyf)说是 OS X 的 RAMDisk 实现有问题，嗯，所以就要想别的招了。
+
+## 将临时文件目录移到机械硬盘分区
+
+因为我是将……好吧其实我也不记得主硬盘位放的是哪个硬盘了，Any way :-)，SSD 和原机械硬盘现在都被我挂着用，于是就可以考虑将那些个临时文件目录移到机械硬盘上，减少对 SSD 的读写。
+
+网上说可以将 `/private/tmp` 和 `/private/var/run` 两个目录挂载到 RAMDisk 上，那想必也是可以挪到其他地方的吧；不过经实践，只有前者可以，后者（至少用这里的软链接方式）会导致系统启动出错，只好作罢。
+
+将 `/private/tmp` 移到机械硬盘上的方法：
+
+```
+$ sudo ditto /private/tmp /Volumes/your_hdd_name/private/tmp
+$ sudo rm -rf /private/tmp
+$ sudo ln -s /Volumes/your_hdd_name/private/tmp /private/tmp
+```
+
+然后其实用户的家目录也可以这样挪到机械硬盘上，不过要注意数据的迁移，所以命令稍有不同：
+
+```
+sudo ditto /Users /Volumes/your_hdd_name/Users
+sudo mv /Users /Users.bak
+sudo ln -s /Volumes/your_hdd_name/Users /Users
+sudo rm -rf /Users.bak
+```
+
+另外还有一个目录 `/private/var/log`，也就是系统日志目录，我觉得也有必要挪一下，但又怕像 `/private/var/run` 那样失败，所以一时没有折腾。
+
+# 禁用 Safari 的 Webpage Previews 功能
+
+我好像没做这条，因为我不怎么用 Safari 的说。
+
+# 关闭 Spotlight 索引
+
+因为我也不怎么用 Spotlight，所以这个我也（跟上一条连起来，感觉有点儿怪怪的哈）关了，记得就是去系统配置里面把所有的勾都给取消掉就行了，嗯。
+
+# 关闭「时间机器」功能
+
+反正我是没开过，反正我的重要数据（代码啥的）都在网上有仓库，图片有 Google+ Photos，电子书……你懂的。
+
+据说是该功能在你没插备份盘时会往系统盘备份，要不要关就看你的实际需求啰。
+
+# 禁用「自动休眠硬盘」选项
+
+就是系统配置、节能器里的那个「Put the hard disk(s) to sleep when possible」。不过我开着这项，因为我还有个机械硬盘嘛。
+
+# Trim Enabler
+
+这个是重头戏哟，所以放在最后（不过这样是不是就会被人忽略掉啊，嘛不管了）。
+
+原文中的链接已经坏了，因为那个链接的作者更新了一篇新的，所以把老的给删了，新链接[在此](https://digitaldj.net/blog/2011/11/17/trim-enabler-for-os-x-lion-mountain-lion-mavericks/ "TRIM Enabler for OS X Lion, Mountain Lion, Mavericks")。建议好好阅读学习哟。不过对于最新的 Yosemite 来说，有一个[更新的脚本](https://gist.github.com/return1/4058659)。
+
+虽说是重头戏，但工作相当于全都丢给别人了嘛，不过这种细节你就不要在意啦。
+
+打完收功！
