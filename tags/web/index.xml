@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Web on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/web/</link>
+    <description>Recent content in Web on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 19 Jun 2014 00:23:16 +0800</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/web/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>LoadRunner 中进行 HTTP 测试时使 Keep-Alive 生效的注意事项</title>
+      <link>https://glacjay.info/post/2014-06-19/loadrunner-%E4%B8%AD%E8%BF%9B%E8%A1%8C-http-%E6%B5%8B%E8%AF%95%E6%97%B6%E4%BD%BF-keep-alive-%E7%94%9F%E6%95%88%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/</link>
+      <pubDate>Thu, 19 Jun 2014 00:23:16 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-06-19/loadrunner-%E4%B8%AD%E8%BF%9B%E8%A1%8C-http-%E6%B5%8B%E8%AF%95%E6%97%B6%E4%BD%BF-keep-alive-%E7%94%9F%E6%95%88%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/</guid>
+      <description>&lt;p&gt;工作需要，在使用 LoadRunner 进行 HTTP 测试时，为了使每个虚拟用户在不同的循环周期中都能保持长连接，则除了要打开 Keep-Alive 运行时配置（默认打开）之外，还有两个选项需要修改，这两个选项都在运行时配置的「Browser - Browser Simulation」中：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Simulate browser cache ：取消勾选。禁用对浏览器缓存机制的模拟，令虚拟用户确实的每次都真正发起与 Web 服务器的对话，而不是只读取一下缓存。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Simulate a new user on each iteration ：取消勾选。不要在每次执行 Action 之前重置虚拟用户的状态，不然会把原来的 TCP 长连接也重置掉，Keep-Alive 就没用了（更准确地说，是在不同循环周期之间就没用了）。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>编写自己的 Web 版 Google Reader 客户端</title>
+      <link>https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/</link>
+      <pubDate>Thu, 11 Aug 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/</guid>
+      <description>&lt;p&gt;最近花在路上的时间明显变多了，手机就成了我打发这些路上时间的利器。小说神马的看太多也会腻，正好 Google Reader 中也积累了大量的未读文章，因此用手机看看订阅文章就成了一个比较好的选择。&lt;/p&gt;
+
+&lt;p&gt;但多次使用下来，却也发现了很多 Google 原版 Web 界面的不方便之处。Google 提供了两个版本的 Reader 界面给手机，一个是苹果风格的 &lt;code&gt;/i/&lt;/code&gt; 界面，设计得很漂亮，功能也很全，用 Nokia 手机也能看，但太费流量（未证实，只是感觉，大概是因为一次加载了很多的文章吧），而且在网络状况不好的时候，体验不太好。另一个是 &lt;code&gt;/m/&lt;/code&gt; 界面，很简洁，选项不多，但也总有些这样那样的细节另我不太满意，下面详述。然后又去找 Nokia 的 S60v3 客户端软件，总之是没一个喜欢啦。作为一个 Geek （至少是自称），在这种情况下，最佳选择自然就是打造一个自己专属的解决方案啦。&lt;/p&gt;
+
+&lt;p&gt;正好蹭着同学的一个 PHP 空间（其实也有 Python 和 Ruby 可选啦，但总觉得会很折腾，还是 PHP 好点，虽然折腾也少不了，见下），于是花了几天时间，连复习 PHP （以前只学过没用过，主要还是看 w3schools 的教程和查 php.net 的函数文档）、研究 OAuth （参见&lt;a href=&#34;http://www.ioncannon.net/programming/1443/google-oauth-for-installed-apps-php-example/&#34;&gt;这篇文章&lt;/a&gt;，不过 Web 应用稍有不同）、研究 Google Reader API （参见&lt;a href=&#34;http://blog.martindoms.com/2009/08/15/using-the-google-reader-api-part-1/&#34;&gt;这系列文章&lt;/a&gt;）、编写代码，终于搞定了一个很阳春的 Google Reader Mobile 版，刚刚满足我的手机阅读需要。&lt;/p&gt;
+
+&lt;p&gt;以下就是我针对 Google 原版所做的，针对我个人的改进：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;保存期限的问题&lt;/strong&gt;：以前也有感觉，这次趁着做这个东东，又确认了一下：Google 只会保存 30 天内的未读文章，超过 30 天的就自动标记成已读了。我希望能保存下来慢慢看，所以就搞了一个简单的 SQLite 数据库，定时把曾经是未读文章的 &lt;code&gt;id&lt;/code&gt; 号都给保存下来，直到我通过这个界面读过之后再删除。嗯，这个功能是最重要的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;先看最老的文章&lt;/strong&gt;：当然，通过这两天对 API 的研究，我已经知道怎么在 Google 的 &lt;code&gt;/m/&lt;/code&gt; 界面中实现这个功能了，不过为了上一个功能，打造自己的界面还是必要的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;重复载入的问题&lt;/strong&gt;：当我要给一篇文章加星的时候，我一般都希望能直接看到下一篇文章，而不是再看一次被加星的这篇。这也是一个很小的改进啦，不过用起来很舒服，既节省了流量，也节省了时间。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加载文章的时候先不要标记为已读&lt;/strong&gt;：由于手机的网络状况通常不太好，当我浏览完一篇，想加个星标的时候，结果页面却打不开了，这种情况经常发生。所以，我就把标记为已读的这个步骤，挪到了看一下篇之前，或者加星标之后。这样，就比再去已读文章里面找要来得方便。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;去掉 &lt;code&gt;/m/&lt;/code&gt; 的所有其他功能&lt;/strong&gt;：当然，这不是一个改进啦，只是我不需要而已。既然是用手机来看，当然就没有那么多需要啦，只要能实现浏览与加星标就好了。需要细看的，就加个标，等有电脑的时候再慢慢看。本来， Google Reader 的星标功能，除了作为 ToRead 列表外，就没什么其他用处了（当然，以后也许会跟搜索整合，然后优先显示神马的，那就不管了）。不过话说回来，功能的简化其实也是一种改进啦，最近刚好看到 InstaPaper 的作者也这么说来着。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;功×夫×网&lt;/strong&gt;：不过其实 Google Reader 并没有被封的很严，倒是我自己的实现招来了这个问题，见下。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;简单来说，就是按顺序，对所有文章，看，（可选地）加星标，然后下一篇。需求往往就这么简单啊。&lt;/p&gt;
+
+&lt;p&gt;当然，在做的时候，还是遇到过各种稀奇古怪的问题（ Neta ：编程好难啊），这里也一并记录下。&lt;/p&gt;
+
+&lt;p&gt;先是在自己机器上 OK 了，等部署到空间的时候却报错： an error occured while processing this directive 。同样的脚本，放到其他目录就没事，还以为是 Apache 的权限问题，也没找到有什么特别的配置。直到有机会查看 Apache 的错误日志，才发现原来就是因为新加的这个目录有组的写权限，而 Apache 不允许这样，真是吐血。话说加上组的写权限，也是为了 SQLite 来着，因为 SQLite 会在数据库所在目录中写事务日志文件。&lt;/p&gt;
+
+&lt;p&gt;然后就是发现，我用的 SQLite3 的 PHP 接口，在空间的 PHP 5.2 版本中还没有呢。真是悲剧。然后又吭哧吭哧地用 PDO 接口重写了数据库的代码。&lt;/p&gt;
+
+&lt;p&gt;等到好不容易改好啦，用电脑访问也一切正常，结果用手机访问的时候，看不了两个页面，就会出现“连接被远程服务器关闭”的错误。一开始还没有往功×夫×网的方向想，只以为又是服务器的权限问题（我为什么要加“又”？），来回地看日志，切换测试，不停地折腾。直到在电脑上偶然看到，该网页需要翻×墙的标志，再一看 URL 才恍然，原来是我传的一个 GET 参数，是该文章的订阅源 URL ，而有些文章是从 Feed×Burner 订阅的，这才触发了功×夫×网。真是躺着也中枪啊，赶急加一个 Base64 编码搞定。&lt;/p&gt;
+
+&lt;p&gt;不管怎样，一个简陋的阅读器就这样被实现出来了。鉴于我近期还不想烧钱换手机，这个东东应该还是很有用武之地的吧。不知道 Google 出的 Android 客户端有没有 30 天的限制。&lt;/p&gt;
+
+&lt;p&gt;最后的最后，该版本仅限我个人使用，因为我没有实现多用户的功能，所以大家（如果有的话）也就不要去尝试访问了。我之后会把代码给开源的，到时随你（如果有的话，嗯）折腾。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; 代码已&lt;a href=&#34;https://github.com/glacjay/mreader&#34;&gt;上传&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Update 2012-12-31:&lt;/strong&gt; 现在有了 Android 手机，已经开始用 gReader 这个客户端了，除了“延迟标记已读”这个功能还没有之外，其他所需功能已经都有了，而且还是离线阅读哦（我自己的版本就没有实现离线阅读这个功能，因为太麻烦）。不过我的数据库里面已经存了 7000 多篇文章没看了……囧&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

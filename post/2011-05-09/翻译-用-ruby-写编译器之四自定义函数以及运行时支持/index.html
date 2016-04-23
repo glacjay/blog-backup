@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="compiler, linux, ruby, ">
+
+
+<meta property="og:title" content="[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2011-05-09T00:00:00Z" />
+<meta property="og:article:modified_time" content="2011-05-09T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="compiler">
+    
+<meta property="og:article:tag" content="linux">
+    
+<meta property="og:article:tag" content="ruby">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2011-05-09",
+    "description": "",
+    "wordCount":  231 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持
+</h1>
+
+  <div class="metas">
+<time datetime="2011-05-09">9 May, 2011</time>
+
+
+  
+  &middot; Read in about 2 min
+  &middot; (231 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/compiler">compiler</a>
+
+<a class="label" href="https://glacjay.info/tags/linux">linux</a>
+
+<a class="label" href="https://glacjay.info/tags/ruby">ruby</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  
+
+<p>原文链接：<a href="http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html">http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html</a></p>
+
+<hr />
+
+<p>抱歉，又拖了很长时间。要忙的事情实在很多。正如上一篇文章末尾提到的那样，这次要讲的是自定义函数，以及一个简单的“运行时库”。</p>
+
+<h2 id="自定义函数:a1905e7840a324707222cc702f5afc30">自定义函数</h2>
+
+<p>一门编程语言如果连函数和方法都没有的话，那也就不能算是一门语言了。而且，实践表明，一门面向对象语言中的所有特性都可以通过过程式的语言要素来实现：一个方法也只不过是以一个对象为额外参数的函数而已。因此，增加对函数的支持就是实现一门语言的核心所在。</p>
+
+<p>其实，这个东东也是很简单的啦。跟以前一样，还是让我们来看一下 C 语言中的函数是怎么实现的吧：</p>
+
+<pre><code class="language-c">void foo()
+{
+  puts(&quot;Hello world&quot;);
+}
+</code></pre>
+
+<p>gcc 生成的汇编代码是这个样子滴：</p>
+
+<pre><code class="language-nasm">.globl foo
+        .type   foo, @function
+foo:
+        pushl   %ebp
+        movl    %esp, %ebp
+        subl    $8, %esp
+        movl    $.LC0, (%esp)
+        call    puts
+        leave
+        ret
+        .size   foo, .-foo
+</code></pre>
+
+<p>其中的函数调用现在应该很容易认了吧。剩下的就是简单的样板代码了：</p>
+
+<p>在函数的开头，首先是将寄存器 <code>%ebp</code> 压入堆栈，然后拷贝寄存器 <code>%esp</code> 到 <code>%ebp</code> 。而在函数的最后， <code>leave</code> 指令就是前面两条指令的逆操作，而 <code>ret</code> 指令则是从堆栈中弹出要返回到的指令地址（也就是调用该函数的那条指令的下一条指令）并跳转。为什么在这里要将 <code>%esp</code> （也就是堆栈指针）拷到 <code>%ebp</code> 呢？嘛，一个很明显的好处就是你可以尽情的申请堆栈空间，然后在完事时简单地将 <code>%ebp</code> 拷回给 <code>%esp</code> 就行了。从上面就可以看到， GCC 已经充分利用了这一点，直接用 <code>leave</code> 指令来处理调用函数时对参数所申请的空间 &ndash; 反正手工释放也只是浪费时间而已。</p>
+
+<p>这么说来的话，要做的事情应该就很简单了啊。</p>
+
+<p>首先需要修改方法 <code>Compiler#initialize</code> ，创建一个用来保存所有函数定义的哈希：</p>
+
+<pre><code class="language-ruby">  def initialize
+    @global_functions = {}
+</code></pre>
+
+<p>然后增加一个输出所有函数定义的方法：</p>
+
+<pre><code class="language-ruby">  def output_functions
+    @global_functions.each do |name,data|
+      puts &quot;.globl #{name}&quot;
+      puts &quot;.type   #{name}, @function&quot;
+      puts &quot;#{name}:&quot;
+      puts &quot;\tpushl   %ebp&quot;
+      puts &quot;\tmovl    %esp, %ebp&quot;
+      compile_exp(data[1])
+      puts &quot;\tleave&quot;
+      puts &quot;\tret&quot;
+      puts &quot;\t.size   #{name}, .-#{name}&quot;
+      puts
+    end
+  end
+</code></pre>
+
+<p>可以看到，这里也同时包括了 <code>.globl</code> 与 <code>.type</code> 与 <code>.size</code> 之类的东西。 <code>.globl</code> 的意思就是你想让这个函数也能够从其他文件（也就是编译单元）中调用，这在链接多个目标文件的时候是很重要的。我想 <code>.type</code> 和 <code>.size</code> 主要是用在调试的时候，分别用来表示一个符号对应的是一个函数，以及这个函数的大小。</p>
+
+<p>除了这些之外，这个方法就很简单啦 &ndash; 它会通过调用 <code>#compile_exp</code> 方法来完成实际的工作。</p>
+
+<p>我们再来增加一个用来定义函数的辅助方法：</p>
+
+<pre><code class="language-ruby">  def defun name, args, body
+    @global_functions[name] = [args, body]
+  end
+</code></pre>
+
+<p>然后在方法 <code>#compile_exp</code> 中增加如下的几行代码：</p>
+
+<pre><code class="language-ruby">    return if !exp || exp.size == 0
+    return defun(*exp[1..-1]) if (exp[0] == :defun)
+</code></pre>
+
+<p>之所以要增加第一行代码，一方面是出于健壮性的考虑，同时这也允许我们用 <code>nil</code> 和空数组来表示“啥也不做”的意思，当你要定义一个空函数的时候就会用到这一点了。这样一来，第二行代码就不需要去检查将要定义的是不是一个空函数了。</p>
+
+<p>不知道你注意到了没有，我们其实已经实现了对函数的递归定义。像 <code>[:defun,:foo,[:defun, :bar, []]]</code> 这样的代码完全是合法的。同时你也许会注意到，这个实现会导致两个函数其实都是可以从别处调用的。好吧，现在是没关系的啦，我们以后会处理这个的（要么不允许编写这样的代码，要么就只允许外层函数来调用内层函数 &ndash; 我还没有决定到底要做哪个啦）。</p>
+
+<p>剩下的事情就是输出这些函数的定义了，因此我们在方法 <code>#compile</code> 中对 <code>#output_constants</code> 的调用之前增加如下的一行：</p>
+
+<pre><code class="language-ruby">    output_functions
+</code></pre>
+
+<h2 id="增加对一个运行时库的支持:a1905e7840a324707222cc702f5afc30">增加对一个运行时库的支持</h2>
+
+<p>首先，让我们将现在的 <code>#compile</code> 方法重命名为 <code>#compile_main</code> ，然后重新定义 <code>#compile</code> 方法如下：</p>
+
+<pre><code class="language-ruby">  def compile(exp)
+    compile_main([:do, DO_BEFORE, exp, DO_AFTER])
+  end
+</code></pre>
+
+<p>之后是对常量 <code>DO_BEFORE</code> 和 <code>DO_AFTER</code> 的定义（如果愿意的话，你也可以把它们放在一个单独的文件中，我现在就直接把它们放在开头好了）：</p>
+
+<pre><code class="language-ruby">DO_BEFORE= [:do,
+  [:defun, :hello_world,[], [:puts, &quot;Hello World&quot;]]
+]
+DO_AFTER= []
+</code></pre>
+
+<p>你得承认，你想看到的应该是更加高级一些的东东，但那样就违背我们最初的目标了。上面的代码对于实现一个运行时库来说已经足够了。当然，你也可以用一些只能通过 C 或者汇编才能实现的东西，只要把包含那些函数实现的目标文件给链接进来就可以了，因为我们一直都是在按照 C 语言的调用规则来办事的嘛。</p>
+
+<p>让我们来测试一下吧。在 <code>Compiler.new.compile(prog)</code> 的前面加入下面的代码：</p>
+
+<pre><code class="language-ruby">prog = [:hello_world]
+</code></pre>
+
+<p>然后编译运行：</p>
+
+<pre><code class="language-plain">$ ruby step4.rb &gt;step4.s
+$ make step4
+cc    step4.s   -o step4
+$ ./step4
+Hello World
+$
+</code></pre>
+
+<p>你可以在<a href="http://www.hokstad.com/static/compiler/step4.rb">这里</a>找到今天的成果。</p>
+
+<h2 id="对函数参数的访问吗:a1905e7840a324707222cc702f5afc30">对函数参数的访问吗？</h2>
+
+<p>今天还遗留了一个任务：实现对函数参数的访问。这个的工作量可是不小的。放心，我不会忘了这个的，这将会是第八篇文章的主题。我也不会让你等太久的啦，这次一定 :-)</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="[翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5/" title="[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

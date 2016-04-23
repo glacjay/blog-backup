@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Network on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/network/</link>
+    <description>Recent content in Network on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 22 Jun 2014 01:09:12 +0800</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/network/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Keepalived 实现双机热备并对关键进程进行监控</title>
+      <link>https://glacjay.info/post/2014-06-22/keepalived-%E5%AE%9E%E7%8E%B0%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87%E5%B9%B6%E5%AF%B9%E5%85%B3%E9%94%AE%E8%BF%9B%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%9B%91%E6%8E%A7/</link>
+      <pubDate>Sun, 22 Jun 2014 01:09:12 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-06-22/keepalived-%E5%AE%9E%E7%8E%B0%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87%E5%B9%B6%E5%AF%B9%E5%85%B3%E9%94%AE%E8%BF%9B%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%9B%91%E6%8E%A7/</guid>
+      <description>&lt;p&gt;三连更有木有！（对不起我网文看多了，而且中间其实断过两天的，我不会告诉你其实是我把这事儿给忘了的）&lt;/p&gt;
+
+&lt;p&gt;另，这篇照例是工作需要。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;使用 Keepalived 实现多机热备（无负载均衡）时，除了对网口状态的监控外，一般还要对系统关键进程（如 Web 服务器的话就是 nginx 或者 httpd 之类的）进行监控，这时就要用到 &lt;code&gt;vrrp_script&lt;/code&gt; 配置。网上能找到的 &lt;code&gt;vrrp_script&lt;/code&gt; 示例都使用了 &lt;code&gt;weight&lt;/code&gt; 选项，以实现基于优先级机制的切换，我在使用中遇到了一点儿问题，总结一下。&lt;/p&gt;
+
+&lt;p&gt;一般在使用双机热备时，如果当前主机——假设为 A ——出了问题（关键进程挂掉，优先级降低，低于备机），这时会自动切换到备机——假设为 B ——继续完成工作，同时等待管理员对 A 的问题进行修复。当 A 的问题修复时，我们不希望 A 马上切换为主机，因为这样有可能断掉用户正在使用的连接，体验不好。在 keepalived 中，通过给 A 增加一条 &lt;code&gt;nopreempt&lt;/code&gt; 配置，就可以防止 A 主动抢回主机状态。&lt;/p&gt;
+
+&lt;p&gt;这时问题就来了。当 A 的问题（关键进程恢复）修复之后，A 的优先级会恢复到原来的值，但由于 &lt;code&gt;nopreempt&lt;/code&gt; 的存在，A 并不会立刻抢占。这时就相当于 A 作为备机，却有更高的优先级。如果 B 之后出了问题（关键进程挂掉，优先级降低），却不会导致切换，因为 B 在出问题之前，其优先级就已经比 A 低了。&lt;/p&gt;
+
+&lt;p&gt;网上有文章说，遇到这种情况，可以在 B 的进程监控脚本中把 B 的 keepalived 进程杀掉，来强制触发切换动作，这种作法显然并不优雅。有没有更好的方法呢？&lt;/p&gt;
+
+&lt;p&gt;注意到，当拔网线触发切换时，被拔网线的机器上，keepalived 并不是降低了自己的优先级，而是进入 FAULT 状态（除 MASTER 和 BACKUP 之外的另一种状态），这时是不会有上述由优先级引起的问题的。所以新的思路就是，当进程监控失败时，不要降低优先级，而是令 keepalived 进入 FAULT 状态，同时在主备两机都加上 &lt;code&gt;nopreempt&lt;/code&gt; 选项。&lt;/p&gt;
+
+&lt;p&gt;至于怎么令 keepalived 进入 FAULT 状态，也很简单，直接去掉 &lt;code&gt;vrrp_script&lt;/code&gt; 中的 &lt;code&gt;weight&lt;/code&gt; 选项即可。虽然谁也没说 &lt;code&gt;weight&lt;/code&gt; 是必选项，但因为网上能搜到的示例都是配了 &lt;code&gt;weight&lt;/code&gt; 的，导致很多人（至少包括我）会主观认为这是必选项，从而无法意识到还有其他方法。当然这也跟 keepalived 的文档不太完善有关。&lt;/p&gt;
+
+&lt;p&gt;PS. 让我发现 &lt;code&gt;weight&lt;/code&gt; 不是必选项的来源是……找不着了，囧。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenSSL 与 WinSock2 配合使用时遇到的一个坑</title>
+      <link>https://glacjay.info/post/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91/</link>
+      <pubDate>Sat, 29 Mar 2014 23:06:38 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91/</guid>
+      <description>&lt;p&gt;今天才发现，这里已经两年多没有被照看过了，估计连树都要长出来了吧。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;在用 Windows 的 WSAEventSelect 模式进行网络编程时，比较固定的一个模式是这样的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;...
+WSAEventSelect(sock, events[0], FD_READ);
+...
+while (1)
+{
+    ret = WSAWaitForMultipleEvents(1, events, FALSE, timeout, FALSE);
+    if (ret &amp;gt;= WSA_WAIT_EVENT_0 &amp;amp;&amp;amp; ret &amp;lt; WSA_WAIT_EVENT_0 + 1)
+    {
+        eventIndex = ret - WSA_WAIT_EVENT_0;
+        if (eventIndex == 0)
+        {
+            WSAEnumNetworkEvents(sock, events[0], &amp;amp;networkEvents);
+            if (networkEvents.lNetworkEvents &amp;amp; FD_READ)
+            {
+                ...
+                recv(sock, buf, sizeof(buf));
+                ...
+            }
+            ...
+        }
+        ...
+    }
+    ...
+}
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当要处理的 sock 属于一个 OpenSSL 连接时，只要把当中的 recv 换成 SSL_read 就行了，当然前面还得加上些 readWaitonWrite 之类的标志位检查啥的，这里就不详细列举了，请参考《Network Security with OpenSSL》一书中的 5.2.2.3 小节。&lt;/p&gt;
+
+&lt;p&gt;但我在实际使用中（事实上是在压力测试中）发现，当程序运行一段时间之后，WSAWaitForMultipleEvents 就会忽然不再返回可读信号了，从而导致对该 socket 的接收操作完全停止。&lt;/p&gt;
+
+&lt;p&gt;经过各种调试手段，甚至是在 OpenSSL 中加入调试输出之后，终于发现问题出在 SSL_read 的实现机制上，貌似 OpenSSL 实现了某种程度的读写缓冲（具体没细看），使得对 SSL_read 的一次调用，并不一定会触发其对底层 socket 的读取操作。而如果没有对底层 socket 的读取操作，那么 windows 的对应 event 对象就不会被 reenable （参考 MSDN 中对 WSAEventSelect 接口的说明文档），从而导致 WSAWaitForMultipleEvents 不再对该事件作检查。&lt;/p&gt;
+
+&lt;p&gt;原因找到了，那么相应的解决方法也就不难发现了，对于我的使用场景来说（不完全是像上面的示例片断那么清晰），最简单的作法就是在 SSL_read 之前加一个空的 recv 调用，其传给 recv 的第二、三个参数的值分别是 NULL 和 0 ，这样就能强制触发 windows event 的 reenable ，同时又不会影响到 SSL 对象内部的读取状态了。&lt;/p&gt;
+
+&lt;p&gt;PS. 遇到这个问题时，最重要的一步其实是如何能够稳定而快速的复现问题。一开始做压力测试时，只有在连续跑个一天以上时才会不定时的出现，导致效率很低；后来偶然发现，通过虚拟机搭建的受限环境，反而能很快复现问题。想来这也是另一种形式的压力测试吧，正常的压力测试是保持环境不变，加大请求压力；这里则变成了保持请求不变，同时压缩可用环境。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>总结一下学到的 LVS 相关知识（ NAT 模式）</title>
+      <link>https://glacjay.info/post/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86-nat-%E6%A8%A1%E5%BC%8F/</link>
+      <pubDate>Sat, 12 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86-nat-%E6%A8%A1%E5%BC%8F/</guid>
+      <description>&lt;p&gt;LVS，即 Linux Virtual Server 的简称，是 Linux 下用来实现负载均衡的一个项目。它支持三种负载模式，分别为 NAT 、 DR 以及 TUN 。&lt;/p&gt;
+
+&lt;p&gt;注意，我这里讲的都是针对的 2.6 的内核， 2.4 、 2.2 、 2.0 版内核的实现方法和配置方法都各有不一样的地方。还好我不需要维护历史遗留系统（擦汗）。&lt;/p&gt;
+
+&lt;p&gt;首先是最简单的 NAT 模式。这种模式跟普通的 NAT 防火墙的原理差不多，只不过它会根据指定的分配策略，为每一个新的客户端连接选择一个不同的真实服务，而不是像 NAT 防火墙那样只映射到后台的同一个真实服务。&lt;/p&gt;
+
+&lt;p&gt;这种模式下最常用的部署方式为，负载均衡机器上分别启用两块网卡，一块外网，一块内网。当然一块网卡也可以，然后在这块网卡上配两个地址。这里假设外网地址为 &lt;code&gt;192.168.0.1&lt;/code&gt; ，内网地址为 &lt;code&gt;192.168.1.1&lt;/code&gt; 。两个真实服务器的地址分别为 &lt;code&gt;192.168.1.2&lt;/code&gt; 以及 &lt;code&gt;192.168.1.3&lt;/code&gt; 。&lt;/p&gt;
+
+&lt;p&gt;这样，要对两台服务器的 SSH 服务进行负载均衡的话，负载机器上要执行的命令如下（当然你得先安装 &lt;code&gt;ipvsadm&lt;/code&gt; 这个命令才行。负载功能的实现还是在内核中做的，跟 &lt;code&gt;iptables&lt;/code&gt; 一样）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;$ sudo ipvsadm -A -t 192.168.0.1:22 -s rr
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;-A&lt;/code&gt; 表示增加一个新的负载均衡服务，一台负载均衡器上可以同时对多个服务进行负载； &lt;code&gt;-t&lt;/code&gt; 表示这是一个 TCP 服务； &lt;code&gt;-s rr&lt;/code&gt; 表示选择 Round Robin 分配策略。 Round Robin 是最简单的一种分配策略，表示在每台真实服务器间进行轮流选择；其他还有最少连接等策略。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo ipvsadm -a -t 192.168.0.1:22 -r 192.168.1.2:22 -m
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;-a&lt;/code&gt; 表示为指定的负载服务增加一个新的真实服务； &lt;code&gt;-t&lt;/code&gt; 同上； &lt;code&gt;-r&lt;/code&gt; 指定真实服务的地址和端口； &lt;code&gt;-m&lt;/code&gt; 则表示这个真实服务采用的是 NAT 模式的负载均衡。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo ipvsadm -a -t 192.168.0.1:22 -r 192.168.1.3:22 -m
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样负载均衡服务就配置好了。当然，记得还要打开系统的 IP 转发功能，不管你用的是哪种负载均衡。真实服务器上则还需要配置路由规则，把回给客户端的路由通过 &lt;code&gt;192.168.1.1&lt;/code&gt; 这个网关进行发送（不指定网关地址，只指定网口是不行的）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo route add -net 192.168.0.0/24 gw 192.168.1.1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这种模式的优点，当然就在于配置简单啦，跟配置 NAT 防火墙基本相同，缺点是有对网络报文的额外处理（替换目的地址）的开销。不过据说 2.6 的内核其开销已经很小了。&lt;/p&gt;
+
+&lt;p&gt;用如下命令可以查看当前的负载状态：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo ipvsadm -l -n
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里有一点要说的是，当负载的是 UDP 服务（如 OpenVPN ）时，建立起来的连接会显示在“非活动连接”那一栏，不知道为什么。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

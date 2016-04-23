@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Random Stuff from GlacJAY </title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="">
+
+
+<meta property="og:title" content="Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="website" />
+
+
+
+<link href="https://glacjay.info/index.xml" rel="alternate" type="application/rss+xml" title="Random Stuff from GlacJAY" />
+
+<link rel="canonical" href="https://glacjay.info/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="https://glacjay.info/index.xml" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<section id="main-content" class="container main_content homepage">
+  <header class="container header">
+    <h1>Random Stuff from GlacJAY
+</h1>
+
+    <span>last update: <time datetime="2016-04-23T10:33:22&#43;08:00">23 April at 10:33am</time>
+</span>
+
+  </header>
+  
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95/">OpenVPN 的并发测试方法
+</a>
+</h2>
+
+  <time datetime="2011-01-19">19 Jan, 2011</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>由于 OpenVPN 本身协议的特殊性，用一般的方法不太好测它的并发。看过 LoadRunner ，但也最多只支持标准的 SSL/TLS 协议（当然，我也没细看这个）。于是动手改了其客户端的实现，最终完成任务。</p>
+
+<p>其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。貌似装十个左右的虚拟网卡驱动之后，机器就不行了。于是解决办法也很简单，把虚拟网卡相关的功能跳过就可以了。根据<a href="/post/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90/">上篇</a>的说明，只要在 <code>incoming_push_message()</code> 函数中，把对 <code>do_up()</code> 的调用直接换成 <code>initialization_sequence_completed()</code> 就 OK 了。</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90/">OpenVPN 的初始化过程分析
+</a>
+</h2>
+
+  <time datetime="2011-01-18">18 Jan, 2011</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>题外话：Eclipse CDT 很给力，至少在我用起来，比 gVim + Cscope 或者 SourceInsight 要来得给力，推荐一下。</p>
+
+<p>更准确的来说，是 OpenVPN 的客户端与服务端之间，从协商密钥、到推送配置，以及最后的网卡与路由配置生效，开始进行 IP 报文的传递，这整个的过程。</p>
+
+<p>完了。嗯，整个过程就像上面说的，这几个步骤而已。</p>
+
+<p>不过重点当然还是代码啦。以前一直以为 OpenVPN 的点对点模式下，两端会进行一个决定谁是客户端，谁是服务端的协商过程，一直都想知道是怎么做的。后来才知道，原来通过配置信息，就已经决定好这个了。当然，我下面说的是客户端-服务器模式。</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90/">OpenVPN 的握手协议分析
+</a>
+</h2>
+
+  <time datetime="2010-11-22">22 Nov, 2010</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>又是好久没来这儿了啊。</p>
+
+<p>最近因为工作需要（其实也没需要那么多），一直在断断续续地看 OpenVPN 的代码，终于大概搞清楚了它的握手是怎么个流程了。简单来说的话其实非常的简单，首先在 <code>reliable</code> 模块中实现了一个可靠的 UDP 报文协议，就是加上超时重传和确认报文的功能；然后用该协议交换一个 Hard Reset 命令，开始握手；最后建立 SSL 对象，并且通过内存 <code>BIO</code> 在可靠 UDP 协议的基础上转发 OpenSSL 的握手协议报文，通过这个 SSL 连接交换 OpenVPN 自己的密钥。接下来就是用这些密钥，该干嘛干嘛了。</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2010-11-22/openvpn-%E7%9A%84%E6%8F%A1%E6%89%8B%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1/">用 Python 操作虚拟网卡
+</a>
+</h2>
+
+  <time datetime="2010-09-18">18 Sep, 2010</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>在我的 <a href="/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/">XTunnel</a> 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。</p>
+
+<p>在 Linux 内核中，特别是在现在的发行版中，应该都已经有了 <code>TUN/TAP</code> 虚拟网卡的驱动程序，看一下有没有 <code>/dev/net/tun</code> 这个文件就可以知道了。如果没有，就执行一下 <code>sudo modprobe tun</code> 这个命令吧。如果还是没有，那就 Google 之吧。下面上代码：</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93----linux-%E7%AF%87/">通过 ODBC 接口访问 Oracle 数据库 -- Linux 篇
+</a>
+</h2>
+
+  <time datetime="2010-03-03">3 Mar, 2010</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>首先，你要安装好 UnixODBC 软件包，这个就不多说了。</p>
+
+<p>然后，安装 Oracle 官方客户端，因为我的使用环境为 Fedora 12 ，所以我下载安装的是 <code>oracle-xe-client-10.2.0.1-1.0.i386.rpm</code> 。</p>
+
+<p>装好之后，要设置一些环境变量，我是用的一个 Shell 脚本来完成这项工作的，你可以把它放在 <code>/etc/profile.d/</code> 目录下并加上可执行权限来让其在系统启动时自动执行，也可以直接运行这个脚本来使其立即生效。脚本如下：</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93----linux-%E7%AF%87/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC/">Oracle 建库 SQL 脚本
+</a>
+</h2>
+
+  <time datetime="2010-03-02">2 Mar, 2010</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    -- 首先是删除该数据库中该用户名下的所有表、序列与触发器， -- 其中触发器是通过表格级联删除的。 declare cursor usertables is select * from user_tables where table_name not like 'BIN$%'; cursor usersequences is select * from user_sequences; begin for next_row in usertables loop execute immediate 'drop table ' || next_row.table_name || ' cascade constraints'; end loop; for next_row in usersequences loop execute immediate 'drop sequence ' || next_row.sequence_name; end loop; end; / -- 然后，就是一砣……的建表语句啦， -- 比方说下面就是两个含外键的表。 create table &quot;A&quot; ( &quot;ID&quot; integer primary
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/">利用 XMPP 协议实现 VPN
+</a>
+</h2>
+
+  <time datetime="2009-12-19">19 Dec, 2009</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>这主意是我<a href="http://chenyufei.info">一同学</a>想到的（至少是他告诉我的），基于一种实际的需要。假设你有两台内网机，都没有公网地址，你想从一台机器访问另一台机器的服务，这时要怎么办呢？当然很可能是我无知了，就我所知，网上倒是有一些提供这类服务的网站，但都是基于 Windows 的远程桌面的，至于 Linux ，我没找过。</p>
+
+<p>于是那家伙联想到了 IM Bot 这种东西。现在网上有各种各样的 IM Bot ，可以通过与之聊天执行各种各样的自动化任务，那为什么不能让它把发过去的命令交给另一台机器的 Shell 执行，并把结果返回呢？这不就实现了一个简单的 Telnet 了吗？这就是最初的想法了（我没去找现成实现，因为我也该练练手了）。而我刚好才折腾过 OpenVPN ，于是就有了标题所说的这个最终想法。这样的话，就能一下子从只支持一种应用协议到支持几乎所有的应用协议了，而且实现的工作量也同时减到了最低。真是好主意啊，自我夸奖一下 :-)</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96/">让 Vim 在保存时自动调用外部命令进行格式化
+</a>
+</h2>
+
+  <time datetime="2009-12-13">13 Dec, 2009</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>肯定有许多人遇到过这个问题，也肯定有许多现成的解决方案被发现，可是我没找到（或者说没耐心找）。无所谓，自己找到的话，得到的就不仅仅是最终结果了。</p>
+
+<p>闲话少说。其实以前也干过类似的事情，就是在保存的时候自动去掉所有的行末空白；不过这个操作使用 Vim 本身的功能就能实现，不需要借助于外部程序，所以只要简单地设一个 <code>BufWrite</code> 时的自动命令就行了。但当需要借助外部程序的时候，在 <code>BufWrite</code> 或者 <code>BufWritePre</code> 或者 <code>FileWritePre</code> 时执行的自动命令就不行了，老是提示说什么文件本身已更改，是否确定写入。我在这上面反覆试了好多次，才发现是自己没有搞清楚底下到底发生了什么。要让外部程序对文件内容进行格式化（或者其他什么操作。我想调的是 gofmt，顺带一提），首先当然得要那个外部程序能看到你做过的，还没有保存的更改，所以说应该是先写入再操作的，即在 <code>BufWritePost</code> 的时候执行自动命令。而我一开始就把基本步骤给搞反了。</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/">使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL
+</a>
+</h2>
+
+  <time datetime="2009-12-05">5 Dec, 2009</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>我的编译环境是 Visual Studio Team System 2008 版本 9.0.21022.8 RTM ， Windows Mobile 5.0 SDK R2 （ VS2008 自带的版本）。当然， Perl 也是需要的，我装的是 ActivePerl 。我要编译的 OpenSSL 版本是 0.9.8e 。</p>
+
+<h2 id="vs2008-的安装:35e51ba4554ba11286e563aed7028ead">VS2008 的安装</h2>
+
+<p>那个 Web Developer Tools （好像叫这个）的安装会失败，又不能不装，根据网上的说明，要把它的目录单独从光盘上解压出来安装，且安装的时候要挂 Office 的安装光盘（我的 Office 版本是 2007 ）。这个装好了之后，再从光盘上安装 VS2008 就没有问题了。</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+    <article class="container content summary">
+  <div class="container hat">
+  <h2><a href="https://glacjay.info/post/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0/">在 Haskell 中实现 Generic zip 函数
+</a>
+</h2>
+
+  <time datetime="2009-07-14">14 Jul, 2009</time>
+
+</div>
+
+  <p class="container content">
+  
+  
+    <p>其实嗫，这个问题已经有标准和其他的解决方案了。标准解决方案参见 <code>Control.Applicative</code> 中的 <code>ZipList</code> ，不过这东东用起来蛮麻烦的说；其他解决方案见 bff 库的 <code>Data.Zippable</code> 模块，嗯，我还没搞明白这玩意怎么用，不过总感觉杀鸡用牛刀了有点（Template Haskell ，以及其他依赖）。</p>
+
+<p>所以，如果你只是跟我一样，看 <code>Data.List</code> 中的那一砣 <code>zipn</code> 不顺眼的话（其实也只是看着不顺哈，用着还是蛮顺的，反正实现不用我写），一个更简单的方案在此：</p>
+
+  
+
+
+</p>
+
+
+  <div class="container readlink">
+  <a href="https://glacjay.info/post/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0/">Read more &rarr;</a>
+
+</div>
+
+
+</article>
+
+  
+  
+<div class="container pagination">
+  
+
+
+<a aria-label="First" href="https://glacjay.info//">
+  <span aria-hidden="true">««</span>
+</a>
+
+<a aria-label="Previous" href="https://glacjay.info//page/2/">
+  <span aria-hidden="true">«</span>
+</a>
+
+
+<a href="https://glacjay.info//">
+  1
+</a>
+
+<a href="https://glacjay.info//page/2/">
+  2
+</a>
+
+<a class="active" href="https://glacjay.info//page/3/">
+  3
+</a>
+
+<a href="https://glacjay.info//page/4/">
+  4
+</a>
+
+
+<a aria-label="Next" href="https://glacjay.info//page/4/">
+  <span aria-hidden="true">»</span>
+</a>
+
+<a aria-label="Last" href="https://glacjay.info//page/4/">
+  <span aria-hidden="true">»»</span>
+</a>
+
+
+</div>
+
+
+</section>
+
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Oracle 建库 SQL 脚本  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="oracle, sql, ">
+
+
+<meta property="og:title" content="Oracle 建库 SQL 脚本  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2010-03-02T00:00:00Z" />
+<meta property="og:article:modified_time" content="2010-03-02T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="oracle">
+    
+<meta property="og:article:tag" content="sql">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="Oracle 建库 SQL 脚本" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "Oracle 建库 SQL 脚本",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2010-03-02",
+    "description": "",
+    "wordCount":  246 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>Oracle 建库 SQL 脚本
+</h1>
+
+  <div class="metas">
+<time datetime="2010-03-02">2 Mar, 2010</time>
+
+
+  
+  &middot; Read in about 2 min
+  &middot; (246 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/oracle">oracle</a>
+
+<a class="label" href="https://glacjay.info/tags/sql">sql</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  <pre><code class="language-sql">-- 首先是删除该数据库中该用户名下的所有表、序列与触发器，
+-- 其中触发器是通过表格级联删除的。
+declare
+  cursor usertables is
+    select *
+    from user_tables
+    where table_name not like 'BIN$%';
+  cursor usersequences is
+    select *
+    from user_sequences;
+begin
+  for next_row in usertables loop
+    execute immediate
+      'drop table ' || next_row.table_name ||
+      ' cascade constraints';
+  end loop;
+  for next_row in usersequences loop
+    execute immediate
+      'drop sequence ' || next_row.sequence_name;
+  end loop;
+end;
+/
+
+-- 然后，就是一砣……的建表语句啦，
+-- 比方说下面就是两个含外键的表。
+create table &quot;A&quot; (
+  &quot;ID&quot; integer primary key,
+  &quot;NAME&quot; nvarchar2(64) not null         -- nvarchar2类型支持UTF8
+);
+-- Oracle中的表名与字段名最好写成这样引号加全大写的形式。
+
+create table &quot;B&quot; (
+  &quot;ID&quot; integer primary key,
+  &quot;A&quot; integer not null references &quot;B&quot; on delete cascade,
+  &quot;VALUE&quot; nvarchar2(64) not null
+);
+
+-- 接下来是第三部分，为所有的表创建对应的序列和触发器，以实现自增主键。
+declare
+  cursor usertables is
+    select cols.table_name, cols.column_name
+    from all_constraints cons, all_cons_columns cols
+    where cols.owner = (
+      select sys_context('USERENV', 'SESSION_USER')
+      from dual)
+    and cols.table_name not like 'BIN$%'
+    and cons.constraint_type = 'P'
+    and cons.constraint_name = cols.constraint_name
+    and cons.owner = cols.owner
+begin
+  for nextrow in usertables loop
+    -- 1000以下的留作初始测试数据用，见下
+    execute immediate
+      'create sequence &quot;' || nextrow.table_name ||
+      '_PK_SEQ&quot; start with 1000';
+    execute immediate
+      'create or replace trigger &quot;' || nextrow.table_name ||
+      '_PK_TRG&quot; before insert on &quot;' || nextrow.table_name ||
+      '&quot; for each row begin if :new.&quot;' || nextrow.column_name ||
+      '&quot; is null then select &quot;' || nextrow.table_name ||
+      '_PK_SEQ&quot;.nextval into :new.&quot;' || nextrow.column_name ||
+      '&quot; from dual; end if; end;';
+  end loop;
+end;
+/
+
+-- 最后当然就是测试数据啦。
+insert into &quot;A&quot; (ID, NAME) values (1, 'first name');
+insert into &quot;B&quot; (ID, AID, VALUE) values (1, 1, 'Jay');
+insert into &quot;B&quot; (ID, AID, VALUE) values (2, 1, '杰');
+</code></pre>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/" title="利用 XMPP 协议实现 VPN">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93----linux-%E7%AF%87/" title="通过 ODBC 接口访问 Oracle 数据库 -- Linux 篇">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

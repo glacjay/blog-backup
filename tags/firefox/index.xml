@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Firefox on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/firefox/</link>
+    <description>Recent content in Firefox on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 23 Apr 2016 10:33:22 +0800</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/firefox/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Firefox 插件：TooManyTabs</title>
+      <link>https://glacjay.info/post/2016-04-23/firefox-%E6%8F%92%E4%BB%B6toomanytabs/</link>
+      <pubDate>Sat, 23 Apr 2016 10:33:22 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2016-04-23/firefox-%E6%8F%92%E4%BB%B6toomanytabs/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://addons.mozilla.org/en-US/firefox/addon/toomanytabs-saves-your-memory/&#34;&gt;TooManyTabs&lt;/a&gt; 简直是标(tuo)签(yan)党(zheng)的福音啊！每每在一大堆待读标签里面翻找要看的网页简直要疯掉！包括我和我的内存 ▔fﾟﾟ▔&lt;/p&gt;
+
+&lt;p&gt;但只是简单的插件介绍的话是不足以让我这个万年懒癌晚期开工写博的，主要是这货配合 Firefox 的帐户同步功能的时候有点儿坑：一开始没有给分组重命名的时候，几个电脑的 TooManyTabs 一同步就全乱套了；直到我把各个电脑的分组都分别命名，然后又费了老劲儿地整理一番之后才搞定。&lt;/p&gt;
+
+&lt;p&gt;让我觉得这个插件很神奇的是，它是用 Firefox 的书签功能来保存标签的，但又不是简单地保存网址，因为标签恢复之后其前进后退的历史也都一并恢复了。看来 Firefox 的书签还有很多的隐藏功能有待发掘啊。&lt;/p&gt;
+
+&lt;p&gt;最后的最后，既然是通过书签功能来保存和同步的，那如果 Firefox Android 的书签功能能再给点儿力就好了，让我可以直接把网址保存到指定的分组下面，这样就不用先发送到电脑上再（能用电脑时）TooManyTabs 了（再加上 Firefox Android 的发送标签功能有时还会丢标签）。&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

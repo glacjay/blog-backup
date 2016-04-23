@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>OpenVPN 的并发测试方法  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="openvpn, ">
+
+
+<meta property="og:title" content="OpenVPN 的并发测试方法  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2011-01-19T00:00:00Z" />
+<meta property="og:article:modified_time" content="2011-01-19T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="openvpn">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="OpenVPN 的并发测试方法" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "OpenVPN 的并发测试方法",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2011-01-19",
+    "description": "",
+    "wordCount":  59 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2011-01-19/openvpn-%E7%9A%84%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95%E6%96%B9%E6%B3%95/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>OpenVPN 的并发测试方法
+</h1>
+
+  <div class="metas">
+<time datetime="2011-01-19">19 Jan, 2011</time>
+
+
+  
+  &middot; Read in about 1 min
+  &middot; (59 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/openvpn">openvpn</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  <p>由于 OpenVPN 本身协议的特殊性，用一般的方法不太好测它的并发。看过 LoadRunner ，但也最多只支持标准的 SSL/TLS 协议（当然，我也没细看这个）。于是动手改了其客户端的实现，最终完成任务。</p>
+
+<p>其实阻止我们在一台机器上同时跑很多 OpenVPN 客户端的因素就只有虚拟网卡一个。貌似装十个左右的虚拟网卡驱动之后，机器就不行了。于是解决办法也很简单，把虚拟网卡相关的功能跳过就可以了。根据<a href="/post/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90/">上篇</a>的说明，只要在 <code>incoming_push_message()</code> 函数中，把对 <code>do_up()</code> 的调用直接换成 <code>initialization_sequence_completed()</code> 就 OK 了。</p>
+
+<p>当然，这样一来，流量的来源也就没有了，而没有数据流量也就无所谓测试了，最多测下并发接入的性能。要流量也很简单，改下 <code>io_wait()</code> 、 <code>read_tun()</code> 、 <code>write_tun()</code> 这几个函数的实现，手工组个 Ping 请求的 IP 报文给 OpenVPN 去发就行了。</p>
+
+<p>在这个过程中我也终于搞清楚那个 <code>checksum</code> 到底是怎么回事儿，原来在累加一遍求出一个和之后，如果这个和本身超过了 <code>16</code> 位，那么还要把这个和继续按 <code>16</code> 位来切分求和，这样才是最终结果。之前看 WikiPedia 上的那个例子，一直就没搞明白那个 <code>2</code> 到底是打哪儿来的。</p>
+
+<p>最后，就是要把起客户端这个过程给自动化了。于是又去研究 Windows 的 Batch 脚本，<code>for</code> 是循环， <code>start</code> 是后台运行， <code>ping</code> 用来模拟 <code>sleep</code> ， <code>taskkill</code> 是强制杀掉，搞了个 <code>1000</code> 客户端连了断、断了连的自动化测试出来。丢在那边跑了两天，服务端表示很淡定。</p>
+
+<p>以上。</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90/" title="OpenVPN 的初始化过程分析">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98/" title="Linux 下有关环境变量与换行符的一个小问题">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

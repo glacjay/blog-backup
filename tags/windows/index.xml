@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Windows on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/windows/</link>
+    <description>Recent content in Windows on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 18 Jun 2014 22:29:01 +0800</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>VS2010 环境中调试 IE ActiveX 控制时断点不起作用的问题</title>
+      <link>https://glacjay.info/post/2014-06-18/vs2010-%E7%8E%AF%E5%A2%83%E4%B8%AD%E8%B0%83%E8%AF%95-ie-activex-%E6%8E%A7%E5%88%B6%E6%97%B6%E6%96%AD%E7%82%B9%E4%B8%8D%E8%B5%B7%E4%BD%9C%E7%94%A8%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Wed, 18 Jun 2014 22:29:01 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-06-18/vs2010-%E7%8E%AF%E5%A2%83%E4%B8%AD%E8%B0%83%E8%AF%95-ie-activex-%E6%8E%A7%E5%88%B6%E6%97%B6%E6%96%AD%E7%82%B9%E4%B8%8D%E8%B5%B7%E4%BD%9C%E7%94%A8%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;p&gt;又是惯例的长了好长时间的草，今天先来篇短的。&lt;/p&gt;
+
+&lt;p&gt;工作需要，在使用 VS2010 开发调试 IE ActiveX 插件时，默认条件下下的断点不起作用，这是因为选错了调试器，在工程属性 - Debugging 中的 Debugger to launch 项，选择 Web Browser Debugger ，然后在 HTTP URL 项填本地 HTML 文件的绝对路径，以 file:/// 打头就可以了。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenSSL 与 WinSock2 配合使用时遇到的一个坑</title>
+      <link>https://glacjay.info/post/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91/</link>
+      <pubDate>Sat, 29 Mar 2014 23:06:38 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91/</guid>
+      <description>&lt;p&gt;今天才发现，这里已经两年多没有被照看过了，估计连树都要长出来了吧。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;在用 Windows 的 WSAEventSelect 模式进行网络编程时，比较固定的一个模式是这样的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;...
+WSAEventSelect(sock, events[0], FD_READ);
+...
+while (1)
+{
+    ret = WSAWaitForMultipleEvents(1, events, FALSE, timeout, FALSE);
+    if (ret &amp;gt;= WSA_WAIT_EVENT_0 &amp;amp;&amp;amp; ret &amp;lt; WSA_WAIT_EVENT_0 + 1)
+    {
+        eventIndex = ret - WSA_WAIT_EVENT_0;
+        if (eventIndex == 0)
+        {
+            WSAEnumNetworkEvents(sock, events[0], &amp;amp;networkEvents);
+            if (networkEvents.lNetworkEvents &amp;amp; FD_READ)
+            {
+                ...
+                recv(sock, buf, sizeof(buf));
+                ...
+            }
+            ...
+        }
+        ...
+    }
+    ...
+}
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当要处理的 sock 属于一个 OpenSSL 连接时，只要把当中的 recv 换成 SSL_read 就行了，当然前面还得加上些 readWaitonWrite 之类的标志位检查啥的，这里就不详细列举了，请参考《Network Security with OpenSSL》一书中的 5.2.2.3 小节。&lt;/p&gt;
+
+&lt;p&gt;但我在实际使用中（事实上是在压力测试中）发现，当程序运行一段时间之后，WSAWaitForMultipleEvents 就会忽然不再返回可读信号了，从而导致对该 socket 的接收操作完全停止。&lt;/p&gt;
+
+&lt;p&gt;经过各种调试手段，甚至是在 OpenSSL 中加入调试输出之后，终于发现问题出在 SSL_read 的实现机制上，貌似 OpenSSL 实现了某种程度的读写缓冲（具体没细看），使得对 SSL_read 的一次调用，并不一定会触发其对底层 socket 的读取操作。而如果没有对底层 socket 的读取操作，那么 windows 的对应 event 对象就不会被 reenable （参考 MSDN 中对 WSAEventSelect 接口的说明文档），从而导致 WSAWaitForMultipleEvents 不再对该事件作检查。&lt;/p&gt;
+
+&lt;p&gt;原因找到了，那么相应的解决方法也就不难发现了，对于我的使用场景来说（不完全是像上面的示例片断那么清晰），最简单的作法就是在 SSL_read 之前加一个空的 recv 调用，其传给 recv 的第二、三个参数的值分别是 NULL 和 0 ，这样就能强制触发 windows event 的 reenable ，同时又不会影响到 SSL 对象内部的读取状态了。&lt;/p&gt;
+
+&lt;p&gt;PS. 遇到这个问题时，最重要的一步其实是如何能够稳定而快速的复现问题。一开始做压力测试时，只有在连续跑个一天以上时才会不定时的出现，导致效率很低；后来偶然发现，通过虚拟机搭建的受限环境，反而能很快复现问题。想来这也是另一种形式的压力测试吧，正常的压力测试是保持环境不变，加大请求压力；这里则变成了保持请求不变，同时压缩可用环境。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>用 Python 操作虚拟网卡</title>
+      <link>https://glacjay.info/post/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1/</link>
+      <pubDate>Sat, 18 Sep 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1/</guid>
+      <description>&lt;p&gt;在我的 &lt;a href=&#34;https://glacjay.info/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/&#34;&gt;XTunnel&lt;/a&gt; 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。&lt;/p&gt;
+
+&lt;p&gt;在 Linux 内核中，特别是在现在的发行版中，应该都已经有了 &lt;code&gt;TUN/TAP&lt;/code&gt; 虚拟网卡的驱动程序，看一下有没有 &lt;code&gt;/dev/net/tun&lt;/code&gt; 这个文件就可以知道了。如果没有，就执行一下 &lt;code&gt;sudo modprobe tun&lt;/code&gt; 这个命令吧。如果还是没有，那就 Google 之吧。下面上代码：&lt;/p&gt;
+
+&lt;script src=&#34;https://gist.github.com/glacjay/585369.js&#34;&gt;&lt;/script&gt;
+
+&lt;p&gt;简而言之，就是首先打开对应的设备文件，然后通过 &lt;code&gt;ioctl&lt;/code&gt; 系统调用告诉它我们想要的网卡类型和名称，同时还可以告诉它我们想以普通用户的身份来对它进行操作。之后通过 &lt;code&gt;ifconfig&lt;/code&gt; 命令将新建的网卡拉起来，就可以开始读写了。&lt;/p&gt;
+
+&lt;p&gt;当你以 root 身份运行这个脚本的时候，可以 &lt;code&gt;ping&lt;/code&gt; 一下 &lt;code&gt;192.168.7.2&lt;/code&gt; 这个地址试试，看看是不是能 &lt;code&gt;ping&lt;/code&gt; 得通。&lt;/p&gt;
+
+&lt;p&gt;下面的代码则在 Mac 环境中实现了同样的功能（不过还没有设置用户身份的功能）：&lt;/p&gt;
+
+&lt;script src=&#34;https://gist.github.com/glacjay/586860.js&#34;&gt;&lt;/script&gt;
+
+&lt;p&gt;当然要运行上面的代码，你首先要到&lt;a href=&#34;http://tuntaposx.sourceforge.net/&#34;&gt;这里&lt;/a&gt;下载并安装 Mac 下的 &lt;code&gt;TUN/TAP&lt;/code&gt; 设备驱动程序才行。安装之后，在系统的 &lt;code&gt;/dev&lt;/code&gt; 目录中就会分别有 16 个 &lt;code&gt;/dev/tunX&lt;/code&gt; 以及 &lt;code&gt;/dev/tapX&lt;/code&gt; （ &lt;code&gt;X&lt;/code&gt; 表示网卡序号）字符设备文件，分别对应于 &lt;code&gt;16&lt;/code&gt; 个同名的 &lt;code&gt;TUN/TAP&lt;/code&gt; 虚拟网卡。当然，在运行这个脚本之前，你是看不到这些网卡的。不不，用 &lt;code&gt;ifconfig -a&lt;/code&gt; 也不行。&lt;/p&gt;
+
+&lt;p&gt;因为与 Linux 下的驱动的实现方法不同，这里是用的文件名来标识网卡类型与名称，所以就不需要 Linux 版本中的第一个 &lt;code&gt;ioctl&lt;/code&gt; 调用了。&lt;/p&gt;
+
+&lt;p&gt;也不记得一开始是在哪边看到的一个讲 &lt;code&gt;TUN/TAP&lt;/code&gt; 编程的文章，说要实现对 &lt;code&gt;ping&lt;/code&gt; 报文的处理，只要简单地将读到的 IP 报文中的源地址与目的地址对换一下，再写回去就可以了。在 Linux 系统中也确实是如此，因此我也就没有深究。直到后来才发现，同样的招数在 Mac 下居然没用。于是赶紧上网翻 ICMP 的报文格式，改报文中的 &lt;code&gt;type&lt;/code&gt; 码，并重新计算 &lt;code&gt;checksum&lt;/code&gt; ，这才搞定。这时也才发现，用 Python 来操作原始的字节流还是没有 C 这种底层语言直观啊。&lt;/p&gt;
+
+&lt;p&gt;可是 Linux 下为什么不需要这么麻烦呢？于是回去抓了抓包，这才发现，相对于 Mac 下的一问（ &lt;code&gt;ping&lt;/code&gt; 命令）一答（ Python 脚本），在 Linux 下居然是两问两答，一问是 &lt;code&gt;ping&lt;/code&gt; 命令，一问是我们的那个 Python 脚本。这也不奇怪，我连 &lt;code&gt;ICMP&lt;/code&gt; 中的 &lt;code&gt;type&lt;/code&gt; 码都没改，发过来的是 &lt;code&gt;request&lt;/code&gt; ，那再发出去的当然还是 &lt;code&gt;request&lt;/code&gt; 。至于应答，大概就是 Linux 的 &lt;code&gt;TUN/TAP&lt;/code&gt; 驱动搞的鬼了。&lt;/p&gt;
+
+&lt;p&gt;最后，当然也有 Windows 的实现版本啦，不过代码被我丢到公司的 Windows 工作用机上了，所以，就请您且听下回分解了。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Update 2011-04-26:&lt;/strong&gt; Windows 下的实现代码如下：&lt;/p&gt;
+
+&lt;script src=&#34;https://gist.github.com/glacjay/586892.js&#34;&gt;&lt;/script&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL</title>
+      <link>https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/</link>
+      <pubDate>Sat, 05 Dec 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/</guid>
+      <description>
+
+&lt;p&gt;我的编译环境是 Visual Studio Team System 2008 版本 9.0.21022.8 RTM ， Windows Mobile 5.0 SDK R2 （ VS2008 自带的版本）。当然， Perl 也是需要的，我装的是 ActivePerl 。我要编译的 OpenSSL 版本是 0.9.8e 。&lt;/p&gt;
+
+&lt;h2 id=&#34;vs2008-的安装:35e51ba4554ba11286e563aed7028ead&#34;&gt;VS2008 的安装&lt;/h2&gt;
+
+&lt;p&gt;那个 Web Developer Tools （好像叫这个）的安装会失败，又不能不装，根据网上的说明，要把它的目录单独从光盘上解压出来安装，且安装的时候要挂 Office 的安装光盘（我的 Office 版本是 2007 ）。这个装好了之后，再从光盘上安装 VS2008 就没有问题了。&lt;/p&gt;
+
+&lt;h2 id=&#34;配置编译环境:35e51ba4554ba11286e563aed7028ead&#34;&gt;配置编译环境&lt;/h2&gt;
+
+&lt;p&gt;首先要写个定义环境变量的脚本，以把 CE 的路径给配置好。 VS2008 的那个命令行启动脚本只配置了 VC 的环境变量，没有配 CE 的环境变量，因为这个是要根据用户需要来做的。我写的脚本内容如下，你可能要根据自己的 VS2008 相关安装目录做调整。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bat&#34;&gt;set PATH=D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\bin\x86_arm;%PATH%
+set INCLUDE=D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\include;C:\Program Files\Windows Mobile 5.0 SDK R2\PocketPC\Include\Armv4i;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\atlmfc\include;%INCLUDE%
+set LIB=C:\Program Files\Windows Mobile 5.0 SDK R2\PocketPC\Lib\ARMV4I;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\atlmfc\lib\armv4i;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\lib\armv4i;%LIB%
+
+set OSVERSION=WCE501
+set TARGETCPU=ARMV4I
+set PLATFORM=VC-CE
+set WCECOMPAT=D:\program\wcecompat
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中 &lt;code&gt;PATH&lt;/code&gt; 、 &lt;code&gt;INCLUDE&lt;/code&gt; 、 &lt;code&gt;LIB&lt;/code&gt; 都是 CE 相关的环境变量，在编译 WCECompat 和 OpenSSL 的时候都是需要的，后面的是 WCECompat 需要的，其中有些是 OpenSSL 也需要的。&lt;/p&gt;
+
+&lt;p&gt;然后启动 Visual Studio 2008 命令提示（开始菜单），并运行上面的这个脚本，编译环境就算是准备好了，可以开始编译 WCECompat 了。&lt;/p&gt;
+
+&lt;h2 id=&#34;编译-wcecompat:35e51ba4554ba11286e563aed7028ead&#34;&gt;编译 WCECompat&lt;/h2&gt;
+
+&lt;p&gt;要编译 CE 版本的 OpenSSL 的话，需要 WCECompat 这个库，这个库实现了许多在 Desktop 开发环境中有而在 CE 中没有的功能，而这些功能是编译与使用 OpenSSL 所必需的。&lt;/p&gt;
+
+&lt;p&gt;不过，官方版本的 WCECompat 现在已经用不起来了（虽然我没有进一步确定），我们要使用 OpenSSL 开发团队 fork 的分支，其下载地址在&lt;a href=&#34;http://github.com/mauricek/wcecompat&#34;&gt;http://github.com/mauricek/wcecompat&lt;/a&gt;，在这个页面上有打包下载的链接，我下载的版本是 cb796f5 （ git 是用 GUID 来表示版本的）。&lt;/p&gt;
+
+&lt;p&gt;下载下来之后，先解压，我的解压路径是 &lt;code&gt;D:\program\wcecompat&lt;/code&gt; ，并进入该目录。这里注意，根据 WCECompat 的文档说明，不能把它解压到一个含空格的路径底下，不然会报文件找不到之类的错，这是因为 WCECompat 的 &lt;code&gt;makefile&lt;/code&gt; 文件没有用引号括住文件名，而空格会把一个文件名分成两个。&lt;/p&gt;
+
+&lt;p&gt;然后要修改一个源码文件 &lt;code&gt;src/time.c&lt;/code&gt; ，在其中找到函数 &lt;code&gt;_tzset&lt;/code&gt; 的定义，这是一个空函数，把它整个注释掉（或删掉），不然在后面我们的程序要链接这个库的时候，会报这个函数重复定义的错。&lt;/p&gt;
+
+&lt;p&gt;运行命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\wcecompat&amp;gt;perl config.pl
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样会生成需要的 &lt;code&gt;makefile&lt;/code&gt; 文件，不过还不能直接用它来编译，要手动改一下，删掉或注释掉其中的 &lt;code&gt;src/winmain.cpp \&lt;/code&gt; 这一行，不然后面链进我们的程序时会报找不到 WinMain 所需的 &lt;code&gt;main&lt;/code&gt; 函数这个错（大概是这样说的）。&lt;/p&gt;
+
+&lt;p&gt;然后运行命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\wcecompat&amp;gt;nmake
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;开始编译。完成之后，就会在 &lt;code&gt;lib&lt;/code&gt; 目录中生成两个库文件 &lt;code&gt;wcecompat.lib&lt;/code&gt; 和 &lt;code&gt;wcecompatex.lib&lt;/code&gt; ，都是静态链接库。&lt;/p&gt;
+
+&lt;h2 id=&#34;编译-openssl:35e51ba4554ba11286e563aed7028ead&#34;&gt;编译 OpenSSL&lt;/h2&gt;
+
+&lt;p&gt;还是同一个命令行窗口，进入 OpenSSL 的解压目录，我的是 &lt;code&gt;D:\program\openssl-0.9.8e&lt;/code&gt; 。根据 &lt;code&gt;INSTALL.WCE&lt;/code&gt; 文件中的说明，运行下列命令进行编译：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\openssl-0.9.8e&amp;gt;perl Configure VC-CE
+...
+D:\program\openssl-0.9.8e&amp;gt;ms\do_ms.bat
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这一步完成之后，打开生成的 &lt;code&gt;ms\ce.mak&lt;/code&gt; 文件，把第 &lt;code&gt;19&lt;/code&gt; 行 &lt;code&gt;CFLAG&lt;/code&gt; 的变量定义中的 &lt;code&gt;/WX&lt;/code&gt; 选项给删掉，不然后面有编译警告会被当成错误，从而编译失败。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\openssl-0.9.8e&amp;gt;nmake -f ms\ce.mak
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这一步的编译过程最终还是会失败退出，不过不要紧（也许吧），失败的是测试程序，这时看 &lt;code&gt;out32_ARMV4I&lt;/code&gt; 目录中，已经有编译好的 &lt;code&gt;libeay32.lib&lt;/code&gt; 和 &lt;code&gt;ssleay32.lib&lt;/code&gt; 这两个文件了。因为前面是用 &lt;code&gt;ms\ce.mak&lt;/code&gt; 文件而不是 &lt;code&gt;ms\cedll.mak&lt;/code&gt; ，所以编译出来的这两个文件都是静态链接库。&lt;/p&gt;
+
+&lt;h2 id=&#34;测试-openssl:35e51ba4554ba11286e563aed7028ead&#34;&gt;测试 OpenSSL&lt;/h2&gt;
+
+&lt;p&gt;最后来测试一下我们编译出来的 OpenSSL （以及 WCECompat ）。打开 VS2008 ，新建个智能设备的项目。然后打开项目属性对话框，先在“配置属性-&amp;gt; C/C++ -&amp;gt;常规”的“附加包含目录”中把 &lt;code&gt;D:\program\openssl-0.9.8e\inc32&lt;/code&gt; 给加进来（测试的话加绝对路径就好了，实际开发的时候要把所有需要的文件拷到项目目录里面）（另，不要加 WCECompat 的 &lt;code&gt;include&lt;/code&gt; 目录，不然会有 &lt;code&gt;abs&lt;/code&gt; 函数不属于 &lt;code&gt;global namespace&lt;/code&gt; 的编译错误），在“配置属性-&amp;gt;链接器-&amp;gt;常规”的“附加库目录”中把 &lt;code&gt;D:\program\openssl-0.9.8e\out32_ARMV4I&lt;/code&gt; 和 &lt;code&gt;D:\program\wcecompat\lib&lt;/code&gt; 给加进来，在“配置属性-&amp;gt;链接器-&amp;gt;输入”的“附加依赖项”中加入 &lt;code&gt;wcecompat.lib wcecompatex.lib libeay32.lib ssleay32.lib&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;打开个源文件（比如某个事件处理函数定义的地方），在最开始的地方加进去 OpenSSL 的头文件包含&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define NO_SYS_TYPES_H
+#include &amp;lt;openssl/ssl.h&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中第一行的宏定义是需要的。虽然 WCECompat 为我们提供了 &lt;code&gt;sys/types.h&lt;/code&gt; 头文件，不过我们不能用（理由见上）。&lt;/p&gt;
+
+&lt;p&gt;然后在事件处理函数中加条语句&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;SSL_CTX *ctx = SSL_CTX_new(SSLv23_method());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;编译下试试吧，看有没有问题。如果没有，那就恭喜了，我们暂时解决了将 OpenSSL 用于 CE 开发的问题，我还不能保证后面不会出其他的问题。&lt;/p&gt;
+
+&lt;h2 id=&#34;另:35e51ba4554ba11286e563aed7028ead&#34;&gt;另&lt;/h2&gt;
+
+&lt;p&gt;虽然我之前配置环境变量等步骤都是基于 PocketPC 来做的，不过最后编出来的库貌似也能用到 Smartphone 程序中，不知道会不会有什么问题。 Mobile 开发果然还是相当的麻烦啊。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

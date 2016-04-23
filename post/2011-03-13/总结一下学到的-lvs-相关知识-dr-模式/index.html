@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>总结一下学到的 LVS 相关知识（ DR 模式）  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="linux, ">
+
+
+<meta property="og:title" content="总结一下学到的 LVS 相关知识（ DR 模式）  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86-dr-%E6%A8%A1%E5%BC%8F/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2011-03-13T00:00:00Z" />
+<meta property="og:article:modified_time" content="2011-03-13T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="linux">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="总结一下学到的 LVS 相关知识（ DR 模式）" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86-dr-%E6%A8%A1%E5%BC%8F/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "总结一下学到的 LVS 相关知识（ DR 模式）",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2011-03-13",
+    "description": "",
+    "wordCount":  288 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2011-03-13/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86-dr-%E6%A8%A1%E5%BC%8F/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>总结一下学到的 LVS 相关知识（ DR 模式）
+</h1>
+
+  <div class="metas">
+<time datetime="2011-03-13">13 Mar, 2011</time>
+
+
+  
+  &middot; Read in about 2 min
+  &middot; (288 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/linux">linux</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  <p>不喜欢看长的 Blog 文章，当然更不喜欢写，所以就分开写啦。另，因为 TUN 模式限制更多，实际很可能用不到，所以不一定会写。</p>
+
+<p>所以这次要讲的是 DR 模式的负载均衡啦。 DR 模式，也就是 Direct Route ，其基本原理就是不对包做任何处理，直接转给所分配的真实服务；回包则由真实服务直接发给客户端而不走负载机。因为不像 NAT 模式那样有相似的架构可以参考，所以这次就上图来说明啦（注，该图偷自<a href="http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.LVS-DR.html">这里</a>）。</p>
+
+<pre><code class="language-plain">
+                           ________
+                          |        |
+                          | client |
+                          |________|
+                          CIP=192.168.1.254
+                              |
+                   CIP-&gt;VIP | |
+                            v |
+                              |
+                           ________
+                          |        |
+                          | router | advertises route to VIP
+                          |________|
+                              |
+                __________    |
+               |          |   |    VIP=192.168.1.110 (eth0:0, arps)
+               | director |---+     DIP=192.168.1.1 (eth0)
+               |__________|   |
+                              |  ^
+MAC_DIP-&gt;MAC_RIP1(CIP-&gt;VIP) | |  |  VIP-&gt;CIP
+                            v |
+                              |
+             +----------------+------------------+
+             |                |                  |
+             |                |                  |
+      RIP1=192.168.1.2  RIP2=192.168.1.3  RIP3=192.168.1.4 (eth0)
+      VIP=192.168.1.110 VIP=192.168.1.110 VIP=192.168.1.110 (all lo:0, non-arping)
+      _____________     _____________      _____________
+     |             |   |             |    |             |
+     |   CIP-&gt;VIP  |   |             |    |             |
+     |   VIP-&gt;CIP  |   |             |    |             |
+     | realserver  |   | realserver  |    | realserver  |
+     |_____________|   |_____________|    |_____________|
+
+</code></pre>
+
+<p>首先，负载机（即图中的 <code>director</code> ）需要将服务发布地址配置成网卡的从地址 <code>VIP</code>（我还不太清楚为什么不能直接配成第一地址），以便接收来自客户端的 IP 报文。然后，它会根据分配置策略选择一个真实服务器（即图中的 <code>realserver</code> ），并将这个 IP 报文直接转发过去，而这就需要真实服务器也有一个从地址配置成 <code>VIP</code> （一般都配到 <code>lo</code> 网口上）。可是，大家都是在一个网段的，如果没有什么措施的话，那一开始来自客户端的目的地址为 <code>VIP</code> 的 IP 报文就不知道要由谁来处理了。所以，在真实服务器上都要把 <code>lo</code> 这个网卡的 ARP 广播与响应功能给禁掉，让客户端不知道真实服务器也有 <code>VIP</code> 这个地址。而负载机则是通过真实服务器的真实地址（非 <code>VIP</code> ）得知它的 MAC 地址，进而进行转发的。</p>
+
+<p>而当真实服务器需要往回发报文的时候，因为与客户端之间并不像 NAT 那样不在同一网段，也没有被负载机隔来，所以回应报文就通过正常途径直接到了客户端的手（网口？）中。</p>
+
+<p>这样一来，相比 NAT 模式而言，其额外的配置工作主要就是 <code>VIP</code> 从地址的配置以及 ARP 相关功能的禁用了。让我们一步一步来吧。首先是负载机的 <code>VIP</code> 配置（真实地址的配置就跟正常的一样，不写了）：</p>
+
+<pre><code>$ sudo ifconfig eth0:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+$ sudo route add -host 192.168.1.110 eth0:0
+</code></pre>
+
+<p>然后是真实服务器的 <code>VIP</code> 配置：</p>
+
+<pre><code>$ sudo ifconfig lo:0 192.168.1.110 broadcast 192.168.1.110 netmask 255.255.255.255
+$ sudo route add -host 192.168.1.110 eth0:0
+</code></pre>
+
+<p>与负载机唯一不同的就是要把地址配到 <code>lo</code> 上。接下来是禁掉这个网卡的 ARP 相关的功能（这里就用不了 <code>sudo</code> 了，必须直接用 <code>root</code> 用户，不知道为嘛）：</p>
+
+<pre><code># echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore
+# echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce
+# echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore
+# echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce
+</code></pre>
+
+<p>当然更好的办法是修改 <code>/etc/sysctl.conf</code> 文件，然后执行 <code>sysctl -p</code> 命令来使修改生效。这样做的好处是配置被保存下来了，下次开机还有效，而且也可以用 <code>sudo</code> 来做。</p>
+
+<p>地址配完了，最后就是 ipvsadm 本身的配置了：</p>
+
+<pre><code>$ sudo ipvsadm -A -t 192.168.1.110:22 -s rr
+$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.2:22 -g
+$ sudo ipvsadm -a -t 192.168.1.110:22 -r 192.168.1.3:22 -g
+...
+</code></pre>
+
+<p>嗯，跟 NAT 模式唯一的不同就是 <code>-g</code> 选项，表示 DR 模式。因为是默认选项，所以不写 <code>-g</code> 也可以。</p>
+
+<p>TCP 服务的话这样就可以了，可是 UDP 服务却还有一些问题需要解决。正如上面所说，服务端发给客户端的回包是不经过负载的，这样的话，如果这个服务程序没有绑定到特定网卡的话，这个回包的源地址默认就是服务器本身的真实地址（如 <code>192.168.1.2</code> ）了，而这样的回包一般是不会被客户端所接受的，因为客户端当初可是往 <code>VIP</code> 这个地址发的请求包。而最通用的解决方法就是将该服务显式绑定到 <code>VIP</code> 这个地址上，强迫其回包的源地址为 <code>VIP</code> ，而这正是客户端所希望看到的。</p>
+
+<p>由上可知，DR 模式相对 NAT 模式而言，对真实服务器来说就是侵入式的配置方式，增加了不少配置工作和限制，而其性能方面的优势据说在现在也大大降低了。因此一般应用的话，直接用 NAT 模式就可以了。</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2011-03-12/%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E5%AD%A6%E5%88%B0%E7%9A%84-lvs-%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86-nat-%E6%A8%A1%E5%BC%8F/" title="总结一下学到的 LVS 相关知识（ NAT 模式）">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2011-04-10/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E9%9B%B6/" title="[翻译] 用 Ruby 写编译器之零">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

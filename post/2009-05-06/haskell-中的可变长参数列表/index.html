@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Haskell 中的可变长参数列表  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="haskell, ">
+
+
+<meta property="og:title" content="Haskell 中的可变长参数列表  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2009-05-06T00:00:00Z" />
+<meta property="og:article:modified_time" content="2009-05-06T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="haskell">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="Haskell 中的可变长参数列表" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "Haskell 中的可变长参数列表",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2009-05-06",
+    "description": "",
+    "wordCount":  177 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>Haskell 中的可变长参数列表
+</h1>
+
+  <div class="metas">
+<time datetime="2009-05-06">6 May, 2009</time>
+
+
+  
+  &middot; Read in about 1 min
+  &middot; (177 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/haskell">haskell</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  <p>说实话，我之前有就这个题目很有激情地写了很长很罗嗦的一篇草稿的，哦，确切来说是大半篇，直到被打断，激情不再，这篇草稿也就此躺了两个多月。好吧，其实是我还不是八卦那块料，就不卖弄了，直接总结。</p>
+
+<p>要在 Haskell 中实现可变长参数列表，就是利用其 Typeclass 系统，对函数进行最终结果类型和中间函数类型之间的重载，然后利用 Haskell 的类型推导机制为我们自动调用合适的重载版本。嗯，就这么简单。下面是一个最简单的例子：</p>
+
+<pre><code class="language-haskell">class BuildList a r | r -&gt; a where
+    buildList' :: [a] -&gt; r
+
+instance BuildList a [a] where
+    buildList' = id
+
+instance BuildList a r =&gt; BuildList a (a -&gt; r) where
+    buildList' as = \a -&gt; buildList' $ as ++ [a]
+
+buildList :: BuildList a r =&gt; r
+buildList = buildList' []
+</code></pre>
+
+<p>好吧，这个例子我是从<a href="http://okmij.org/ftp/Haskell/vararg-fn.lhs">这里</a>看到的，或者说我就是从这里学到这个东东的。在此友情提醒那些和我一样不怎么有耐心的家伙一句，原理解释在后面。</p>
+
+<p>按照我的想法，上面这个例子应该还可以进一步简化以去掉对两个语言扩展的依赖的，就是写一个 <code>buildIntList</code> 的特化版本，结果不幸地失败了。有知道的大大告诉我一声，在下洗耳恭听。</p>
+
+<hr />
+
+<p><strong>Update</strong>: 不需要大大们来告诉我了，我已经知道该怎么简化上面的这个 <code>buildList</code> 了，不过简化后的版本是 <code>buildCharList</code> ，也就是 <code>buildString</code> 啦，而不是原先说的 <code>buildIntList</code> 。先看实现：</p>
+
+<pre><code class="language-haskell">class BuildString r where
+    buildString' :: String -&gt; r
+
+instance BuildString [Char] where
+    buildString' = id             -- or whatever you want
+
+instance BuildString r =&gt; BuildString (Char -&gt; r) where
+    buildString' cs = \c -&gt; buildString' $ cs ++ [c]
+
+buildString :: BuildString r =&gt; r
+buildString = buildString' []
+</code></pre>
+
+<p>这样就把对 <code>MultiParameterTypeClass</code> 和 <code>FunctionalDependency</code> 的依赖给简化掉了，可是又同时增加了对 <code>-XFlexibleInstances</code> 选项的需要（因为 <code>instance BuildString [Char] where</code> 这一行；如果你想把 <code>[Char]</code> 写成 <code>String</code> 的话，就还要再加上个 <code>-XTypeSynonymInstances</code>），暂时想不到更好的办法了。</p>
+
+<p>另外，关于我在这里为什么要用 <code>Char</code> 而不是 <code>Int</code> 呢，是因为 <code>'a'</code> 的类型很明确，就是 <code>Char</code> ，而 <code>5</code> 的类型就不明确了，因此，你可以这样调用 <code>buildString</code> ：</p>
+
+<pre><code>*TestVarargs&gt; buildString 'a' 'b' 'c' :: String
+&quot;abc&quot;
+</code></pre>
+
+<p>可是却必须这样调用 <code>buildIntList</code> ：</p>
+
+<pre><code>*TestVarargs&gt; buildIntList (1::Int) (2::Int) (3::Int) :: [Int]
+[1,2,3]
+</code></pre>
+
+<p>虽然在我看来，GHC 应该可以倒推出每个参数的类型的，可他就是不认，我暂时也没什么办法。</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2009-04-08/%E6%9C%89%E5%85%B3-c/c-%E4%B8%AD%E7%9A%84-do--...--while-0-%E6%83%AF%E7%94%A8%E6%B3%95/" title="有关 C/C&#43;&#43; 中的 do { ... } while (0) 惯用法">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0/" title="在 Haskell 中实现 Generic zip 函数">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

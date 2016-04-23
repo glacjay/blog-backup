@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>编写自己的 Web 版 Google Reader 客户端  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="php, web, ">
+
+
+<meta property="og:title" content="编写自己的 Web 版 Google Reader 客户端  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2011-08-11T00:00:00Z" />
+<meta property="og:article:modified_time" content="2011-08-11T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="php">
+    
+<meta property="og:article:tag" content="web">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="编写自己的 Web 版 Google Reader 客户端" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "编写自己的 Web 版 Google Reader 客户端",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2011-08-11",
+    "description": "",
+    "wordCount":  152 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>编写自己的 Web 版 Google Reader 客户端
+</h1>
+
+  <div class="metas">
+<time datetime="2011-08-11">11 Aug, 2011</time>
+
+
+  
+  &middot; Read in about 1 min
+  &middot; (152 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/php">php</a>
+
+<a class="label" href="https://glacjay.info/tags/web">web</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  <p>最近花在路上的时间明显变多了，手机就成了我打发这些路上时间的利器。小说神马的看太多也会腻，正好 Google Reader 中也积累了大量的未读文章，因此用手机看看订阅文章就成了一个比较好的选择。</p>
+
+<p>但多次使用下来，却也发现了很多 Google 原版 Web 界面的不方便之处。Google 提供了两个版本的 Reader 界面给手机，一个是苹果风格的 <code>/i/</code> 界面，设计得很漂亮，功能也很全，用 Nokia 手机也能看，但太费流量（未证实，只是感觉，大概是因为一次加载了很多的文章吧），而且在网络状况不好的时候，体验不太好。另一个是 <code>/m/</code> 界面，很简洁，选项不多，但也总有些这样那样的细节另我不太满意，下面详述。然后又去找 Nokia 的 S60v3 客户端软件，总之是没一个喜欢啦。作为一个 Geek （至少是自称），在这种情况下，最佳选择自然就是打造一个自己专属的解决方案啦。</p>
+
+<p>正好蹭着同学的一个 PHP 空间（其实也有 Python 和 Ruby 可选啦，但总觉得会很折腾，还是 PHP 好点，虽然折腾也少不了，见下），于是花了几天时间，连复习 PHP （以前只学过没用过，主要还是看 w3schools 的教程和查 php.net 的函数文档）、研究 OAuth （参见<a href="http://www.ioncannon.net/programming/1443/google-oauth-for-installed-apps-php-example/">这篇文章</a>，不过 Web 应用稍有不同）、研究 Google Reader API （参见<a href="http://blog.martindoms.com/2009/08/15/using-the-google-reader-api-part-1/">这系列文章</a>）、编写代码，终于搞定了一个很阳春的 Google Reader Mobile 版，刚刚满足我的手机阅读需要。</p>
+
+<p>以下就是我针对 Google 原版所做的，针对我个人的改进：</p>
+
+<ul>
+<li><strong>保存期限的问题</strong>：以前也有感觉，这次趁着做这个东东，又确认了一下：Google 只会保存 30 天内的未读文章，超过 30 天的就自动标记成已读了。我希望能保存下来慢慢看，所以就搞了一个简单的 SQLite 数据库，定时把曾经是未读文章的 <code>id</code> 号都给保存下来，直到我通过这个界面读过之后再删除。嗯，这个功能是最重要的。</li>
+<li><strong>先看最老的文章</strong>：当然，通过这两天对 API 的研究，我已经知道怎么在 Google 的 <code>/m/</code> 界面中实现这个功能了，不过为了上一个功能，打造自己的界面还是必要的。</li>
+<li><strong>重复载入的问题</strong>：当我要给一篇文章加星的时候，我一般都希望能直接看到下一篇文章，而不是再看一次被加星的这篇。这也是一个很小的改进啦，不过用起来很舒服，既节省了流量，也节省了时间。</li>
+<li><strong>加载文章的时候先不要标记为已读</strong>：由于手机的网络状况通常不太好，当我浏览完一篇，想加个星标的时候，结果页面却打不开了，这种情况经常发生。所以，我就把标记为已读的这个步骤，挪到了看一下篇之前，或者加星标之后。这样，就比再去已读文章里面找要来得方便。</li>
+<li><strong>去掉 <code>/m/</code> 的所有其他功能</strong>：当然，这不是一个改进啦，只是我不需要而已。既然是用手机来看，当然就没有那么多需要啦，只要能实现浏览与加星标就好了。需要细看的，就加个标，等有电脑的时候再慢慢看。本来， Google Reader 的星标功能，除了作为 ToRead 列表外，就没什么其他用处了（当然，以后也许会跟搜索整合，然后优先显示神马的，那就不管了）。不过话说回来，功能的简化其实也是一种改进啦，最近刚好看到 InstaPaper 的作者也这么说来着。</li>
+<li><strong>功×夫×网</strong>：不过其实 Google Reader 并没有被封的很严，倒是我自己的实现招来了这个问题，见下。</li>
+</ul>
+
+<p>简单来说，就是按顺序，对所有文章，看，（可选地）加星标，然后下一篇。需求往往就这么简单啊。</p>
+
+<p>当然，在做的时候，还是遇到过各种稀奇古怪的问题（ Neta ：编程好难啊），这里也一并记录下。</p>
+
+<p>先是在自己机器上 OK 了，等部署到空间的时候却报错： an error occured while processing this directive 。同样的脚本，放到其他目录就没事，还以为是 Apache 的权限问题，也没找到有什么特别的配置。直到有机会查看 Apache 的错误日志，才发现原来就是因为新加的这个目录有组的写权限，而 Apache 不允许这样，真是吐血。话说加上组的写权限，也是为了 SQLite 来着，因为 SQLite 会在数据库所在目录中写事务日志文件。</p>
+
+<p>然后就是发现，我用的 SQLite3 的 PHP 接口，在空间的 PHP 5.2 版本中还没有呢。真是悲剧。然后又吭哧吭哧地用 PDO 接口重写了数据库的代码。</p>
+
+<p>等到好不容易改好啦，用电脑访问也一切正常，结果用手机访问的时候，看不了两个页面，就会出现“连接被远程服务器关闭”的错误。一开始还没有往功×夫×网的方向想，只以为又是服务器的权限问题（我为什么要加“又”？），来回地看日志，切换测试，不停地折腾。直到在电脑上偶然看到，该网页需要翻×墙的标志，再一看 URL 才恍然，原来是我传的一个 GET 参数，是该文章的订阅源 URL ，而有些文章是从 Feed×Burner 订阅的，这才触发了功×夫×网。真是躺着也中枪啊，赶急加一个 Base64 编码搞定。</p>
+
+<p>不管怎样，一个简陋的阅读器就这样被实现出来了。鉴于我近期还不想烧钱换手机，这个东东应该还是很有用武之地的吧。不知道 Google 出的 Android 客户端有没有 30 天的限制。</p>
+
+<p>最后的最后，该版本仅限我个人使用，因为我没有实现多用户的功能，所以大家（如果有的话）也就不要去尝试访问了。我之后会把代码给开源的，到时随你（如果有的话，嗯）折腾。</p>
+
+<hr />
+
+<p><strong>Update:</strong> 代码已<a href="https://github.com/glacjay/mreader">上传</a>。</p>
+
+<p><strong>Update 2012-12-31:</strong> 现在有了 Android 手机，已经开始用 gReader 这个客户端了，除了“延迟标记已读”这个功能还没有之外，其他所需功能已经都有了，而且还是离线阅读哦（我自己的版本就没有实现离线阅读这个功能，因为太麻烦）。不过我的数据库里面已经存了 7000 多篇文章没看了……囧</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about/" title="[转载] Compilers: what are you thinking about?">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86/" title="修改 OpenVPN 实现加密算法的自动协商">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

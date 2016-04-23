@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>[转载] Compilers: what are you thinking about?  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="compiler, ">
+
+
+<meta property="og:title" content="[转载] Compilers: what are you thinking about?  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2011-07-26T00:00:00Z" />
+<meta property="og:article:modified_time" content="2011-07-26T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="compiler">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="[转载] Compilers: what are you thinking about?" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "[转载] Compilers: what are you thinking about?",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2011-07-26",
+    "description": "",
+    "wordCount":  624 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>[转载] Compilers: what are you thinking about?
+</h1>
+
+  <div class="metas">
+<time datetime="2011-07-26">26 Jul, 2011</time>
+
+
+  
+  &middot; Read in about 3 min
+  &middot; (624 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/compiler">compiler</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  
+
+<p>最近在翻看以前加星的 Google Reader 文章，把有用的整理出来打标签，然后就看到了这篇。原文作者的博客现在不知道被丢到哪边去了，搜也搜不到，转到这里，权当保存一下吧。</p>
+
+<p>原文链接：<a href="http://www.onebadseed.com/blog/?p=119">Compilers: what are you thinking about?</a>。当然，已经打不开了。</p>
+
+<hr />
+
+<h2 id="compilers-what-are-you-thinking-about:ef1b8fdac518361c2e2ceb322c646507">Compilers: what are you thinking about?</h2>
+
+<p>Author: Rotten Cotton</p>
+
+<p>My recent post <a href="http://www.onebadseed.com/blog/?p=103">Compiler bibliography</a>, a motley list of compiler papers that had been sitting in a box in my attic, generated a surprising amount of traffic: over a thousand unique visitors. But no comments. For those of you interested in compiler design, I ask, what are you trying to understand? What are you trying to do?</p>
+
+<p>I imagine some of you are interested in understanding how compilers work and, more importantly, how to build them. The first step in learning to design compilers is to build one. (Tautologous, no?) To start, I recommend following the syllabus of a compiler design course. Googling “<a href="http://www.google.com/search?hl=en&amp;q=compiler+syllabus&amp;aq=f&amp;oq=&amp;aqi=g1">compiler syllabus</a>” returns a massive list of syllabi for compiler for compiler classes. The first link, a <a href="http://web.cecs.pdx.edu/~harry/compilers/syllabus.html">compiler design</a> class, at Portand State University, follows Louden’s book <a href="http://www.amazon.com/gp/product/0534939724?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0534939724">Compiler Construction</a> to build a SPARC compiler for a toy programming language, <a href="http://web.cecs.pdx.edu/~harry/compilers/PCATLangSpec.pdf">PCAT</a> (pdf). MIT’s compiler design class, <a href="http://ocw.mit.edu/OcwWeb/Electrical-Engineering-and-Computer-Science/6-035Fall-2005/CourseHome/">6.035</a>, is on <a href="http://ocw.mit.edu/">OCW</a>. Following one of these classes will teach you the basic challenges involved in designing a compiler and the organizational principles that have emerged to solve these problems. If you’re ambitious, start with a free C front end and build a C compiler for your favorite architecture. There is <a href="http://www.smlnj.org/doc/ckit/index.html">ckit</a> for ML, <a href="http://www.sivity.net/projects/language.c/">Language.C</a> for Haskell or <a href="http://clang.llvm.org/">clang</a> (part of the <a href="http://llvm.org/">LLVM</a> project) written in, I think, C++. There are others, no doubt. This way, you won’t have to write a front-end and you will have a huge source of potential examples on which to test your compiler and, when your start to design optimizations (the fun part), explore your compiler’s performance.</p>
+
+<p>For a few years after I first took 6.035, whenever the course was taught again and the project (toy language) for that semester was announced, I would spend a long caffeine-fueled weekend hacking out a new compiler. I must have build three or four compilers this way, targeting different architectures and exploring various design choices. This was a very valuable experience.</p>
+
+<p>Once you understand the basics of compiler design, what’s next? There are a number of directions you can go.</p>
+
+<p>You can study programming language features and their implementation in a compiler and runtime. For this, I recommend a book like Scott’s <a href="http://www.amazon.com/gp/product/0123745144?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0123745144">Programming Language Pragmatics</a> or Turbak and Gifford’s <a href="http://www.amazon.com/gp/product/0262201755?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0262201755">Design Concepts in Programming Languages</a>. I used a draft version of the latter in MIT’s Programming Languages class, 6.821. This will move beyond compiling the standard C- or Pascal-like toy languages standard in most first-year compiler courses. Learn about semantics: denotational, operational and axiomatic. This is important if you (a) want to build a correct compiler, and (b) as a theoretical foundation for program analysis.</p>
+
+<p>At the other end of the spectrum are computer architectures. Go learn about computer architecture: instruction set architectures and micro-architectures, their implementation. There are many interesting architectures out there to study. Write assembly language programs by hand. Learn to extract maximal performance form an architecture on small examples. Pay attention to the techniques used to extract performance when hand-coding. These will be the basis for compiler optimizations. The standard text for computer architecture is probably Hennessy and Patterson’s text, <a href="http://www.amazon.com/gp/product/0123704901?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0123704901">Computer Architecture: A Quantitative Approach</a>.</p>
+
+<p>A deep understanding of both the semantics of your input programming language and your target (micro-)architectures is essential to building a compiler that generates high-performance code. Program analysis and optimization is the bridge between the input program and assembly language. Start with a book on advanced compiler design like Muchnick’s <a href="http://www.amazon.com/gp/product/1558603204?ie=UTF8&amp;tag=wwwonebadseec-20&amp;linkCode=as2&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1558603204">Advanced Compiler Design and Implementation</a> (or maybe the new dragon book, I haven’t looked at it) or start diving into the literature or program analysis and optimization.</p>
+
+<p>What are you trying to understand about compilers?</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda/" title="[翻译] 用 Ruby 写编译器之六：匿名函数 lambda">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/" title="编写自己的 Web 版 Google Reader 客户端">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

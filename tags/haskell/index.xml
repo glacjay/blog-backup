@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Haskell on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/haskell/</link>
+    <description>Recent content in Haskell on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Tue, 14 Jul 2009 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/haskell/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>在 Haskell 中实现 Generic zip 函数</title>
+      <link>https://glacjay.info/post/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0/</link>
+      <pubDate>Tue, 14 Jul 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0/</guid>
+      <description>&lt;p&gt;其实嗫，这个问题已经有标准和其他的解决方案了。标准解决方案参见 &lt;code&gt;Control.Applicative&lt;/code&gt; 中的 &lt;code&gt;ZipList&lt;/code&gt; ，不过这东东用起来蛮麻烦的说；其他解决方案见 bff 库的 &lt;code&gt;Data.Zippable&lt;/code&gt; 模块，嗯，我还没搞明白这玩意怎么用，不过总感觉杀鸡用牛刀了有点（Template Haskell ，以及其他依赖）。&lt;/p&gt;
+
+&lt;p&gt;所以，如果你只是跟我一样，看 &lt;code&gt;Data.List&lt;/code&gt; 中的那一砣 &lt;code&gt;zipn&lt;/code&gt; 不顺眼的话（其实也只是看着不顺哈，用着还是蛮顺的，反正实现不用我写），一个更简单的方案在此：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;&amp;gt; z :: [a -&amp;gt; b] -&amp;gt; [a] -&amp;gt; [b]
+&amp;gt; z = zipWith ($)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;吼吼，够简单的吧。其实这跟 &lt;code&gt;Control.Monad&lt;/code&gt; 中的 &lt;code&gt;ap&lt;/code&gt; 和 &lt;code&gt;Control.Applicative&lt;/code&gt; 中的是一类东东啦，只不过是针对列表的 &lt;code&gt;zip&lt;/code&gt; 功能滴。&lt;/p&gt;
+
+&lt;p&gt;那要怎么用嗫，也不是很麻烦啦，像这样就可以了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*Main&amp;gt; (,) `map` [1,2,3] `z` &amp;quot;abc&amp;quot;
+[(1,&#39;a&#39;),(2,&#39;b&#39;),(3,&#39;c&#39;)]
+*Main&amp;gt; (,,) `map` [1,2,3] `z` &amp;quot;abc&amp;quot; `z` [Nothing, Just False, Just True]
+[(1,&#39;a&#39;,Nothing),(2,&#39;b&#39;,Just False),(3,&#39;c&#39;,Just True)]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里的 &lt;code&gt;map&lt;/code&gt; 所对应的自然就是 &lt;code&gt;Control.Applicative&lt;/code&gt; 中的啦。&lt;/p&gt;
+
+&lt;p&gt;还有更好玩的哦，如果再加上&lt;a href=&#34;https://glacjay.info/post/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8/&#34;&gt;上一篇博&lt;/a&gt;中的不定参函数的话呢：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*Main&amp;gt; buildList `map` [1,2,3] `z` [4,5,6] :: [[Int]]
+[[1,4],[2,5],[3,6]]
+*Main&amp;gt; buildList `map` [1,2,3] `z` [4,5,6] `z` [7,8,9] :: [[Int]]
+[[1,4,7],[2,5,8],[3,6,9]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;那我这次要说得就这么多啦，至于怎么用，就请大家尽情地发挥你们的想象力吧（其实是我想象力不够 :-(）&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Haskell 中的可变长参数列表</title>
+      <link>https://glacjay.info/post/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8/</link>
+      <pubDate>Wed, 06 May 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-05-06/haskell-%E4%B8%AD%E7%9A%84%E5%8F%AF%E5%8F%98%E9%95%BF%E5%8F%82%E6%95%B0%E5%88%97%E8%A1%A8/</guid>
+      <description>&lt;p&gt;说实话，我之前有就这个题目很有激情地写了很长很罗嗦的一篇草稿的，哦，确切来说是大半篇，直到被打断，激情不再，这篇草稿也就此躺了两个多月。好吧，其实是我还不是八卦那块料，就不卖弄了，直接总结。&lt;/p&gt;
+
+&lt;p&gt;要在 Haskell 中实现可变长参数列表，就是利用其 Typeclass 系统，对函数进行最终结果类型和中间函数类型之间的重载，然后利用 Haskell 的类型推导机制为我们自动调用合适的重载版本。嗯，就这么简单。下面是一个最简单的例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;class BuildList a r | r -&amp;gt; a where
+    buildList&#39; :: [a] -&amp;gt; r
+
+instance BuildList a [a] where
+    buildList&#39; = id
+
+instance BuildList a r =&amp;gt; BuildList a (a -&amp;gt; r) where
+    buildList&#39; as = \a -&amp;gt; buildList&#39; $ as ++ [a]
+
+buildList :: BuildList a r =&amp;gt; r
+buildList = buildList&#39; []
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;好吧，这个例子我是从&lt;a href=&#34;http://okmij.org/ftp/Haskell/vararg-fn.lhs&#34;&gt;这里&lt;/a&gt;看到的，或者说我就是从这里学到这个东东的。在此友情提醒那些和我一样不怎么有耐心的家伙一句，原理解释在后面。&lt;/p&gt;
+
+&lt;p&gt;按照我的想法，上面这个例子应该还可以进一步简化以去掉对两个语言扩展的依赖的，就是写一个 &lt;code&gt;buildIntList&lt;/code&gt; 的特化版本，结果不幸地失败了。有知道的大大告诉我一声，在下洗耳恭听。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Update&lt;/strong&gt;: 不需要大大们来告诉我了，我已经知道该怎么简化上面的这个 &lt;code&gt;buildList&lt;/code&gt; 了，不过简化后的版本是 &lt;code&gt;buildCharList&lt;/code&gt; ，也就是 &lt;code&gt;buildString&lt;/code&gt; 啦，而不是原先说的 &lt;code&gt;buildIntList&lt;/code&gt; 。先看实现：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;class BuildString r where
+    buildString&#39; :: String -&amp;gt; r
+
+instance BuildString [Char] where
+    buildString&#39; = id             -- or whatever you want
+
+instance BuildString r =&amp;gt; BuildString (Char -&amp;gt; r) where
+    buildString&#39; cs = \c -&amp;gt; buildString&#39; $ cs ++ [c]
+
+buildString :: BuildString r =&amp;gt; r
+buildString = buildString&#39; []
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样就把对 &lt;code&gt;MultiParameterTypeClass&lt;/code&gt; 和 &lt;code&gt;FunctionalDependency&lt;/code&gt; 的依赖给简化掉了，可是又同时增加了对 &lt;code&gt;-XFlexibleInstances&lt;/code&gt; 选项的需要（因为 &lt;code&gt;instance BuildString [Char] where&lt;/code&gt; 这一行；如果你想把 &lt;code&gt;[Char]&lt;/code&gt; 写成 &lt;code&gt;String&lt;/code&gt; 的话，就还要再加上个 &lt;code&gt;-XTypeSynonymInstances&lt;/code&gt;），暂时想不到更好的办法了。&lt;/p&gt;
+
+&lt;p&gt;另外，关于我在这里为什么要用 &lt;code&gt;Char&lt;/code&gt; 而不是 &lt;code&gt;Int&lt;/code&gt; 呢，是因为 &lt;code&gt;&#39;a&#39;&lt;/code&gt; 的类型很明确，就是 &lt;code&gt;Char&lt;/code&gt; ，而 &lt;code&gt;5&lt;/code&gt; 的类型就不明确了，因此，你可以这样调用 &lt;code&gt;buildString&lt;/code&gt; ：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*TestVarargs&amp;gt; buildString &#39;a&#39; &#39;b&#39; &#39;c&#39; :: String
+&amp;quot;abc&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可是却必须这样调用 &lt;code&gt;buildIntList&lt;/code&gt; ：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*TestVarargs&amp;gt; buildIntList (1::Int) (2::Int) (3::Int) :: [Int]
+[1,2,3]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;虽然在我看来，GHC 应该可以倒推出每个参数的类型的，可他就是不认，我暂时也没什么办法。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

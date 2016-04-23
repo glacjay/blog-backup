@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/c/</link>
+    <description>Recent content in C on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 05 Mar 2011 22:00:00 +0000</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/c/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>发布一个寻找局域网内主机的小工具</title>
+      <link>https://glacjay.info/post/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7/</link>
+      <pubDate>Sat, 05 Mar 2011 22:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-03-05/%E5%8F%91%E5%B8%83%E4%B8%80%E4%B8%AA%E5%AF%BB%E6%89%BE%E5%B1%80%E5%9F%9F%E7%BD%91%E5%86%85%E4%B8%BB%E6%9C%BA%E7%9A%84%E5%B0%8F%E5%B7%A5%E5%85%B7/</guid>
+      <description>&lt;p&gt;在工作中，经常需要远程登录到机房中的设备上进行调试与开发，走的是工作局域网。由于这些设备的地址也是动态获取的，因此在遇到一些意外事故，如网线松了、网络不稳定之类的，这些地址可能就变了。每当这时，我们就得跑到机房，给设备连上显示器（我们连 KVM 都没有，命苦啊），查看 IP ，然后再跑回去重新连。太麻烦了。&lt;/p&gt;
+
+&lt;p&gt;我知道有支持动态地址的 DNS 服务，可是我们没权限操作 DNS 服务器，而且设备也都是不固定的，没必要惊动网络管理员（好吧，我甚至都不知道谁是网络管理员，作为三年的“老”员工，我面壁去了。好吧，其实我就是想写写程序练练手），所以我就写了个小程序，用来查找一台特定设备的 IP 地址。&lt;/p&gt;
+
+&lt;p&gt;原理其实很简单啦。客户端（也就是我的笔记本）发个 UDP 广播报文，里面有要找的主机的名字。服务端呢，启动时则指定一个主机名字。当服务端收到一个 UDP 广播报文，并且发现找的就是自己呢，就返回一个 &lt;code&gt;bingo&lt;/code&gt; 报文。这样，客户端就知道这个主机的 IP 地址啦。&lt;/p&gt;
+
+&lt;p&gt;现在用的服务端口是 &lt;code&gt;5460&lt;/code&gt; （取自某本网络小说 :-），应该没有哪个知名服务用这个端口吧。当然，因为这个工具确实太简单了，所以就没有考虑冲突的情况啦。请大家在使用的时候，给主机取个有个性的名字哟。&lt;/p&gt;
+
+&lt;p&gt;我通过这个程序学到的新知识就是，要发送 UDP 的广播报文，只是指定一个全 &lt;code&gt;1&lt;/code&gt; 的地址是不够的，还要设置 socket 选项 &lt;code&gt;SO_BROADCAST&lt;/code&gt; （我继续面壁去了）。&lt;/p&gt;
+
+&lt;p&gt;下面是代码（好撑篇幅啊，又没人给我稿费的说）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;stdlib.h&amp;gt;
+#include &amp;lt;errno.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+
+#include &amp;lt;sys/socket.h&amp;gt;
+#include &amp;lt;netinet/in.h&amp;gt;
+#include &amp;lt;pthread.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+#include &amp;lt;arpa/inet.h&amp;gt;
+
+#define PORT 5460
+
+static char *progname;
+static int sock;
+
+static void usage(void)
+{
+    fprintf(stderr,
+            &amp;quot;Usage: %s options\n&amp;quot;
+            &amp;quot;where options must be one of:\n&amp;quot;
+            &amp;quot;  -s         Running as a  named server.\n&amp;quot;
+            &amp;quot;  -c         Asking for &#39;s address.\n&amp;quot;,
+            progname);
+    exit(1);
+}
+
+static int udp_socket(void)
+{
+    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+    if (sock == -1) {
+        fprintf(stderr, &amp;quot;Cannot open a new socket: %s\n&amp;quot;, strerror(errno));
+        exit(1);
+    }
+    return sock;
+}
+
+static void server(const char *name)
+{
+    struct sockaddr_in listen_addr;
+
+    listen_addr.sin_family = AF_INET;
+    listen_addr.sin_addr.s_addr = INADDR_ANY;
+    listen_addr.sin_port = htons(PORT);
+
+    if (bind(sock, (struct sockaddr *) &amp;amp;listen_addr,
+             sizeof(listen_addr)) == -1)
+    {
+        fprintf(stderr, &amp;quot;Cannot bind to the UDP port %d: %s\n&amp;quot;,
+                PORT, strerror(errno));
+        exit(1);
+    }
+
+    while (1) {
+        char buf[BUFSIZ+1];
+        struct sockaddr_in addr;
+        int addrlen = sizeof(addr);
+        int received;
+
+        received = recvfrom(sock, buf, sizeof(buf)-1, 0,
+                            (struct sockaddr *) &amp;amp;addr, (socklen_t *) &amp;amp;addrlen);
+        if (received == -1)
+            continue;
+
+        buf[received] = 0;
+        if (strcmp(buf, name) == 0)
+            sendto(sock, &amp;quot;bingo&amp;quot;, 5, 0, (struct sockaddr *) &amp;amp;addr, addrlen);
+    }
+}
+
+static void *waiton_response(void *arg)
+{
+    char *name = (char *) arg;
+
+    while (1) {
+        char buf[BUFSIZ+1];
+        struct sockaddr_in addr;
+        socklen_t addrlen = sizeof(addr);
+        int received;
+
+        received = recvfrom(sock, buf, sizeof(buf)-1, 0,
+                            (struct sockaddr *) &amp;amp;addr, &amp;amp;addrlen);
+        if (received == -1)
+            continue;
+        buf[received] = 0;
+        if (strcmp(buf, &amp;quot;bingo&amp;quot;) == 0) {
+            printf(&amp;quot;Got. %s&#39;s address is %s.\n&amp;quot;,
+                   name, inet_ntoa(addr.sin_addr));
+            exit(0);
+        }
+    }
+
+    return NULL;
+}
+
+static void client(const char *name)
+{
+    int bcast = 1;
+    pthread_t tid;
+    pthread_attr_t attr;
+    struct sockaddr_in addr;
+    int i;
+
+    setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &amp;amp;bcast, sizeof(bcast));
+
+    pthread_attr_init(&amp;amp;attr);
+    pthread_attr_setdetachstate(&amp;amp;attr, PTHREAD_CREATE_DETACHED);
+
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = 0xffffffff;
+    addr.sin_port = htons(PORT);
+
+    for (i = 0; i &amp;lt; 6; i++) {
+        printf(&amp;quot;Searching...\n&amp;quot;);
+
+        sendto(sock, name, strlen(name), 0,
+               (struct sockaddr *) &amp;amp;addr, sizeof(addr));
+        if (i == 0)
+            pthread_create(&amp;amp;tid, &amp;amp;attr, waiton_response, (void *) name);
+        sleep(5);
+    }
+
+    printf(&amp;quot;Cannot find the machine.\n&amp;quot;);
+    pthread_attr_destroy(&amp;amp;attr);
+}
+
+int main(int argc, char **argv)
+{
+    progname = argv[0];
+    sock = udp_socket();
+
+    if (argc != 3)
+        usage();
+    if (strcmp(argv[1], &amp;quot;-s&amp;quot;) == 0)
+        server(argv[2]);
+    else if (strcmp(argv[1], &amp;quot;-c&amp;quot;) == 0)
+        client(argv[2]);
+    else
+        usage();
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;PS. 最近 gist.github.com 好像不是很给力，用它贴代码的话，不翻墙就看不到，只好直接贴这里了。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL</title>
+      <link>https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/</link>
+      <pubDate>Sat, 05 Dec 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/</guid>
+      <description>
+
+&lt;p&gt;我的编译环境是 Visual Studio Team System 2008 版本 9.0.21022.8 RTM ， Windows Mobile 5.0 SDK R2 （ VS2008 自带的版本）。当然， Perl 也是需要的，我装的是 ActivePerl 。我要编译的 OpenSSL 版本是 0.9.8e 。&lt;/p&gt;
+
+&lt;h2 id=&#34;vs2008-的安装:35e51ba4554ba11286e563aed7028ead&#34;&gt;VS2008 的安装&lt;/h2&gt;
+
+&lt;p&gt;那个 Web Developer Tools （好像叫这个）的安装会失败，又不能不装，根据网上的说明，要把它的目录单独从光盘上解压出来安装，且安装的时候要挂 Office 的安装光盘（我的 Office 版本是 2007 ）。这个装好了之后，再从光盘上安装 VS2008 就没有问题了。&lt;/p&gt;
+
+&lt;h2 id=&#34;配置编译环境:35e51ba4554ba11286e563aed7028ead&#34;&gt;配置编译环境&lt;/h2&gt;
+
+&lt;p&gt;首先要写个定义环境变量的脚本，以把 CE 的路径给配置好。 VS2008 的那个命令行启动脚本只配置了 VC 的环境变量，没有配 CE 的环境变量，因为这个是要根据用户需要来做的。我写的脚本内容如下，你可能要根据自己的 VS2008 相关安装目录做调整。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bat&#34;&gt;set PATH=D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\bin\x86_arm;%PATH%
+set INCLUDE=D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\include;C:\Program Files\Windows Mobile 5.0 SDK R2\PocketPC\Include\Armv4i;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\atlmfc\include;%INCLUDE%
+set LIB=C:\Program Files\Windows Mobile 5.0 SDK R2\PocketPC\Lib\ARMV4I;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\atlmfc\lib\armv4i;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\lib\armv4i;%LIB%
+
+set OSVERSION=WCE501
+set TARGETCPU=ARMV4I
+set PLATFORM=VC-CE
+set WCECOMPAT=D:\program\wcecompat
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中 &lt;code&gt;PATH&lt;/code&gt; 、 &lt;code&gt;INCLUDE&lt;/code&gt; 、 &lt;code&gt;LIB&lt;/code&gt; 都是 CE 相关的环境变量，在编译 WCECompat 和 OpenSSL 的时候都是需要的，后面的是 WCECompat 需要的，其中有些是 OpenSSL 也需要的。&lt;/p&gt;
+
+&lt;p&gt;然后启动 Visual Studio 2008 命令提示（开始菜单），并运行上面的这个脚本，编译环境就算是准备好了，可以开始编译 WCECompat 了。&lt;/p&gt;
+
+&lt;h2 id=&#34;编译-wcecompat:35e51ba4554ba11286e563aed7028ead&#34;&gt;编译 WCECompat&lt;/h2&gt;
+
+&lt;p&gt;要编译 CE 版本的 OpenSSL 的话，需要 WCECompat 这个库，这个库实现了许多在 Desktop 开发环境中有而在 CE 中没有的功能，而这些功能是编译与使用 OpenSSL 所必需的。&lt;/p&gt;
+
+&lt;p&gt;不过，官方版本的 WCECompat 现在已经用不起来了（虽然我没有进一步确定），我们要使用 OpenSSL 开发团队 fork 的分支，其下载地址在&lt;a href=&#34;http://github.com/mauricek/wcecompat&#34;&gt;http://github.com/mauricek/wcecompat&lt;/a&gt;，在这个页面上有打包下载的链接，我下载的版本是 cb796f5 （ git 是用 GUID 来表示版本的）。&lt;/p&gt;
+
+&lt;p&gt;下载下来之后，先解压，我的解压路径是 &lt;code&gt;D:\program\wcecompat&lt;/code&gt; ，并进入该目录。这里注意，根据 WCECompat 的文档说明，不能把它解压到一个含空格的路径底下，不然会报文件找不到之类的错，这是因为 WCECompat 的 &lt;code&gt;makefile&lt;/code&gt; 文件没有用引号括住文件名，而空格会把一个文件名分成两个。&lt;/p&gt;
+
+&lt;p&gt;然后要修改一个源码文件 &lt;code&gt;src/time.c&lt;/code&gt; ，在其中找到函数 &lt;code&gt;_tzset&lt;/code&gt; 的定义，这是一个空函数，把它整个注释掉（或删掉），不然在后面我们的程序要链接这个库的时候，会报这个函数重复定义的错。&lt;/p&gt;
+
+&lt;p&gt;运行命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\wcecompat&amp;gt;perl config.pl
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样会生成需要的 &lt;code&gt;makefile&lt;/code&gt; 文件，不过还不能直接用它来编译，要手动改一下，删掉或注释掉其中的 &lt;code&gt;src/winmain.cpp \&lt;/code&gt; 这一行，不然后面链进我们的程序时会报找不到 WinMain 所需的 &lt;code&gt;main&lt;/code&gt; 函数这个错（大概是这样说的）。&lt;/p&gt;
+
+&lt;p&gt;然后运行命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\wcecompat&amp;gt;nmake
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;开始编译。完成之后，就会在 &lt;code&gt;lib&lt;/code&gt; 目录中生成两个库文件 &lt;code&gt;wcecompat.lib&lt;/code&gt; 和 &lt;code&gt;wcecompatex.lib&lt;/code&gt; ，都是静态链接库。&lt;/p&gt;
+
+&lt;h2 id=&#34;编译-openssl:35e51ba4554ba11286e563aed7028ead&#34;&gt;编译 OpenSSL&lt;/h2&gt;
+
+&lt;p&gt;还是同一个命令行窗口，进入 OpenSSL 的解压目录，我的是 &lt;code&gt;D:\program\openssl-0.9.8e&lt;/code&gt; 。根据 &lt;code&gt;INSTALL.WCE&lt;/code&gt; 文件中的说明，运行下列命令进行编译：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\openssl-0.9.8e&amp;gt;perl Configure VC-CE
+...
+D:\program\openssl-0.9.8e&amp;gt;ms\do_ms.bat
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这一步完成之后，打开生成的 &lt;code&gt;ms\ce.mak&lt;/code&gt; 文件，把第 &lt;code&gt;19&lt;/code&gt; 行 &lt;code&gt;CFLAG&lt;/code&gt; 的变量定义中的 &lt;code&gt;/WX&lt;/code&gt; 选项给删掉，不然后面有编译警告会被当成错误，从而编译失败。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\program\openssl-0.9.8e&amp;gt;nmake -f ms\ce.mak
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这一步的编译过程最终还是会失败退出，不过不要紧（也许吧），失败的是测试程序，这时看 &lt;code&gt;out32_ARMV4I&lt;/code&gt; 目录中，已经有编译好的 &lt;code&gt;libeay32.lib&lt;/code&gt; 和 &lt;code&gt;ssleay32.lib&lt;/code&gt; 这两个文件了。因为前面是用 &lt;code&gt;ms\ce.mak&lt;/code&gt; 文件而不是 &lt;code&gt;ms\cedll.mak&lt;/code&gt; ，所以编译出来的这两个文件都是静态链接库。&lt;/p&gt;
+
+&lt;h2 id=&#34;测试-openssl:35e51ba4554ba11286e563aed7028ead&#34;&gt;测试 OpenSSL&lt;/h2&gt;
+
+&lt;p&gt;最后来测试一下我们编译出来的 OpenSSL （以及 WCECompat ）。打开 VS2008 ，新建个智能设备的项目。然后打开项目属性对话框，先在“配置属性-&amp;gt; C/C++ -&amp;gt;常规”的“附加包含目录”中把 &lt;code&gt;D:\program\openssl-0.9.8e\inc32&lt;/code&gt; 给加进来（测试的话加绝对路径就好了，实际开发的时候要把所有需要的文件拷到项目目录里面）（另，不要加 WCECompat 的 &lt;code&gt;include&lt;/code&gt; 目录，不然会有 &lt;code&gt;abs&lt;/code&gt; 函数不属于 &lt;code&gt;global namespace&lt;/code&gt; 的编译错误），在“配置属性-&amp;gt;链接器-&amp;gt;常规”的“附加库目录”中把 &lt;code&gt;D:\program\openssl-0.9.8e\out32_ARMV4I&lt;/code&gt; 和 &lt;code&gt;D:\program\wcecompat\lib&lt;/code&gt; 给加进来，在“配置属性-&amp;gt;链接器-&amp;gt;输入”的“附加依赖项”中加入 &lt;code&gt;wcecompat.lib wcecompatex.lib libeay32.lib ssleay32.lib&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;打开个源文件（比如某个事件处理函数定义的地方），在最开始的地方加进去 OpenSSL 的头文件包含&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#define NO_SYS_TYPES_H
+#include &amp;lt;openssl/ssl.h&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中第一行的宏定义是需要的。虽然 WCECompat 为我们提供了 &lt;code&gt;sys/types.h&lt;/code&gt; 头文件，不过我们不能用（理由见上）。&lt;/p&gt;
+
+&lt;p&gt;然后在事件处理函数中加条语句&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;SSL_CTX *ctx = SSL_CTX_new(SSLv23_method());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;编译下试试吧，看有没有问题。如果没有，那就恭喜了，我们暂时解决了将 OpenSSL 用于 CE 开发的问题，我还不能保证后面不会出其他的问题。&lt;/p&gt;
+
+&lt;h2 id=&#34;另:35e51ba4554ba11286e563aed7028ead&#34;&gt;另&lt;/h2&gt;
+
+&lt;p&gt;虽然我之前配置环境变量等步骤都是基于 PocketPC 来做的，不过最后编出来的库貌似也能用到 Smartphone 程序中，不知道会不会有什么问题。 Mobile 开发果然还是相当的麻烦啊。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>有关 C/C&#43;&#43; 中的 do { ... } while (0) 惯用法</title>
+      <link>https://glacjay.info/post/2009-04-08/%E6%9C%89%E5%85%B3-c/c-%E4%B8%AD%E7%9A%84-do--...--while-0-%E6%83%AF%E7%94%A8%E6%B3%95/</link>
+      <pubDate>Wed, 08 Apr 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-04-08/%E6%9C%89%E5%85%B3-c/c-%E4%B8%AD%E7%9A%84-do--...--while-0-%E6%83%AF%E7%94%A8%E6%B3%95/</guid>
+      <description>&lt;p&gt;C/C++ 中的宏是个让人又爱又恨的家伙（感觉这句话好俗啊），在带给我们很强大的 Power 的同时，却也需要我们绝对的细心，而这也是在宏定义中诸多惯用法的由来。&lt;/p&gt;
+
+&lt;p&gt;当我们要把一组语句定义成一个宏，并希望像用一条语句那样来使用它的时候，我们就可以这样做：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#define MACROX \
+    do { \
+        statement1 \
+        statement2 \
+        ... \
+    } while (0)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;之后，我们只要在调用方写 &lt;code&gt;MACROX;&lt;/code&gt; 就可以了。之所以不能简单的用花括号把这一组语句括起来，是为了防止扰乱 &lt;code&gt;if&lt;/code&gt; 语句中的 &lt;code&gt;else&lt;/code&gt; 子句的匹配问题。嗯，确实是个不错的主意啊，直到我遇到了一个，嗯，也许只有我才会遇到的问题。那就是，我在这组语句中，不能用 &lt;code&gt;break&lt;/code&gt; 和 &lt;code&gt;continue&lt;/code&gt; 。是不是觉得这需求蛮诡异的，呵呵，连我自己都觉得，不过这是我在重构一些相似的循环体时遇到的。但总之，我是找到了另外的一种包装方法啦，自己想想也没什么问题，大概，就像下面这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;#define MACROX \
+    if (true) { \
+        statement1 \
+        statement2 \
+        ... \
+    } else
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;嗯，看起来是不是要比大家都知道的那个诡异很多啊。不管了，以后发现问题了再说吧。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43; 中的纯虚析构函数与抽象类</title>
+      <link>https://glacjay.info/post/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB/</link>
+      <pubDate>Sun, 22 Mar 2009 20:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB/</guid>
+      <description>&lt;p&gt;我以前只知道，在 C++ 中，如果要表示一个类是抽象基类，只要为它定义一个纯虚析构函数就可以了，没想到今天用到的时候才发现，连接的时候通不过，说没有找到那个函数的定义。到网上一搜才知道，原来纯虚函数也是可以有定义的啊。在实现文件中加上它的空定义之后，一切就 OK 了。&lt;/p&gt;
+
+&lt;p&gt;不过，因为我那个基类里面已经有了一个纯虚函数，所以貌似没必要把析构函数也定义成纯虚的。&lt;/p&gt;
+
+&lt;p&gt;PS. 在 C++ 里面要实现 AST 还真是一件麻烦的体力劳动，要写那么多类，每个类还得写那么一砣的样板代码。幸好不是那种长期运行的服务器程序，不需要太考虑 memory leak 的问题，就不用写析构函数和 &lt;code&gt;delete&lt;/code&gt; 了（实际上是懒得写），不然样板代码还要更大砣。不知道有什么更好的方法没。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

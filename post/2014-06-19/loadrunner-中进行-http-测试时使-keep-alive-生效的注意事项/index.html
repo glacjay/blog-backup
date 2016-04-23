@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>LoadRunner 中进行 HTTP 测试时使 Keep-Alive 生效的注意事项  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="web, ">
+
+
+<meta property="og:title" content="LoadRunner 中进行 HTTP 测试时使 Keep-Alive 生效的注意事项  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2014-06-19/loadrunner-%E4%B8%AD%E8%BF%9B%E8%A1%8C-http-%E6%B5%8B%E8%AF%95%E6%97%B6%E4%BD%BF-keep-alive-%E7%94%9F%E6%95%88%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2014-06-19T00:23:16&#43;08:00" />
+<meta property="og:article:modified_time" content="2014-06-19T00:23:16&#43;08:00" />
+
+  
+    
+<meta property="og:article:tag" content="web">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="LoadRunner 中进行 HTTP 测试时使 Keep-Alive 生效的注意事项" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2014-06-19/loadrunner-%E4%B8%AD%E8%BF%9B%E8%A1%8C-http-%E6%B5%8B%E8%AF%95%E6%97%B6%E4%BD%BF-keep-alive-%E7%94%9F%E6%95%88%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "LoadRunner 中进行 HTTP 测试时使 Keep-Alive 生效的注意事项",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2014-06-19",
+    "description": "",
+    "wordCount":  29 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2014-06-19/loadrunner-%E4%B8%AD%E8%BF%9B%E8%A1%8C-http-%E6%B5%8B%E8%AF%95%E6%97%B6%E4%BD%BF-keep-alive-%E7%94%9F%E6%95%88%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>LoadRunner 中进行 HTTP 测试时使 Keep-Alive 生效的注意事项
+</h1>
+
+  <div class="metas">
+<time datetime="2014-06-19">19 Jun, 2014</time>
+
+
+  
+  &middot; Read in about 1 min
+  &middot; (29 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/web">web</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  <p>工作需要，在使用 LoadRunner 进行 HTTP 测试时，为了使每个虚拟用户在不同的循环周期中都能保持长连接，则除了要打开 Keep-Alive 运行时配置（默认打开）之外，还有两个选项需要修改，这两个选项都在运行时配置的「Browser - Browser Simulation」中：</p>
+
+<ul>
+<li><p>Simulate browser cache ：取消勾选。禁用对浏览器缓存机制的模拟，令虚拟用户确实的每次都真正发起与 Web 服务器的对话，而不是只读取一下缓存。</p></li>
+
+<li><p>Simulate a new user on each iteration ：取消勾选。不要在每次执行 Action 之前重置虚拟用户的状态，不然会把原来的 TCP 长连接也重置掉，Keep-Alive 就没用了（更准确地说，是在不同循环周期之间就没用了）。</p></li>
+</ul>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2014-06-18/vs2010-%E7%8E%AF%E5%A2%83%E4%B8%AD%E8%B0%83%E8%AF%95-ie-activex-%E6%8E%A7%E5%88%B6%E6%97%B6%E6%96%AD%E7%82%B9%E4%B8%8D%E8%B5%B7%E4%BD%9C%E7%94%A8%E7%9A%84%E9%97%AE%E9%A2%98/" title="VS2010 环境中调试 IE ActiveX 控制时断点不起作用的问题">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2014-06-22/keepalived-%E5%AE%9E%E7%8E%B0%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87%E5%B9%B6%E5%AF%B9%E5%85%B3%E9%94%AE%E8%BF%9B%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%9B%91%E6%8E%A7/" title="Keepalived 实现双机热备并对关键进程进行监控">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

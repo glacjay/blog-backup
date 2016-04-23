@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Oracle on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/oracle/</link>
+    <description>Recent content in Oracle on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 03 Mar 2010 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/oracle/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>通过 ODBC 接口访问 Oracle 数据库 -- Linux 篇</title>
+      <link>https://glacjay.info/post/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93----linux-%E7%AF%87/</link>
+      <pubDate>Wed, 03 Mar 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2010-03-03/%E9%80%9A%E8%BF%87-odbc-%E6%8E%A5%E5%8F%A3%E8%AE%BF%E9%97%AE-oracle-%E6%95%B0%E6%8D%AE%E5%BA%93----linux-%E7%AF%87/</guid>
+      <description>&lt;p&gt;首先，你要安装好 UnixODBC 软件包，这个就不多说了。&lt;/p&gt;
+
+&lt;p&gt;然后，安装 Oracle 官方客户端，因为我的使用环境为 Fedora 12 ，所以我下载安装的是 &lt;code&gt;oracle-xe-client-10.2.0.1-1.0.i386.rpm&lt;/code&gt; 。&lt;/p&gt;
+
+&lt;p&gt;装好之后，要设置一些环境变量，我是用的一个 Shell 脚本来完成这项工作的，你可以把它放在 &lt;code&gt;/etc/profile.d/&lt;/code&gt; 目录下并加上可执行权限来让其在系统启动时自动执行，也可以直接运行这个脚本来使其立即生效。脚本如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;# File: oracle.sh
+export ORACLE_HOME=/usr/lib/oracle/xe/app/oracle/product/10.2.0/client
+export PATH=$PATH:$ORACLE_HOME/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME/lib
+export TNS_ADMIN=$ORACLE_HOME/network/admin
+export TWO_TASK=test
+export NLS_LANG=”Simplified Chinese_china.UTF8”
+export NLS_DATE_FORMAT=&amp;quot;YYYY-MM-DD HH24:MI:SS&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中 &lt;code&gt;TWO_TASK&lt;/code&gt; 变量的值应设为 &lt;code&gt;tnsnames.ora&lt;/code&gt; 文件中的那个键名（下面再讲）， &lt;code&gt;NLS_LANG&lt;/code&gt; 是为了 UTF-8 编码，而 &lt;code&gt;NLS_DATE_FORMAT&lt;/code&gt; 设的是 &lt;code&gt;DATE&lt;/code&gt; 类型的数据在插入和显示时所用的格式，这里设的是我比较习惯的一种。&lt;/p&gt;
+
+&lt;p&gt;然后在 &lt;code&gt;$ORACLE_HOME&lt;/code&gt; 目录中建一个子目录 &lt;code&gt;network/admin&lt;/code&gt; ，并在其中新建两个文本文件如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;# File: sqlnet.ora
+SQLNET.AUTHENTICATION_SERVICES = (NTS)
+NAMES.DIRECTORY_PATH = (TNSNAMES, EZCONNECT)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个文件中的都是一些固定的配置，其中 &lt;code&gt;TNSNAMES&lt;/code&gt; 和 &lt;code&gt;EZCONNECT&lt;/code&gt; 分别为我所用到的两种指定连接目标的方式。另一个文件：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;# File: tnsnames.ora
+test =
+  (DESCRIPTION =
+    (ADDRESS =
+      (PROTOCOL = TCP)
+      (HOST = 192.168.0.2)
+      (PORT = 1521)
+    )
+    (CONNECT_DATA =
+      (SID = test)
+    )
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;第二行中的 &lt;code&gt;test&lt;/code&gt; 就是 &lt;code&gt;TWO_TASK&lt;/code&gt; 环境变量的值， &lt;code&gt;SID&lt;/code&gt; 就是数据库名，其它的就不需要说明了。当然，在这个文件中可以配置多个数据库连接，用不同的名称来标识（ &lt;code&gt;TWO_TASK&lt;/code&gt; 就是用来选择的），这个例子中只有一个配置。&lt;/p&gt;
+
+&lt;p&gt;以上的步骤主要是 Oracle 相关，都完成了之后，可以先测一下 Oracle 客户端是不是能正常使用了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;$ sqlplus username/password@test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个命令可以连接数据库。这种参数格式就是上面提到的 &lt;code&gt;TNSNAMES&lt;/code&gt; 方式，而 &lt;code&gt;EZCONNECT&lt;/code&gt; 方式则是下面的样子（这种方式就不需要在 &lt;code&gt;tnsnames.ora&lt;/code&gt; 文件中进行配置了）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sqlplus username/password@192.168.0.2:1521/test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;成功之后可以试试下面的 SQL 语句：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;gt; select * from some_table;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接下来就是配置 UnixODBC 了。首先是 &lt;code&gt;odbcinst.ini&lt;/code&gt; 文件：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ini&#34;&gt;[oracle]
+Driver = /usr/lib/oracle/xe/app/oracle/product/10.2.0/client/lib/libsqora.so.10.1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后是 &lt;code&gt;odbc.ini&lt;/code&gt; 文件：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ini&#34;&gt;[oracle]
+Driver = oracle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;都没什么可配的。&lt;/p&gt;
+
+&lt;p&gt;最后就是程序了，跟其它的 ODBC 程序没什么不同，除了连接字符串，需要写成这个样子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;&amp;quot;DSN=oracle;UID=username;PWD=password&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;DSN&lt;/code&gt; 就是 ODBC Data Source 名，也就是上面 &lt;code&gt;odbc.ini&lt;/code&gt; 文件中方括号内的名字； &lt;code&gt;UID&lt;/code&gt; 就是用户名， &lt;code&gt;PWD&lt;/code&gt; 就是密码。&lt;/p&gt;
+
+&lt;p&gt;好了，就这么多。&lt;/p&gt;
+
+&lt;p&gt;PS. 我和另一位同事分别碰到过一次一个特别令人头痛的问题，就是在连接时， UnixODBC 说 &lt;code&gt;libsqora.so.10.1&lt;/code&gt; （就是在 &lt;code&gt;odbcinst.ini&lt;/code&gt; 文件中指定的那个）找不到，虽然这个文件明明就在那边；用 &lt;code&gt;ldd&lt;/code&gt; 命令查看该文件的结果是说“这不是一个动态可执行文件”。更不幸的是，我不知怎么在我的机器上把这个问题给莫名其妙地解决了，却想破头都不知道是怎么解决的。太失败了。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; 问题解决了，出问题的都是新装的 Fedora 12 机器，后来做了次全系统的更新，再建个链接，就好了。只是不知道倒底是哪个软件包的版本太老，试了 &lt;code&gt;glibc&lt;/code&gt; 、 &lt;code&gt;libtool&lt;/code&gt; 、 &lt;code&gt;kernel&lt;/code&gt; 都不是。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Update 2012-12-31:&lt;/strong&gt; 找到问题的原因了，都是 SELinux 惹的祸，关之即可，或者配下相关的策略啥的。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Oracle 建库 SQL 脚本</title>
+      <link>https://glacjay.info/post/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC/</link>
+      <pubDate>Tue, 02 Mar 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2010-03-02/oracle-%E5%BB%BA%E5%BA%93-sql-%E8%84%9A%E6%9C%AC/</guid>
+      <description>&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;-- 首先是删除该数据库中该用户名下的所有表、序列与触发器，
+-- 其中触发器是通过表格级联删除的。
+declare
+  cursor usertables is
+    select *
+    from user_tables
+    where table_name not like &#39;BIN$%&#39;;
+  cursor usersequences is
+    select *
+    from user_sequences;
+begin
+  for next_row in usertables loop
+    execute immediate
+      &#39;drop table &#39; || next_row.table_name ||
+      &#39; cascade constraints&#39;;
+  end loop;
+  for next_row in usersequences loop
+    execute immediate
+      &#39;drop sequence &#39; || next_row.sequence_name;
+  end loop;
+end;
+/
+
+-- 然后，就是一砣……的建表语句啦，
+-- 比方说下面就是两个含外键的表。
+create table &amp;quot;A&amp;quot; (
+  &amp;quot;ID&amp;quot; integer primary key,
+  &amp;quot;NAME&amp;quot; nvarchar2(64) not null         -- nvarchar2类型支持UTF8
+);
+-- Oracle中的表名与字段名最好写成这样引号加全大写的形式。
+
+create table &amp;quot;B&amp;quot; (
+  &amp;quot;ID&amp;quot; integer primary key,
+  &amp;quot;A&amp;quot; integer not null references &amp;quot;B&amp;quot; on delete cascade,
+  &amp;quot;VALUE&amp;quot; nvarchar2(64) not null
+);
+
+-- 接下来是第三部分，为所有的表创建对应的序列和触发器，以实现自增主键。
+declare
+  cursor usertables is
+    select cols.table_name, cols.column_name
+    from all_constraints cons, all_cons_columns cols
+    where cols.owner = (
+      select sys_context(&#39;USERENV&#39;, &#39;SESSION_USER&#39;)
+      from dual)
+    and cols.table_name not like &#39;BIN$%&#39;
+    and cons.constraint_type = &#39;P&#39;
+    and cons.constraint_name = cols.constraint_name
+    and cons.owner = cols.owner
+begin
+  for nextrow in usertables loop
+    -- 1000以下的留作初始测试数据用，见下
+    execute immediate
+      &#39;create sequence &amp;quot;&#39; || nextrow.table_name ||
+      &#39;_PK_SEQ&amp;quot; start with 1000&#39;;
+    execute immediate
+      &#39;create or replace trigger &amp;quot;&#39; || nextrow.table_name ||
+      &#39;_PK_TRG&amp;quot; before insert on &amp;quot;&#39; || nextrow.table_name ||
+      &#39;&amp;quot; for each row begin if :new.&amp;quot;&#39; || nextrow.column_name ||
+      &#39;&amp;quot; is null then select &amp;quot;&#39; || nextrow.table_name ||
+      &#39;_PK_SEQ&amp;quot;.nextval into :new.&amp;quot;&#39; || nextrow.column_name ||
+      &#39;&amp;quot; from dual; end if; end;&#39;;
+  end loop;
+end;
+/
+
+-- 最后当然就是测试数据啦。
+insert into &amp;quot;A&amp;quot; (ID, NAME) values (1, &#39;first name&#39;);
+insert into &amp;quot;B&amp;quot; (ID, AID, VALUE) values (1, 1, &#39;Jay&#39;);
+insert into &amp;quot;B&amp;quot; (ID, AID, VALUE) values (2, 1, &#39;杰&#39;);
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

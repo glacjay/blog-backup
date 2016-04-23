@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="bison, compiler, ">
+
+
+<meta property="og:title" content="MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2009-03-22T22:00:00Z" />
+<meta property="og:article:modified_time" content="2009-03-22T22:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="bison">
+    
+<meta property="og:article:tag" content="compiler">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2009-03-22",
+    "description": "",
+    "wordCount":  91 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案
+</h1>
+
+  <div class="metas">
+<time datetime="2009-03-22">22 Mar, 2009</time>
+
+
+  
+  &middot; Read in about 1 min
+  &middot; (91 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/bison">bison</a>
+
+<a class="label" href="https://glacjay.info/tags/compiler">compiler</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  <p>我正在看<a href="http://www.cs.princeton.edu/~appel/modern/java/">虎书</a>，在这本书中所给出的那个 <a href="http://www.cambridge.org/us/features/052182060X/">MiniJava</a> 语言的语法并不是 LALR(1) 语法，因此在某些情况下，所生成的语法分析器会对正确的输入给出语法解析错误。不过 Bison 提供了一个简单而又强大的<a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Generalized-LR-Parsing">解决方案</a>，可以轻易的解决掉这个问题。</p>
+
+<p>MiniJava 语法中的 non-LALR(1) 部分其实是一个 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Shift_002fReduce">shift/reduce 冲突</a>。具体来说就是，在 <a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod7">MethodDeclaration</a> 中的 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod6">VarDeclaration</a>)* 和 (<a href="http://www.cambridge.org/us/features/052182060X/grammar.html#prod5">Statement</a>)* 之间的状态下，当 Lookahead Token 是一个 IDENTIFIER 时，如果选择 shift ，那么下一步的动作就是进一步将这个 IDENTIFIER reduce 为一个 Type ，即将这个 IDENTIFIER 看作一个新的变量定义的开始；而如果选择 reduce 的话，实际上就是按照 (Statement)* 中的 epsilon 规则来 reduce ，即结束变量定义部分的解析，转而进入语句定义部分的解析。我们可以看到，仅仅依靠目前的信息，即 IDENTIFIER 这个 Lookahead Token ，是不足以决定接下来的动作的，因此 Bison 的默认策略，即 shift ，就会在某些情况下（这种情况其实很常见，就是当第一条语句是赋值语句时）产生错误的解析步骤。</p>
+
+<p>这个问题其实很好解决，只要 Bison 能多向前看一个 Token 就可以了，可是 Bison 是 LALR(1) 语法分析器生成器，而不是 LALR(2) 。不过 Bison 提供了另外一条解决问题的途径，就是 GLR - Generalized LR Parsing 。简单来说，就是当 Bison 遇到一个冲突时，不管是 shift/reduce 冲突，还是 <a href="http://www.gnu.org/software/bison/manual/html_mono/bison.html#Reduce_002fReduce">reduce/reduce 冲突</a>，就会将分析路径分为两条，分别跟进两种情况。当其中一条分析路径遇到语法错误，进行不下去时，就会自动消失。如果我们的文法是没有二义性的 LR 文法的话，最后就肯定可以得到正确的分析结果了。而我们的 MiniJava 的文法就是这种情况。说来好像复杂，但用起来其实很简单，只要在我们的 Bison 文法文件中加上 %glr-parser 这个选项就可以了。</p>
+
+<p>不过奇怪的是，加上这个选项之后，我们就不用再自己写 YYSTYPE 和 YYLTYPE 的定义了，搞不懂，莫非是个 Bug ？</p>
+
+<p>另外，本来我以为只要将变量定义语句也算到语句中的一种的话，这个问题也可以得到解决，不过后来发现我想错了，这样还是无法处理函数定义中的第一条语句是赋值语句的情况。未经证实，嗯，因为要改的地方还不少。</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2009-03-22/c-%E4%B8%AD%E7%9A%84%E7%BA%AF%E8%99%9A%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0%E4%B8%8E%E6%8A%BD%E8%B1%A1%E7%B1%BB/" title="C&#43;&#43; 中的纯虚析构函数与抽象类">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2009-04-08/%E6%9C%89%E5%85%B3-c/c-%E4%B8%AD%E7%9A%84-do--...--while-0-%E6%83%AF%E7%94%A8%E6%B3%95/" title="有关 C/C&#43;&#43; 中的 do { ... } while (0) 惯用法">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

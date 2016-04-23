@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>我的 MBP SSD 优化过程  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="mac, ssd, ">
+
+
+<meta property="og:title" content="我的 MBP SSD 优化过程  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2015-01-17/%E6%88%91%E7%9A%84-mbp-ssd-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2015-01-17T16:40:49&#43;08:00" />
+<meta property="og:article:modified_time" content="2015-01-17T16:40:49&#43;08:00" />
+
+  
+    
+<meta property="og:article:tag" content="mac">
+    
+<meta property="og:article:tag" content="ssd">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="我的 MBP SSD 优化过程" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2015-01-17/%E6%88%91%E7%9A%84-mbp-ssd-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "我的 MBP SSD 优化过程",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2015-01-17",
+    "description": "",
+    "wordCount":  171 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2015-01-17/%E6%88%91%E7%9A%84-mbp-ssd-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>我的 MBP SSD 优化过程
+</h1>
+
+  <div class="metas">
+<time datetime="2015-01-17">17 Jan, 2015</time>
+
+
+  
+  &middot; Read in about 1 min
+  &middot; (171 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/mac">mac</a>
+
+<a class="label" href="https://glacjay.info/tags/ssd">ssd</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  
+
+<p>嗯，这次的标题终于没那么长了 ;-)</p>
+
+<hr />
+
+<p>给我的 MBP 换 SSD 已经是很久之前的事了，当时就已经折腾过一次优化了，不过没有相应的记录。最近发现了新装的 Yosemite 的一些老是搞不定而且连原因都不知道的问题（其中一个可以参见<a href="http://apple.stackexchange.com/questions/163500/when-i-want-to-install-teamviewer-10-why-cant-i-select-my-system-disk-as-the-d" title="AskDifferent: When I want to install TeamViewer 10, why can't I select my system disk as the distination?">我在 AskDifferent 上的提问</a>），一怒之下重装之，自然对 SSD 的优化也要重新搞一遍。搞的过程中发现有的手段能用，有的却不行，特此记录。</p>
+
+<p>优化手段的主要来源是<a href="http://chenyufei.info/blog/2011-09-06/13-%E5%AF%B8-macbook-pro-%E6%8B%86%E5%85%89%E9%A9%B1%E6%9B%B4%E6%8D%A2-ssd/" title="13 寸 Macbook Pro 拆光驱更换 SSD">朋友的一篇博文</a>及其中的链接。</p>
+
+<p><strong>注意：操作有风险，动手须谨慎哟。因为我是不（lan）会（de）做太多解释的，所以你一定要在操作前搞清楚那些个命令的作用哟，特别是像 <code>rm</code> 啦 <code>mv</code> 啦之类的危险命令哟，可别说我没提醒你哟 -_-</strong></p>
+
+<h2 id="firefox-缓存设置:9e2083c66d09d4578fff70c65a50ec8b">Firefox 缓存设置</h2>
+
+<p>虽然 Firefox 不是我的主役浏览器，但有时还会用用，姑且改之。总之就是打开 <code>about:config</code> 页面，修改如下设置：</p>
+
+<ul>
+<li>将 <code>browser.cache.disk.enable</code> 改为 <code>false</code></li>
+<li>将 <code>browser.cache.memory.enable</code> 改为 <code>true</code></li>
+</ul>
+
+<p>这样 Firefox 就只会把缓存的东西都放在内存而不是硬盘（也就是 SSD）上了（应该吧）。</p>
+
+<h2 id="关掉根文件系统的-上一次读取时间-特性:9e2083c66d09d4578fff70c65a50ec8b">关掉根文件系统的「上一次读取时间」特性</h2>
+
+<p>「上一次读取时间」指的虽然是文件上次被读取的时间，但这个信息是会写到硬盘上文件的元数据中的。想想系统文件还不是整天被读过来读过去的，但这个时间信息又没什么用，果断禁之！以 root 身份创建（如果之前没有的话）并编辑文件 <code>/etc/fstab</code>，增加如下一行（或者修改原有配置，增加 <code>noatime</code> 挂载属性）：</p>
+
+<pre><code>/dev/disk2 / hfs rw,noatime
+</code></pre>
+
+<p>其中的 <code>/dev/disk2</code> 自然要换成你的 SSD 对应的磁盘文件路径啦。</p>
+
+<h2 id="禁用冬眠模式:9e2083c66d09d4578fff70c65a50ec8b">禁用冬眠模式</h2>
+
+<p>执行如下命令即可：</p>
+
+<pre><code>$ sudo pmset -a hibernatemode 0
+$ sudo rm /var/vm/sleepimage
+</code></pre>
+
+<p>PS. 冬眠模式是为了在电池耗尽时能保存机器的运行状态，防止意外丢失数据的。一般认为电池耗尽这种情况很少会发生，毕竟当你发现电池快用光时肯定就会到处找插座了嘛。结果我最近偏偏碰到了一次，而且还是在插着电源的时候！一开始还怀疑难道我的电源线又挂了？！结果后来试着把电脑端反过来接就好了。真是莫名，看来这根电源线也大限将至么……不管怎样，有问题的时候电脑端的 LED 指示灯虽然亮着但是很暗几乎看不出来，难道这表示电压不足？有知道的人么？（不过首先，得有能看到我这篇博的人（泪奔</p>
+
+<h2 id="减少临时文件的读写:9e2083c66d09d4578fff70c65a50ec8b">减少临时文件的读写</h2>
+
+<h3 id="ramdisk:9e2083c66d09d4578fff70c65a50ec8b">RAMDisk</h3>
+
+<p>我在试了网上的方法之后，发现如果用了 RAMDisk，则系统很快就会卡死。据<a href="https://twitter.com/cyfdecyf">陈同学</a>说是 OS X 的 RAMDisk 实现有问题，嗯，所以就要想别的招了。</p>
+
+<h3 id="将临时文件目录移到机械硬盘分区:9e2083c66d09d4578fff70c65a50ec8b">将临时文件目录移到机械硬盘分区</h3>
+
+<p>因为我是将……好吧其实我也不记得主硬盘位放的是哪个硬盘了，Any way :-)，SSD 和原机械硬盘现在都被我挂着用，于是就可以考虑将那些个临时文件目录移到机械硬盘上，减少对 SSD 的读写。</p>
+
+<p>网上说可以将 <code>/private/tmp</code> 和 <code>/private/var/run</code> 两个目录挂载到 RAMDisk 上，那想必也是可以挪到其他地方的吧；不过经实践，只有前者可以，后者（至少用这里的软链接方式）会导致系统启动出错，只好作罢。</p>
+
+<p>将 <code>/private/tmp</code> 移到机械硬盘上的方法：</p>
+
+<pre><code>$ sudo ditto /private/tmp /Volumes/your_hdd_name/private/tmp
+$ sudo rm -rf /private/tmp
+$ sudo ln -s /Volumes/your_hdd_name/private/tmp /private/tmp
+</code></pre>
+
+<p>然后其实用户的家目录也可以这样挪到机械硬盘上，不过要注意数据的迁移，所以命令稍有不同：</p>
+
+<pre><code>sudo ditto /Users /Volumes/your_hdd_name/Users
+sudo mv /Users /Users.bak
+sudo ln -s /Volumes/your_hdd_name/Users /Users
+sudo rm -rf /Users.bak
+</code></pre>
+
+<p>另外还有一个目录 <code>/private/var/log</code>，也就是系统日志目录，我觉得也有必要挪一下，但又怕像 <code>/private/var/run</code> 那样失败，所以一时没有折腾。</p>
+
+<h2 id="禁用-safari-的-webpage-previews-功能:9e2083c66d09d4578fff70c65a50ec8b">禁用 Safari 的 Webpage Previews 功能</h2>
+
+<p>我好像没做这条，因为我不怎么用 Safari 的说。</p>
+
+<h2 id="关闭-spotlight-索引:9e2083c66d09d4578fff70c65a50ec8b">关闭 Spotlight 索引</h2>
+
+<p>因为我也不怎么用 Spotlight，所以这个我也（跟上一条连起来，感觉有点儿怪怪的哈）关了，记得就是去系统配置里面把所有的勾都给取消掉就行了，嗯。</p>
+
+<h2 id="关闭-时间机器-功能:9e2083c66d09d4578fff70c65a50ec8b">关闭「时间机器」功能</h2>
+
+<p>反正我是没开过，反正我的重要数据（代码啥的）都在网上有仓库，图片有 Google+ Photos，电子书……你懂的。</p>
+
+<p>据说是该功能在你没插备份盘时会往系统盘备份，要不要关就看你的实际需求啰。</p>
+
+<h2 id="禁用-自动休眠硬盘-选项:9e2083c66d09d4578fff70c65a50ec8b">禁用「自动休眠硬盘」选项</h2>
+
+<p>就是系统配置、节能器里的那个「Put the hard disk(s) to sleep when possible」。不过我开着这项，因为我还有个机械硬盘嘛。</p>
+
+<h2 id="trim-enabler:9e2083c66d09d4578fff70c65a50ec8b">Trim Enabler</h2>
+
+<p>这个是重头戏哟，所以放在最后（不过这样是不是就会被人忽略掉啊，嘛不管了）。</p>
+
+<p>原文中的链接已经坏了，因为那个链接的作者更新了一篇新的，所以把老的给删了，新链接<a href="https://digitaldj.net/blog/2011/11/17/trim-enabler-for-os-x-lion-mountain-lion-mavericks/" title="TRIM Enabler for OS X Lion, Mountain Lion, Mavericks">在此</a>。建议好好阅读学习哟。不过对于最新的 Yosemite 来说，有一个<a href="https://gist.github.com/return1/4058659">更新的脚本</a>。</p>
+
+<p>虽说是重头戏，但工作相当于全都丢给别人了嘛，不过这种细节你就不要在意啦。</p>
+
+<p>打完收功！</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2014-06-22/keepalived-%E5%AE%9E%E7%8E%B0%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87%E5%B9%B6%E5%AF%B9%E5%85%B3%E9%94%AE%E8%BF%9B%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%9B%91%E6%8E%A7/" title="Keepalived 实现双机热备并对关键进程进行监控">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2016-04-23/firefox-%E6%8F%92%E4%BB%B6toomanytabs/" title="Firefox 插件：TooManyTabs">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

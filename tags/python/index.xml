@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Python on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/python/</link>
+    <description>Recent content in Python on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 18 Sep 2010 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>用 Python 操作虚拟网卡</title>
+      <link>https://glacjay.info/post/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1/</link>
+      <pubDate>Sat, 18 Sep 2010 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2010-09-18/%E7%94%A8-python-%E6%93%8D%E4%BD%9C%E8%99%9A%E6%8B%9F%E7%BD%91%E5%8D%A1/</guid>
+      <description>&lt;p&gt;在我的 &lt;a href=&#34;https://glacjay.info/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/&#34;&gt;XTunnel&lt;/a&gt; 项目中，已经用 Python 作过这种相对底层的工作了（这说明 Python 果然还是非常强大的，上下层通吃啊），不过那边目前还是只实现了 Linux 的版本。后来我又陆陆续续地把 Windows 以及 Mac 下的操作方法给搞通了，今天就来总结一下。&lt;/p&gt;
+
+&lt;p&gt;在 Linux 内核中，特别是在现在的发行版中，应该都已经有了 &lt;code&gt;TUN/TAP&lt;/code&gt; 虚拟网卡的驱动程序，看一下有没有 &lt;code&gt;/dev/net/tun&lt;/code&gt; 这个文件就可以知道了。如果没有，就执行一下 &lt;code&gt;sudo modprobe tun&lt;/code&gt; 这个命令吧。如果还是没有，那就 Google 之吧。下面上代码：&lt;/p&gt;
+
+&lt;script src=&#34;https://gist.github.com/glacjay/585369.js&#34;&gt;&lt;/script&gt;
+
+&lt;p&gt;简而言之，就是首先打开对应的设备文件，然后通过 &lt;code&gt;ioctl&lt;/code&gt; 系统调用告诉它我们想要的网卡类型和名称，同时还可以告诉它我们想以普通用户的身份来对它进行操作。之后通过 &lt;code&gt;ifconfig&lt;/code&gt; 命令将新建的网卡拉起来，就可以开始读写了。&lt;/p&gt;
+
+&lt;p&gt;当你以 root 身份运行这个脚本的时候，可以 &lt;code&gt;ping&lt;/code&gt; 一下 &lt;code&gt;192.168.7.2&lt;/code&gt; 这个地址试试，看看是不是能 &lt;code&gt;ping&lt;/code&gt; 得通。&lt;/p&gt;
+
+&lt;p&gt;下面的代码则在 Mac 环境中实现了同样的功能（不过还没有设置用户身份的功能）：&lt;/p&gt;
+
+&lt;script src=&#34;https://gist.github.com/glacjay/586860.js&#34;&gt;&lt;/script&gt;
+
+&lt;p&gt;当然要运行上面的代码，你首先要到&lt;a href=&#34;http://tuntaposx.sourceforge.net/&#34;&gt;这里&lt;/a&gt;下载并安装 Mac 下的 &lt;code&gt;TUN/TAP&lt;/code&gt; 设备驱动程序才行。安装之后，在系统的 &lt;code&gt;/dev&lt;/code&gt; 目录中就会分别有 16 个 &lt;code&gt;/dev/tunX&lt;/code&gt; 以及 &lt;code&gt;/dev/tapX&lt;/code&gt; （ &lt;code&gt;X&lt;/code&gt; 表示网卡序号）字符设备文件，分别对应于 &lt;code&gt;16&lt;/code&gt; 个同名的 &lt;code&gt;TUN/TAP&lt;/code&gt; 虚拟网卡。当然，在运行这个脚本之前，你是看不到这些网卡的。不不，用 &lt;code&gt;ifconfig -a&lt;/code&gt; 也不行。&lt;/p&gt;
+
+&lt;p&gt;因为与 Linux 下的驱动的实现方法不同，这里是用的文件名来标识网卡类型与名称，所以就不需要 Linux 版本中的第一个 &lt;code&gt;ioctl&lt;/code&gt; 调用了。&lt;/p&gt;
+
+&lt;p&gt;也不记得一开始是在哪边看到的一个讲 &lt;code&gt;TUN/TAP&lt;/code&gt; 编程的文章，说要实现对 &lt;code&gt;ping&lt;/code&gt; 报文的处理，只要简单地将读到的 IP 报文中的源地址与目的地址对换一下，再写回去就可以了。在 Linux 系统中也确实是如此，因此我也就没有深究。直到后来才发现，同样的招数在 Mac 下居然没用。于是赶紧上网翻 ICMP 的报文格式，改报文中的 &lt;code&gt;type&lt;/code&gt; 码，并重新计算 &lt;code&gt;checksum&lt;/code&gt; ，这才搞定。这时也才发现，用 Python 来操作原始的字节流还是没有 C 这种底层语言直观啊。&lt;/p&gt;
+
+&lt;p&gt;可是 Linux 下为什么不需要这么麻烦呢？于是回去抓了抓包，这才发现，相对于 Mac 下的一问（ &lt;code&gt;ping&lt;/code&gt; 命令）一答（ Python 脚本），在 Linux 下居然是两问两答，一问是 &lt;code&gt;ping&lt;/code&gt; 命令，一问是我们的那个 Python 脚本。这也不奇怪，我连 &lt;code&gt;ICMP&lt;/code&gt; 中的 &lt;code&gt;type&lt;/code&gt; 码都没改，发过来的是 &lt;code&gt;request&lt;/code&gt; ，那再发出去的当然还是 &lt;code&gt;request&lt;/code&gt; 。至于应答，大概就是 Linux 的 &lt;code&gt;TUN/TAP&lt;/code&gt; 驱动搞的鬼了。&lt;/p&gt;
+
+&lt;p&gt;最后，当然也有 Windows 的实现版本啦，不过代码被我丢到公司的 Windows 工作用机上了，所以，就请您且听下回分解了。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Update 2011-04-26:&lt;/strong&gt; Windows 下的实现代码如下：&lt;/p&gt;
+
+&lt;script src=&#34;https://gist.github.com/glacjay/586892.js&#34;&gt;&lt;/script&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>利用 XMPP 协议实现 VPN</title>
+      <link>https://glacjay.info/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/</link>
+      <pubDate>Sat, 19 Dec 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-12-19/%E5%88%A9%E7%94%A8-xmpp-%E5%8D%8F%E8%AE%AE%E5%AE%9E%E7%8E%B0-vpn/</guid>
+      <description>&lt;p&gt;这主意是我&lt;a href=&#34;http://chenyufei.info&#34;&gt;一同学&lt;/a&gt;想到的（至少是他告诉我的），基于一种实际的需要。假设你有两台内网机，都没有公网地址，你想从一台机器访问另一台机器的服务，这时要怎么办呢？当然很可能是我无知了，就我所知，网上倒是有一些提供这类服务的网站，但都是基于 Windows 的远程桌面的，至于 Linux ，我没找过。&lt;/p&gt;
+
+&lt;p&gt;于是那家伙联想到了 IM Bot 这种东西。现在网上有各种各样的 IM Bot ，可以通过与之聊天执行各种各样的自动化任务，那为什么不能让它把发过去的命令交给另一台机器的 Shell 执行，并把结果返回呢？这不就实现了一个简单的 Telnet 了吗？这就是最初的想法了（我没去找现成实现，因为我也该练练手了）。而我刚好才折腾过 OpenVPN ，于是就有了标题所说的这个最终想法。这样的话，就能一下子从只支持一种应用协议到支持几乎所有的应用协议了，而且实现的工作量也同时减到了最低。真是好主意啊，自我夸奖一下 :-)&lt;/p&gt;
+
+&lt;p&gt;其实真正解释起来是很简单的想法啦，就是把从虚拟网卡读到的 IP 包，base64 一下，当聊天内容发给对端就万事 OK 。&lt;/p&gt;
+
+&lt;p&gt;选择 XMPP 当然不仅是因为它的开放性，最重要的原因就是有一个现成的冤大头给我们利用，就是 Google 啦，而且还有在线的聊天记录供调试用，何乐而不为呢 :-)&lt;/p&gt;
+
+&lt;p&gt;实现这个想法的关键就两点，一是 XMPP 协议库，Python 的有好几个；二是对虚拟网卡的读写，Linux 下有现成的虚拟网卡，Windows 也有，不过要另装，而 Python 的标准库就完全能实现对其的读写了。不愧是胶水语言啊。&lt;/p&gt;
+
+&lt;p&gt;目前来说，一个还只支持 Linux 的阳春版已经实现出来啦，在&lt;a href=&#34;http://code.google.com/p/xtunnel&#34;&gt;这里&lt;/a&gt;，欢迎大牛们前去参观。&lt;/p&gt;
+
+&lt;p&gt;之后的开发可能会转向 C 也可能不会，就看 Python 在 Windows 下的表现啦（当然也可能是应用户需求）。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

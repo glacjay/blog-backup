@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bison on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/bison/</link>
+    <description>Recent content in Bison on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 22 Mar 2009 22:00:00 +0000</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/bison/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>MiniJava 语法中的 non-LALR(1) 的部分及用 Bison 的解决方案</title>
+      <link>https://glacjay.info/post/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</link>
+      <pubDate>Sun, 22 Mar 2009 22:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-03-22/minijava-%E8%AF%AD%E6%B3%95%E4%B8%AD%E7%9A%84-non-lalr1-%E7%9A%84%E9%83%A8%E5%88%86%E5%8F%8A%E7%94%A8-bison-%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/</guid>
+      <description>&lt;p&gt;我正在看&lt;a href=&#34;http://www.cs.princeton.edu/~appel/modern/java/&#34;&gt;虎书&lt;/a&gt;，在这本书中所给出的那个 &lt;a href=&#34;http://www.cambridge.org/us/features/052182060X/&#34;&gt;MiniJava&lt;/a&gt; 语言的语法并不是 LALR(1) 语法，因此在某些情况下，所生成的语法分析器会对正确的输入给出语法解析错误。不过 Bison 提供了一个简单而又强大的&lt;a href=&#34;http://www.gnu.org/software/bison/manual/html_mono/bison.html#Generalized-LR-Parsing&#34;&gt;解决方案&lt;/a&gt;，可以轻易的解决掉这个问题。&lt;/p&gt;
+
+&lt;p&gt;MiniJava 语法中的 non-LALR(1) 部分其实是一个 &lt;a href=&#34;http://www.gnu.org/software/bison/manual/html_mono/bison.html#Shift_002fReduce&#34;&gt;shift/reduce 冲突&lt;/a&gt;。具体来说就是，在 &lt;a href=&#34;http://www.cambridge.org/us/features/052182060X/grammar.html#prod7&#34;&gt;MethodDeclaration&lt;/a&gt; 中的 (&lt;a href=&#34;http://www.cambridge.org/us/features/052182060X/grammar.html#prod6&#34;&gt;VarDeclaration&lt;/a&gt;)* 和 (&lt;a href=&#34;http://www.cambridge.org/us/features/052182060X/grammar.html#prod5&#34;&gt;Statement&lt;/a&gt;)* 之间的状态下，当 Lookahead Token 是一个 IDENTIFIER 时，如果选择 shift ，那么下一步的动作就是进一步将这个 IDENTIFIER reduce 为一个 Type ，即将这个 IDENTIFIER 看作一个新的变量定义的开始；而如果选择 reduce 的话，实际上就是按照 (Statement)* 中的 epsilon 规则来 reduce ，即结束变量定义部分的解析，转而进入语句定义部分的解析。我们可以看到，仅仅依靠目前的信息，即 IDENTIFIER 这个 Lookahead Token ，是不足以决定接下来的动作的，因此 Bison 的默认策略，即 shift ，就会在某些情况下（这种情况其实很常见，就是当第一条语句是赋值语句时）产生错误的解析步骤。&lt;/p&gt;
+
+&lt;p&gt;这个问题其实很好解决，只要 Bison 能多向前看一个 Token 就可以了，可是 Bison 是 LALR(1) 语法分析器生成器，而不是 LALR(2) 。不过 Bison 提供了另外一条解决问题的途径，就是 GLR - Generalized LR Parsing 。简单来说，就是当 Bison 遇到一个冲突时，不管是 shift/reduce 冲突，还是 &lt;a href=&#34;http://www.gnu.org/software/bison/manual/html_mono/bison.html#Reduce_002fReduce&#34;&gt;reduce/reduce 冲突&lt;/a&gt;，就会将分析路径分为两条，分别跟进两种情况。当其中一条分析路径遇到语法错误，进行不下去时，就会自动消失。如果我们的文法是没有二义性的 LR 文法的话，最后就肯定可以得到正确的分析结果了。而我们的 MiniJava 的文法就是这种情况。说来好像复杂，但用起来其实很简单，只要在我们的 Bison 文法文件中加上 %glr-parser 这个选项就可以了。&lt;/p&gt;
+
+&lt;p&gt;不过奇怪的是，加上这个选项之后，我们就不用再自己写 YYSTYPE 和 YYLTYPE 的定义了，搞不懂，莫非是个 Bug ？&lt;/p&gt;
+
+&lt;p&gt;另外，本来我以为只要将变量定义语句也算到语句中的一种的话，这个问题也可以得到解决，不过后来发现我想错了，这样还是无法处理函数定义中的第一条语句是赋值语句的情况。未经证实，嗯，因为要改的地方还不少。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>对 Bison 手册中的 C&#43;&#43; 的例子的总结</title>
+      <link>https://glacjay.info/post/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/</link>
+      <pubDate>Thu, 19 Mar 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-03-19/%E5%AF%B9-bison-%E6%89%8B%E5%86%8C%E4%B8%AD%E7%9A%84-c-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%9A%84%E6%80%BB%E7%BB%93/</guid>
+      <description>&lt;p&gt;注意，我用的软件版本为：Bison - 2.4.1，Flex - 2.5.35 。至于老的版本会怎样我就不深究了。工具不是重点。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;pre&gt;&lt;code&gt;%skeleton &amp;quot;lalr1.cc&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以用&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;%language &amp;quot;c++&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;来代替了，其中参数 &amp;ldquo;c++&amp;rdquo; 不区分大小写。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;如我在&lt;a href=&#34;https://glacjay.info/post/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/&#34;&gt;上一篇 Blog&lt;/a&gt; 中所说，分别在 &lt;code&gt;%union&lt;/code&gt; 的前后放不同的 &lt;code&gt;%{ %}&lt;/code&gt; 形式的 Prologue 这种方式对于需要输出头文件的情况已经不适用了，新的方法为在&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;%code requires { ... }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;中放 Bison 定义要用到的 C/C++ 代码，在&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;%code provides { ... }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;中放需要 Bison 定义的 C/C++ 代码。这两部分的代码都会原样输出到生成的头文件中。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;在 &lt;code&gt;%code provides&lt;/code&gt; 块中要如下定义 &lt;code&gt;YYSTYPE&lt;/code&gt; 和 &lt;code&gt;YYLTYPE&lt;/code&gt; 这两个类型：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;typedef yy::Parser::semantic_type YYSTYPE;
+typedef yy::Parser::location_type YYLTYPE;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;不然 Flex 就会抱怨说这两个类型没有声明，我不知道为什么。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;这一点我一直有点奇怪，既然在 &lt;code&gt;%option&lt;/code&gt; 中已经指定了 &lt;code&gt;noyywrap&lt;/code&gt; 这个选项，为什么还要对 &lt;code&gt;yywrap&lt;/code&gt; 做 &lt;code&gt;#undef&lt;/code&gt; 再 &lt;code&gt;#define&lt;/code&gt; 的处理呢，也许是之前版本的 Bug 吧，反正我用的这个版本只要指定了那个选项就 OK 了。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Flex 中有两个选项是针对与 Bison 之间的配合使用的，就是 &lt;code&gt;bison-bridge&lt;/code&gt; 和 &lt;code&gt;bison-locations&lt;/code&gt; 。不过我是没搞懂这两个选项是怎么用的啦，至少是按照例子中的那样定义 &lt;code&gt;YY_DECL&lt;/code&gt; 这个宏的情况下。按照错误提示更改了 &lt;code&gt;yylex&lt;/code&gt; 的两个参数的名称之后，编译出来的程序会 segmentation fault 的。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;其他就没什么说的了，按照例子上的来就可以了。&lt;/p&gt;
+
+&lt;p&gt;PS. 其实有个蛮不错的 Bison 的替代品，叫作 Lemon 的一个 Parser Generator ，是写 SQLite 的那个家伙搞出来的，并且就用在了 SQLite 的实现中。这东东较 Bison 有很多使用上的改进，用起来会很舒服，唯一可惜的就是不自动支持 &lt;code&gt;Location&lt;/code&gt; ，至于这个特性有没有那么重要呢？谁知道，先就这样吧。&lt;/p&gt;
+
+&lt;p&gt;PPS. 其实还是有几个有趣的针对 C++ 后端的 Parser Generator 的，像 YARD 就是一个充分挖掘了 C++ 的模板特性的 Parser 库，用起来感觉会很不一样就是了；Boost.Spirit 则是充分发挥了 C++ 的运算符重载能力的 Parser 库，算的上是 C++ 的 Internal DSL 应用了；再有就是连 Guido 都称赞过的 ANTLR 了，只是为其写 C 后端的那个家伙一直说要完成 C++ 后端又一直不见影子。其实我倒是很想用 ANTLR 这种 Lexer 和 Parser 原生整合在一起的工具的，看回来有时间是不是自己动手实现一个 C++ 的后端出来玩玩。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Bison 中的 Prologue 的格式变迁</title>
+      <link>https://glacjay.info/post/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/</link>
+      <pubDate>Wed, 18 Mar 2009 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2009-03-18/bison-%E4%B8%AD%E7%9A%84-prologue-%E7%9A%84%E6%A0%BC%E5%BC%8F%E5%8F%98%E8%BF%81/</guid>
+      <description>&lt;p&gt;今天在用 Bison 手册中的 C++ 例子作为一个编译器前端实现的起点时发现，这个官方示例居然编译通不过，具体错误为在 Bison 生成的头文件中，没有 Driver 类的声明。按照 POSIX Yacc 标准，位于 &lt;code&gt;%union&lt;/code&gt; 块之前的 Prologue 区中的代码，应该会被拷到头文件中的啊，于是 google 半天，在某个地方的 Bison ChangeLog 中找到了线索。&lt;/p&gt;
+
+&lt;p&gt;原来，POSIX Yacc 确实应该符合上述行为，可是 Bison 这家伙为了统一性，从 2.3a 版开始，就把所有 Prologue 中的代码，不管是 %union 前的还是之后的，统统只拷到实现文件中而不管头文件了。而为了对应不同的需求，又新增了一套 Prologue 语法，就是 &lt;code&gt;%before-header&lt;/code&gt; 等四个新的 directive。好吧，这样也不错，以显式的统一格式的声明代替了可能会让人抓狂的隐规则。遂试之，结果告诉我说语法错误。接着往上看 ChangeLog 才发现，到了 2.3b 就又改了，把 &lt;code&gt;%before-header&lt;/code&gt; 改成了 &lt;code&gt;%code&lt;/code&gt; 之类的。这回终于没问题了。&lt;/p&gt;
+
+&lt;p&gt;我说，这也太不厚道了吧，这种兼容性改动，我在它的文档里面扒了半天都没看到半个字，而且还是出现在流行度这么高的软件中。于是深刻体会到「错文档不如无文档」的道理啊。由此看来，要做好软件还是需要有相当的责任感的啊。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

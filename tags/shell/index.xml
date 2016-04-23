@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Shell on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/shell/</link>
+    <description>Recent content in Shell on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 05 Mar 2011 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/shell/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Linux 下有关环境变量与换行符的一个小问题</title>
+      <link>https://glacjay.info/post/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Sat, 05 Mar 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-03-05/linux-%E4%B8%8B%E6%9C%89%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%8D%A2%E8%A1%8C%E7%AC%A6%E7%9A%84%E4%B8%80%E4%B8%AA%E5%B0%8F%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;p&gt;最近在工作中，老是遇到一个莫名其妙的问题。我有一个用来设置一些环境变量的脚本，结果经常发现这个脚本设过的环境变量乱七八糟的，像 PATH 这种，就是之前的值跟后面添加的值重叠在了一起。直到后来才发现，原来是换行符搞的鬼。&lt;/p&gt;
+
+&lt;p&gt;这样说还不太清楚，上代码吧。编辑文本文件 &lt;code&gt;test.sh&lt;/code&gt; 如下，记得以 DOS 换行符的模式来保存：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;# Save this file using DOS&#39;s CR/LF.
+
+export VAR1=blahblahblah
+export VAR2=hello
+export VAR1=$VAR1:$VAR2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后，执行一下命令：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;$ . ./test.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;来使环境变量生效，并看一下结果：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;$ echo $VAR1
+:helloahblah
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当然，Shell 看到的还不是这个样子，而是会把多出来的那个 CR 回车符也看作是路径（或者其他什么值）的一部分，最后当然也会导致所作的设置不生效啦。&lt;/p&gt;
+
+&lt;p&gt;至于为什么会变成这种换行符，我倒是还没有搞明白，因为我的源文件确实是 Unix 风格的换行符。也许是因为是在 Windows 下用 ClearCase 来进行源码控制的关系？&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

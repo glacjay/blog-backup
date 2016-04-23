@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ssd on Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/tags/ssd/</link>
+    <description>Recent content in Ssd on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 17 Jan 2015 16:40:49 +0800</lastBuildDate>
+    <atom:link href="https://glacjay.info/tags/ssd/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>我的 MBP SSD 优化过程</title>
+      <link>https://glacjay.info/post/2015-01-17/%E6%88%91%E7%9A%84-mbp-ssd-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/</link>
+      <pubDate>Sat, 17 Jan 2015 16:40:49 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2015-01-17/%E6%88%91%E7%9A%84-mbp-ssd-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/</guid>
+      <description>
+
+&lt;p&gt;嗯，这次的标题终于没那么长了 ;-)&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;给我的 MBP 换 SSD 已经是很久之前的事了，当时就已经折腾过一次优化了，不过没有相应的记录。最近发现了新装的 Yosemite 的一些老是搞不定而且连原因都不知道的问题（其中一个可以参见&lt;a href=&#34;http://apple.stackexchange.com/questions/163500/when-i-want-to-install-teamviewer-10-why-cant-i-select-my-system-disk-as-the-d&#34; title=&#34;AskDifferent: When I want to install TeamViewer 10, why can&#39;t I select my system disk as the distination?&#34;&gt;我在 AskDifferent 上的提问&lt;/a&gt;），一怒之下重装之，自然对 SSD 的优化也要重新搞一遍。搞的过程中发现有的手段能用，有的却不行，特此记录。&lt;/p&gt;
+
+&lt;p&gt;优化手段的主要来源是&lt;a href=&#34;http://chenyufei.info/blog/2011-09-06/13-%E5%AF%B8-macbook-pro-%E6%8B%86%E5%85%89%E9%A9%B1%E6%9B%B4%E6%8D%A2-ssd/&#34; title=&#34;13 寸 Macbook Pro 拆光驱更换 SSD&#34;&gt;朋友的一篇博文&lt;/a&gt;及其中的链接。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意：操作有风险，动手须谨慎哟。因为我是不（lan）会（de）做太多解释的，所以你一定要在操作前搞清楚那些个命令的作用哟，特别是像 &lt;code&gt;rm&lt;/code&gt; 啦 &lt;code&gt;mv&lt;/code&gt; 啦之类的危险命令哟，可别说我没提醒你哟 -_-&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;firefox-缓存设置:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;Firefox 缓存设置&lt;/h2&gt;
+
+&lt;p&gt;虽然 Firefox 不是我的主役浏览器，但有时还会用用，姑且改之。总之就是打开 &lt;code&gt;about:config&lt;/code&gt; 页面，修改如下设置：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;将 &lt;code&gt;browser.cache.disk.enable&lt;/code&gt; 改为 &lt;code&gt;false&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;将 &lt;code&gt;browser.cache.memory.enable&lt;/code&gt; 改为 &lt;code&gt;true&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这样 Firefox 就只会把缓存的东西都放在内存而不是硬盘（也就是 SSD）上了（应该吧）。&lt;/p&gt;
+
+&lt;h2 id=&#34;关掉根文件系统的-上一次读取时间-特性:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;关掉根文件系统的「上一次读取时间」特性&lt;/h2&gt;
+
+&lt;p&gt;「上一次读取时间」指的虽然是文件上次被读取的时间，但这个信息是会写到硬盘上文件的元数据中的。想想系统文件还不是整天被读过来读过去的，但这个时间信息又没什么用，果断禁之！以 root 身份创建（如果之前没有的话）并编辑文件 &lt;code&gt;/etc/fstab&lt;/code&gt;，增加如下一行（或者修改原有配置，增加 &lt;code&gt;noatime&lt;/code&gt; 挂载属性）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/dev/disk2 / hfs rw,noatime
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中的 &lt;code&gt;/dev/disk2&lt;/code&gt; 自然要换成你的 SSD 对应的磁盘文件路径啦。&lt;/p&gt;
+
+&lt;h2 id=&#34;禁用冬眠模式:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;禁用冬眠模式&lt;/h2&gt;
+
+&lt;p&gt;执行如下命令即可：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo pmset -a hibernatemode 0
+$ sudo rm /var/vm/sleepimage
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;PS. 冬眠模式是为了在电池耗尽时能保存机器的运行状态，防止意外丢失数据的。一般认为电池耗尽这种情况很少会发生，毕竟当你发现电池快用光时肯定就会到处找插座了嘛。结果我最近偏偏碰到了一次，而且还是在插着电源的时候！一开始还怀疑难道我的电源线又挂了？！结果后来试着把电脑端反过来接就好了。真是莫名，看来这根电源线也大限将至么……不管怎样，有问题的时候电脑端的 LED 指示灯虽然亮着但是很暗几乎看不出来，难道这表示电压不足？有知道的人么？（不过首先，得有能看到我这篇博的人（泪奔&lt;/p&gt;
+
+&lt;h2 id=&#34;减少临时文件的读写:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;减少临时文件的读写&lt;/h2&gt;
+
+&lt;h3 id=&#34;ramdisk:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;RAMDisk&lt;/h3&gt;
+
+&lt;p&gt;我在试了网上的方法之后，发现如果用了 RAMDisk，则系统很快就会卡死。据&lt;a href=&#34;https://twitter.com/cyfdecyf&#34;&gt;陈同学&lt;/a&gt;说是 OS X 的 RAMDisk 实现有问题，嗯，所以就要想别的招了。&lt;/p&gt;
+
+&lt;h3 id=&#34;将临时文件目录移到机械硬盘分区:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;将临时文件目录移到机械硬盘分区&lt;/h3&gt;
+
+&lt;p&gt;因为我是将……好吧其实我也不记得主硬盘位放的是哪个硬盘了，Any way :-)，SSD 和原机械硬盘现在都被我挂着用，于是就可以考虑将那些个临时文件目录移到机械硬盘上，减少对 SSD 的读写。&lt;/p&gt;
+
+&lt;p&gt;网上说可以将 &lt;code&gt;/private/tmp&lt;/code&gt; 和 &lt;code&gt;/private/var/run&lt;/code&gt; 两个目录挂载到 RAMDisk 上，那想必也是可以挪到其他地方的吧；不过经实践，只有前者可以，后者（至少用这里的软链接方式）会导致系统启动出错，只好作罢。&lt;/p&gt;
+
+&lt;p&gt;将 &lt;code&gt;/private/tmp&lt;/code&gt; 移到机械硬盘上的方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo ditto /private/tmp /Volumes/your_hdd_name/private/tmp
+$ sudo rm -rf /private/tmp
+$ sudo ln -s /Volumes/your_hdd_name/private/tmp /private/tmp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后其实用户的家目录也可以这样挪到机械硬盘上，不过要注意数据的迁移，所以命令稍有不同：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo ditto /Users /Volumes/your_hdd_name/Users
+sudo mv /Users /Users.bak
+sudo ln -s /Volumes/your_hdd_name/Users /Users
+sudo rm -rf /Users.bak
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;另外还有一个目录 &lt;code&gt;/private/var/log&lt;/code&gt;，也就是系统日志目录，我觉得也有必要挪一下，但又怕像 &lt;code&gt;/private/var/run&lt;/code&gt; 那样失败，所以一时没有折腾。&lt;/p&gt;
+
+&lt;h2 id=&#34;禁用-safari-的-webpage-previews-功能:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;禁用 Safari 的 Webpage Previews 功能&lt;/h2&gt;
+
+&lt;p&gt;我好像没做这条，因为我不怎么用 Safari 的说。&lt;/p&gt;
+
+&lt;h2 id=&#34;关闭-spotlight-索引:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;关闭 Spotlight 索引&lt;/h2&gt;
+
+&lt;p&gt;因为我也不怎么用 Spotlight，所以这个我也（跟上一条连起来，感觉有点儿怪怪的哈）关了，记得就是去系统配置里面把所有的勾都给取消掉就行了，嗯。&lt;/p&gt;
+
+&lt;h2 id=&#34;关闭-时间机器-功能:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;关闭「时间机器」功能&lt;/h2&gt;
+
+&lt;p&gt;反正我是没开过，反正我的重要数据（代码啥的）都在网上有仓库，图片有 Google+ Photos，电子书……你懂的。&lt;/p&gt;
+
+&lt;p&gt;据说是该功能在你没插备份盘时会往系统盘备份，要不要关就看你的实际需求啰。&lt;/p&gt;
+
+&lt;h2 id=&#34;禁用-自动休眠硬盘-选项:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;禁用「自动休眠硬盘」选项&lt;/h2&gt;
+
+&lt;p&gt;就是系统配置、节能器里的那个「Put the hard disk(s) to sleep when possible」。不过我开着这项，因为我还有个机械硬盘嘛。&lt;/p&gt;
+
+&lt;h2 id=&#34;trim-enabler:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;Trim Enabler&lt;/h2&gt;
+
+&lt;p&gt;这个是重头戏哟，所以放在最后（不过这样是不是就会被人忽略掉啊，嘛不管了）。&lt;/p&gt;
+
+&lt;p&gt;原文中的链接已经坏了，因为那个链接的作者更新了一篇新的，所以把老的给删了，新链接&lt;a href=&#34;https://digitaldj.net/blog/2011/11/17/trim-enabler-for-os-x-lion-mountain-lion-mavericks/&#34; title=&#34;TRIM Enabler for OS X Lion, Mountain Lion, Mavericks&#34;&gt;在此&lt;/a&gt;。建议好好阅读学习哟。不过对于最新的 Yosemite 来说，有一个&lt;a href=&#34;https://gist.github.com/return1/4058659&#34;&gt;更新的脚本&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;虽说是重头戏，但工作相当于全都丢给别人了嘛，不过这种细节你就不要在意啦。&lt;/p&gt;
+
+&lt;p&gt;打完收功！&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

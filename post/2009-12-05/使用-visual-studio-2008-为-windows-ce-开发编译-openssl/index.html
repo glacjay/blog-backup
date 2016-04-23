@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL  &middot; Random Stuff from GlacJAY</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="description" content="" />
+
+<meta name="keywords" content="c&#43;&#43;, windows, ">
+
+
+<meta property="og:title" content="使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL  &middot; Random Stuff from GlacJAY ">
+<meta property="og:site_name" content="Random Stuff from GlacJAY"/>
+<meta property="og:url" content="https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/" />
+<meta property="og:locale" content="zh-cn">
+
+
+<meta property="og:type" content="article" />
+<meta property="og:description" content=""/>
+<meta property="og:article:published_time" content="2009-12-05T00:00:00Z" />
+<meta property="og:article:modified_time" content="2009-12-05T00:00:00Z" />
+
+  
+    
+<meta property="og:article:tag" content="c&#43;&#43;">
+    
+<meta property="og:article:tag" content="windows">
+    
+  
+
+  
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@glacjay" />
+<meta name="twitter:creator" content="@glacjay" />
+<meta name="twitter:title" content="使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:url" content="https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/" />
+<meta name="twitter:domain" content="https://glacjay.info/">
+  
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL",
+    "author": {
+      "@type": "Person",
+      "name": "http://profiles.google.com/+?rel=author"
+    },
+    "datePublished": "2009-12-05",
+    "description": "",
+    "wordCount":  284 
+  }
+</script>
+
+
+
+<link rel="canonical" href="https://glacjay.info/post/2009-12-05/%E4%BD%BF%E7%94%A8-visual-studio-2008-%E4%B8%BA-windows-ce-%E5%BC%80%E5%8F%91%E7%BC%96%E8%AF%91-openssl/" />
+
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glacjay.info/touch-icon-144-precomposed.png">
+<link href="https://glacjay.info/favicon.png" rel="icon">
+
+<meta name="generator" content="Hugo 0.15" />
+
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link href='https://fonts.googleapis.com/css?family=Merriweather:300%7CRaleway%7COpen+Sans' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="https://glacjay.info/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://glacjay.info/css/style.css">
+<link rel="stylesheet" href="https://glacjay.info/css/highlight/solarized_light.css">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Roboto';
+    font-size: 18px;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-family: 'Roboto';
+}
+pre {
+    font-family: 'Roboto Mono';
+}
+</style>
+
+</head>
+<body>
+  <main id="main-wrapper" class="container main_wrapper has-sidebar">
+    <header id="main-header" class="container main_header">
+  <div class="container brand">
+  <div class="container title h1-like">
+  <a class="baselink" href="https://glacjay.info/">
+  Random Stuff from GlacJAY
+
+</a>
+
+</div>
+
+  
+<div class="container topline">
+  
+
+</div>
+
+
+</div>
+
+  <nav class="container nav primary no-print">
+  
+
+
+  
+<a href="https://glacjay.info/post">归档</a>
+
+<a href="https://glacjay.info/tags">标签</a>
+
+
+</nav>
+
+<div class="container nav secondary no-print">
+  
+
+
+<a id="contact-link-github" class="contact_link" href="https://github.com/glacjay">
+  <span class="fa fa-github-square"></span><span>github</span></a>
+
+
+
+
+
+
+
+
+
+
+
+<a id="contact-link-twitter" class="contact_link" href="https://twitter.com/glacjay">
+  <span class="fa fa-twitter-square"></span><span>twitter</span></a>
+
+
+
+
+
+<a id="contact-link-rss" class="contact_link" href="" type="application/rss+xml">
+  <span class="fa fa-rss-square"></span><span>rss</span></a>
+
+
+
+</div>
+
+
+  
+
+</header>
+
+
+<article id="main-content" class="container main_content single">
+  <header class="container hat">
+  <h1>使用 Visual Studio 2008 为 Windows CE 开发编译 OpenSSL
+</h1>
+
+  <div class="metas">
+<time datetime="2009-12-05">5 Dec, 2009</time>
+
+
+  
+  &middot; Read in about 2 min
+  &middot; (284 Words)
+  <br>
+  
+<a class="label" href="https://glacjay.info/tags/c">c&#43;&#43;</a>
+
+<a class="label" href="https://glacjay.info/tags/windows">windows</a>
+
+
+
+</div>
+
+</header>
+
+  <div class="container content">
+  
+
+<p>我的编译环境是 Visual Studio Team System 2008 版本 9.0.21022.8 RTM ， Windows Mobile 5.0 SDK R2 （ VS2008 自带的版本）。当然， Perl 也是需要的，我装的是 ActivePerl 。我要编译的 OpenSSL 版本是 0.9.8e 。</p>
+
+<h2 id="vs2008-的安装:35e51ba4554ba11286e563aed7028ead">VS2008 的安装</h2>
+
+<p>那个 Web Developer Tools （好像叫这个）的安装会失败，又不能不装，根据网上的说明，要把它的目录单独从光盘上解压出来安装，且安装的时候要挂 Office 的安装光盘（我的 Office 版本是 2007 ）。这个装好了之后，再从光盘上安装 VS2008 就没有问题了。</p>
+
+<h2 id="配置编译环境:35e51ba4554ba11286e563aed7028ead">配置编译环境</h2>
+
+<p>首先要写个定义环境变量的脚本，以把 CE 的路径给配置好。 VS2008 的那个命令行启动脚本只配置了 VC 的环境变量，没有配 CE 的环境变量，因为这个是要根据用户需要来做的。我写的脚本内容如下，你可能要根据自己的 VS2008 相关安装目录做调整。</p>
+
+<pre><code class="language-bat">set PATH=D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\bin\x86_arm;%PATH%
+set INCLUDE=D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\include;C:\Program Files\Windows Mobile 5.0 SDK R2\PocketPC\Include\Armv4i;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\atlmfc\include;%INCLUDE%
+set LIB=C:\Program Files\Windows Mobile 5.0 SDK R2\PocketPC\Lib\ARMV4I;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\atlmfc\lib\armv4i;D:\Program Files\Microsoft Visual Studio 9.0\VC\ce\lib\armv4i;%LIB%
+
+set OSVERSION=WCE501
+set TARGETCPU=ARMV4I
+set PLATFORM=VC-CE
+set WCECOMPAT=D:\program\wcecompat
+</code></pre>
+
+<p>其中 <code>PATH</code> 、 <code>INCLUDE</code> 、 <code>LIB</code> 都是 CE 相关的环境变量，在编译 WCECompat 和 OpenSSL 的时候都是需要的，后面的是 WCECompat 需要的，其中有些是 OpenSSL 也需要的。</p>
+
+<p>然后启动 Visual Studio 2008 命令提示（开始菜单），并运行上面的这个脚本，编译环境就算是准备好了，可以开始编译 WCECompat 了。</p>
+
+<h2 id="编译-wcecompat:35e51ba4554ba11286e563aed7028ead">编译 WCECompat</h2>
+
+<p>要编译 CE 版本的 OpenSSL 的话，需要 WCECompat 这个库，这个库实现了许多在 Desktop 开发环境中有而在 CE 中没有的功能，而这些功能是编译与使用 OpenSSL 所必需的。</p>
+
+<p>不过，官方版本的 WCECompat 现在已经用不起来了（虽然我没有进一步确定），我们要使用 OpenSSL 开发团队 fork 的分支，其下载地址在<a href="http://github.com/mauricek/wcecompat">http://github.com/mauricek/wcecompat</a>，在这个页面上有打包下载的链接，我下载的版本是 cb796f5 （ git 是用 GUID 来表示版本的）。</p>
+
+<p>下载下来之后，先解压，我的解压路径是 <code>D:\program\wcecompat</code> ，并进入该目录。这里注意，根据 WCECompat 的文档说明，不能把它解压到一个含空格的路径底下，不然会报文件找不到之类的错，这是因为 WCECompat 的 <code>makefile</code> 文件没有用引号括住文件名，而空格会把一个文件名分成两个。</p>
+
+<p>然后要修改一个源码文件 <code>src/time.c</code> ，在其中找到函数 <code>_tzset</code> 的定义，这是一个空函数，把它整个注释掉（或删掉），不然在后面我们的程序要链接这个库的时候，会报这个函数重复定义的错。</p>
+
+<p>运行命令</p>
+
+<pre><code>D:\program\wcecompat&gt;perl config.pl
+</code></pre>
+
+<p>这样会生成需要的 <code>makefile</code> 文件，不过还不能直接用它来编译，要手动改一下，删掉或注释掉其中的 <code>src/winmain.cpp \</code> 这一行，不然后面链进我们的程序时会报找不到 WinMain 所需的 <code>main</code> 函数这个错（大概是这样说的）。</p>
+
+<p>然后运行命令</p>
+
+<pre><code>D:\program\wcecompat&gt;nmake
+</code></pre>
+
+<p>开始编译。完成之后，就会在 <code>lib</code> 目录中生成两个库文件 <code>wcecompat.lib</code> 和 <code>wcecompatex.lib</code> ，都是静态链接库。</p>
+
+<h2 id="编译-openssl:35e51ba4554ba11286e563aed7028ead">编译 OpenSSL</h2>
+
+<p>还是同一个命令行窗口，进入 OpenSSL 的解压目录，我的是 <code>D:\program\openssl-0.9.8e</code> 。根据 <code>INSTALL.WCE</code> 文件中的说明，运行下列命令进行编译：</p>
+
+<pre><code>D:\program\openssl-0.9.8e&gt;perl Configure VC-CE
+...
+D:\program\openssl-0.9.8e&gt;ms\do_ms.bat
+...
+</code></pre>
+
+<p>这一步完成之后，打开生成的 <code>ms\ce.mak</code> 文件，把第 <code>19</code> 行 <code>CFLAG</code> 的变量定义中的 <code>/WX</code> 选项给删掉，不然后面有编译警告会被当成错误，从而编译失败。</p>
+
+<pre><code>D:\program\openssl-0.9.8e&gt;nmake -f ms\ce.mak
+...
+</code></pre>
+
+<p>这一步的编译过程最终还是会失败退出，不过不要紧（也许吧），失败的是测试程序，这时看 <code>out32_ARMV4I</code> 目录中，已经有编译好的 <code>libeay32.lib</code> 和 <code>ssleay32.lib</code> 这两个文件了。因为前面是用 <code>ms\ce.mak</code> 文件而不是 <code>ms\cedll.mak</code> ，所以编译出来的这两个文件都是静态链接库。</p>
+
+<h2 id="测试-openssl:35e51ba4554ba11286e563aed7028ead">测试 OpenSSL</h2>
+
+<p>最后来测试一下我们编译出来的 OpenSSL （以及 WCECompat ）。打开 VS2008 ，新建个智能设备的项目。然后打开项目属性对话框，先在“配置属性-&gt; C/C++ -&gt;常规”的“附加包含目录”中把 <code>D:\program\openssl-0.9.8e\inc32</code> 给加进来（测试的话加绝对路径就好了，实际开发的时候要把所有需要的文件拷到项目目录里面）（另，不要加 WCECompat 的 <code>include</code> 目录，不然会有 <code>abs</code> 函数不属于 <code>global namespace</code> 的编译错误），在“配置属性-&gt;链接器-&gt;常规”的“附加库目录”中把 <code>D:\program\openssl-0.9.8e\out32_ARMV4I</code> 和 <code>D:\program\wcecompat\lib</code> 给加进来，在“配置属性-&gt;链接器-&gt;输入”的“附加依赖项”中加入 <code>wcecompat.lib wcecompatex.lib libeay32.lib ssleay32.lib</code>。</p>
+
+<p>打开个源文件（比如某个事件处理函数定义的地方），在最开始的地方加进去 OpenSSL 的头文件包含</p>
+
+<pre><code class="language-c">#define NO_SYS_TYPES_H
+#include &lt;openssl/ssl.h&gt;
+</code></pre>
+
+<p>其中第一行的宏定义是需要的。虽然 WCECompat 为我们提供了 <code>sys/types.h</code> 头文件，不过我们不能用（理由见上）。</p>
+
+<p>然后在事件处理函数中加条语句</p>
+
+<pre><code class="language-c">SSL_CTX *ctx = SSL_CTX_new(SSLv23_method());
+</code></pre>
+
+<p>编译下试试吧，看有没有问题。如果没有，那就恭喜了，我们暂时解决了将 OpenSSL 用于 CE 开发的问题，我还不能保证后面不会出其他的问题。</p>
+
+<h2 id="另:35e51ba4554ba11286e563aed7028ead">另</h2>
+
+<p>虽然我之前配置环境变量等步骤都是基于 PocketPC 来做的，不过最后编出来的库貌似也能用到 Smartphone 程序中，不知道会不会有什么问题。 Mobile 开发果然还是相当的麻烦啊。</p>
+
+</div>
+
+
+  <footer class="container">
+  <div class="container navigation no-print">
+  <h2>Navigation</h2>
+  
+  
+
+    
+    <a class="prev" href="https://glacjay.info/post/2009-07-14/%E5%9C%A8-haskell-%E4%B8%AD%E5%AE%9E%E7%8E%B0-generic-zip-%E5%87%BD%E6%95%B0/" title="在 Haskell 中实现 Generic zip 函数">
+      Previous
+    </a>
+    
+
+    
+    <a class="next" href="https://glacjay.info/post/2009-12-13/%E8%AE%A9-vim-%E5%9C%A8%E4%BF%9D%E5%AD%98%E6%97%B6%E8%87%AA%E5%8A%A8%E8%B0%83%E7%94%A8%E5%A4%96%E9%83%A8%E5%91%BD%E4%BB%A4%E8%BF%9B%E8%A1%8C%E6%A0%BC%E5%BC%8F%E5%8C%96/" title="让 Vim 在保存时自动调用外部命令进行格式化">
+      Next
+    </a>
+    
+
+  
+
+
+</div>
+
+  <div class="container comments">
+  <h2>Comments</h2>
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+</div>
+
+</footer>
+
+</article>
+      <footer id="main-footer" class="container main_footer">
+  
+
+  <div class="container nav foot no-print">
+  
+
+  <a class="toplink" href="#">back to top</a>
+
+</div>
+
+  <div class="container credits">
+  
+<div class="container footline">
+  
+
+</div>
+
+
+  
+
+</div>
+
+</footer>
+
+    </main>
+    
+<script type="text/javascript">
+  (function() {
+    
+    
+    if (window.location.hostname == "localhost")
+      return;
+
+    var dsq = document.createElement('script'); dsq.async = true; dsq.type = 'text/javascript';
+    dsq.src = '//glacjay.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+
+<script src="https://glacjay.info/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+    
+  </body>
+</html>
+

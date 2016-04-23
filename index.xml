@@ -1,0 +1,1347 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Random Stuff from GlacJAY</title>
+    <link>https://glacjay.info/</link>
+    <description>Recent content on Random Stuff from GlacJAY</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sat, 23 Apr 2016 10:33:22 +0800</lastBuildDate>
+    <atom:link href="https://glacjay.info/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Firefox 插件：TooManyTabs</title>
+      <link>https://glacjay.info/post/2016-04-23/firefox-%E6%8F%92%E4%BB%B6toomanytabs/</link>
+      <pubDate>Sat, 23 Apr 2016 10:33:22 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2016-04-23/firefox-%E6%8F%92%E4%BB%B6toomanytabs/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://addons.mozilla.org/en-US/firefox/addon/toomanytabs-saves-your-memory/&#34;&gt;TooManyTabs&lt;/a&gt; 简直是标(tuo)签(yan)党(zheng)的福音啊！每每在一大堆待读标签里面翻找要看的网页简直要疯掉！包括我和我的内存 ▔fﾟﾟ▔&lt;/p&gt;
+
+&lt;p&gt;但只是简单的插件介绍的话是不足以让我这个万年懒癌晚期开工写博的，主要是这货配合 Firefox 的帐户同步功能的时候有点儿坑：一开始没有给分组重命名的时候，几个电脑的 TooManyTabs 一同步就全乱套了；直到我把各个电脑的分组都分别命名，然后又费了老劲儿地整理一番之后才搞定。&lt;/p&gt;
+
+&lt;p&gt;让我觉得这个插件很神奇的是，它是用 Firefox 的书签功能来保存标签的，但又不是简单地保存网址，因为标签恢复之后其前进后退的历史也都一并恢复了。看来 Firefox 的书签还有很多的隐藏功能有待发掘啊。&lt;/p&gt;
+
+&lt;p&gt;最后的最后，既然是通过书签功能来保存和同步的，那如果 Firefox Android 的书签功能能再给点儿力就好了，让我可以直接把网址保存到指定的分组下面，这样就不用先发送到电脑上再（能用电脑时）TooManyTabs 了（再加上 Firefox Android 的发送标签功能有时还会丢标签）。&lt;/p&gt;
+
+&lt;p&gt;以上&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>我的 MBP SSD 优化过程</title>
+      <link>https://glacjay.info/post/2015-01-17/%E6%88%91%E7%9A%84-mbp-ssd-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/</link>
+      <pubDate>Sat, 17 Jan 2015 16:40:49 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2015-01-17/%E6%88%91%E7%9A%84-mbp-ssd-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B/</guid>
+      <description>
+
+&lt;p&gt;嗯，这次的标题终于没那么长了 ;-)&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;给我的 MBP 换 SSD 已经是很久之前的事了，当时就已经折腾过一次优化了，不过没有相应的记录。最近发现了新装的 Yosemite 的一些老是搞不定而且连原因都不知道的问题（其中一个可以参见&lt;a href=&#34;http://apple.stackexchange.com/questions/163500/when-i-want-to-install-teamviewer-10-why-cant-i-select-my-system-disk-as-the-d&#34; title=&#34;AskDifferent: When I want to install TeamViewer 10, why can&#39;t I select my system disk as the distination?&#34;&gt;我在 AskDifferent 上的提问&lt;/a&gt;），一怒之下重装之，自然对 SSD 的优化也要重新搞一遍。搞的过程中发现有的手段能用，有的却不行，特此记录。&lt;/p&gt;
+
+&lt;p&gt;优化手段的主要来源是&lt;a href=&#34;http://chenyufei.info/blog/2011-09-06/13-%E5%AF%B8-macbook-pro-%E6%8B%86%E5%85%89%E9%A9%B1%E6%9B%B4%E6%8D%A2-ssd/&#34; title=&#34;13 寸 Macbook Pro 拆光驱更换 SSD&#34;&gt;朋友的一篇博文&lt;/a&gt;及其中的链接。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意：操作有风险，动手须谨慎哟。因为我是不（lan）会（de）做太多解释的，所以你一定要在操作前搞清楚那些个命令的作用哟，特别是像 &lt;code&gt;rm&lt;/code&gt; 啦 &lt;code&gt;mv&lt;/code&gt; 啦之类的危险命令哟，可别说我没提醒你哟 -_-&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;firefox-缓存设置:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;Firefox 缓存设置&lt;/h2&gt;
+
+&lt;p&gt;虽然 Firefox 不是我的主役浏览器，但有时还会用用，姑且改之。总之就是打开 &lt;code&gt;about:config&lt;/code&gt; 页面，修改如下设置：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;将 &lt;code&gt;browser.cache.disk.enable&lt;/code&gt; 改为 &lt;code&gt;false&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;将 &lt;code&gt;browser.cache.memory.enable&lt;/code&gt; 改为 &lt;code&gt;true&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这样 Firefox 就只会把缓存的东西都放在内存而不是硬盘（也就是 SSD）上了（应该吧）。&lt;/p&gt;
+
+&lt;h2 id=&#34;关掉根文件系统的-上一次读取时间-特性:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;关掉根文件系统的「上一次读取时间」特性&lt;/h2&gt;
+
+&lt;p&gt;「上一次读取时间」指的虽然是文件上次被读取的时间，但这个信息是会写到硬盘上文件的元数据中的。想想系统文件还不是整天被读过来读过去的，但这个时间信息又没什么用，果断禁之！以 root 身份创建（如果之前没有的话）并编辑文件 &lt;code&gt;/etc/fstab&lt;/code&gt;，增加如下一行（或者修改原有配置，增加 &lt;code&gt;noatime&lt;/code&gt; 挂载属性）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/dev/disk2 / hfs rw,noatime
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中的 &lt;code&gt;/dev/disk2&lt;/code&gt; 自然要换成你的 SSD 对应的磁盘文件路径啦。&lt;/p&gt;
+
+&lt;h2 id=&#34;禁用冬眠模式:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;禁用冬眠模式&lt;/h2&gt;
+
+&lt;p&gt;执行如下命令即可：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo pmset -a hibernatemode 0
+$ sudo rm /var/vm/sleepimage
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;PS. 冬眠模式是为了在电池耗尽时能保存机器的运行状态，防止意外丢失数据的。一般认为电池耗尽这种情况很少会发生，毕竟当你发现电池快用光时肯定就会到处找插座了嘛。结果我最近偏偏碰到了一次，而且还是在插着电源的时候！一开始还怀疑难道我的电源线又挂了？！结果后来试着把电脑端反过来接就好了。真是莫名，看来这根电源线也大限将至么……不管怎样，有问题的时候电脑端的 LED 指示灯虽然亮着但是很暗几乎看不出来，难道这表示电压不足？有知道的人么？（不过首先，得有能看到我这篇博的人（泪奔&lt;/p&gt;
+
+&lt;h2 id=&#34;减少临时文件的读写:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;减少临时文件的读写&lt;/h2&gt;
+
+&lt;h3 id=&#34;ramdisk:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;RAMDisk&lt;/h3&gt;
+
+&lt;p&gt;我在试了网上的方法之后，发现如果用了 RAMDisk，则系统很快就会卡死。据&lt;a href=&#34;https://twitter.com/cyfdecyf&#34;&gt;陈同学&lt;/a&gt;说是 OS X 的 RAMDisk 实现有问题，嗯，所以就要想别的招了。&lt;/p&gt;
+
+&lt;h3 id=&#34;将临时文件目录移到机械硬盘分区:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;将临时文件目录移到机械硬盘分区&lt;/h3&gt;
+
+&lt;p&gt;因为我是将……好吧其实我也不记得主硬盘位放的是哪个硬盘了，Any way :-)，SSD 和原机械硬盘现在都被我挂着用，于是就可以考虑将那些个临时文件目录移到机械硬盘上，减少对 SSD 的读写。&lt;/p&gt;
+
+&lt;p&gt;网上说可以将 &lt;code&gt;/private/tmp&lt;/code&gt; 和 &lt;code&gt;/private/var/run&lt;/code&gt; 两个目录挂载到 RAMDisk 上，那想必也是可以挪到其他地方的吧；不过经实践，只有前者可以，后者（至少用这里的软链接方式）会导致系统启动出错，只好作罢。&lt;/p&gt;
+
+&lt;p&gt;将 &lt;code&gt;/private/tmp&lt;/code&gt; 移到机械硬盘上的方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ sudo ditto /private/tmp /Volumes/your_hdd_name/private/tmp
+$ sudo rm -rf /private/tmp
+$ sudo ln -s /Volumes/your_hdd_name/private/tmp /private/tmp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后其实用户的家目录也可以这样挪到机械硬盘上，不过要注意数据的迁移，所以命令稍有不同：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo ditto /Users /Volumes/your_hdd_name/Users
+sudo mv /Users /Users.bak
+sudo ln -s /Volumes/your_hdd_name/Users /Users
+sudo rm -rf /Users.bak
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;另外还有一个目录 &lt;code&gt;/private/var/log&lt;/code&gt;，也就是系统日志目录，我觉得也有必要挪一下，但又怕像 &lt;code&gt;/private/var/run&lt;/code&gt; 那样失败，所以一时没有折腾。&lt;/p&gt;
+
+&lt;h2 id=&#34;禁用-safari-的-webpage-previews-功能:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;禁用 Safari 的 Webpage Previews 功能&lt;/h2&gt;
+
+&lt;p&gt;我好像没做这条，因为我不怎么用 Safari 的说。&lt;/p&gt;
+
+&lt;h2 id=&#34;关闭-spotlight-索引:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;关闭 Spotlight 索引&lt;/h2&gt;
+
+&lt;p&gt;因为我也不怎么用 Spotlight，所以这个我也（跟上一条连起来，感觉有点儿怪怪的哈）关了，记得就是去系统配置里面把所有的勾都给取消掉就行了，嗯。&lt;/p&gt;
+
+&lt;h2 id=&#34;关闭-时间机器-功能:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;关闭「时间机器」功能&lt;/h2&gt;
+
+&lt;p&gt;反正我是没开过，反正我的重要数据（代码啥的）都在网上有仓库，图片有 Google+ Photos，电子书……你懂的。&lt;/p&gt;
+
+&lt;p&gt;据说是该功能在你没插备份盘时会往系统盘备份，要不要关就看你的实际需求啰。&lt;/p&gt;
+
+&lt;h2 id=&#34;禁用-自动休眠硬盘-选项:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;禁用「自动休眠硬盘」选项&lt;/h2&gt;
+
+&lt;p&gt;就是系统配置、节能器里的那个「Put the hard disk(s) to sleep when possible」。不过我开着这项，因为我还有个机械硬盘嘛。&lt;/p&gt;
+
+&lt;h2 id=&#34;trim-enabler:9e2083c66d09d4578fff70c65a50ec8b&#34;&gt;Trim Enabler&lt;/h2&gt;
+
+&lt;p&gt;这个是重头戏哟，所以放在最后（不过这样是不是就会被人忽略掉啊，嘛不管了）。&lt;/p&gt;
+
+&lt;p&gt;原文中的链接已经坏了，因为那个链接的作者更新了一篇新的，所以把老的给删了，新链接&lt;a href=&#34;https://digitaldj.net/blog/2011/11/17/trim-enabler-for-os-x-lion-mountain-lion-mavericks/&#34; title=&#34;TRIM Enabler for OS X Lion, Mountain Lion, Mavericks&#34;&gt;在此&lt;/a&gt;。建议好好阅读学习哟。不过对于最新的 Yosemite 来说，有一个&lt;a href=&#34;https://gist.github.com/return1/4058659&#34;&gt;更新的脚本&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;虽说是重头戏，但工作相当于全都丢给别人了嘛，不过这种细节你就不要在意啦。&lt;/p&gt;
+
+&lt;p&gt;打完收功！&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Keepalived 实现双机热备并对关键进程进行监控</title>
+      <link>https://glacjay.info/post/2014-06-22/keepalived-%E5%AE%9E%E7%8E%B0%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87%E5%B9%B6%E5%AF%B9%E5%85%B3%E9%94%AE%E8%BF%9B%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%9B%91%E6%8E%A7/</link>
+      <pubDate>Sun, 22 Jun 2014 01:09:12 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-06-22/keepalived-%E5%AE%9E%E7%8E%B0%E5%8F%8C%E6%9C%BA%E7%83%AD%E5%A4%87%E5%B9%B6%E5%AF%B9%E5%85%B3%E9%94%AE%E8%BF%9B%E7%A8%8B%E8%BF%9B%E8%A1%8C%E7%9B%91%E6%8E%A7/</guid>
+      <description>&lt;p&gt;三连更有木有！（对不起我网文看多了，而且中间其实断过两天的，我不会告诉你其实是我把这事儿给忘了的）&lt;/p&gt;
+
+&lt;p&gt;另，这篇照例是工作需要。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;使用 Keepalived 实现多机热备（无负载均衡）时，除了对网口状态的监控外，一般还要对系统关键进程（如 Web 服务器的话就是 nginx 或者 httpd 之类的）进行监控，这时就要用到 &lt;code&gt;vrrp_script&lt;/code&gt; 配置。网上能找到的 &lt;code&gt;vrrp_script&lt;/code&gt; 示例都使用了 &lt;code&gt;weight&lt;/code&gt; 选项，以实现基于优先级机制的切换，我在使用中遇到了一点儿问题，总结一下。&lt;/p&gt;
+
+&lt;p&gt;一般在使用双机热备时，如果当前主机——假设为 A ——出了问题（关键进程挂掉，优先级降低，低于备机），这时会自动切换到备机——假设为 B ——继续完成工作，同时等待管理员对 A 的问题进行修复。当 A 的问题修复时，我们不希望 A 马上切换为主机，因为这样有可能断掉用户正在使用的连接，体验不好。在 keepalived 中，通过给 A 增加一条 &lt;code&gt;nopreempt&lt;/code&gt; 配置，就可以防止 A 主动抢回主机状态。&lt;/p&gt;
+
+&lt;p&gt;这时问题就来了。当 A 的问题（关键进程恢复）修复之后，A 的优先级会恢复到原来的值，但由于 &lt;code&gt;nopreempt&lt;/code&gt; 的存在，A 并不会立刻抢占。这时就相当于 A 作为备机，却有更高的优先级。如果 B 之后出了问题（关键进程挂掉，优先级降低），却不会导致切换，因为 B 在出问题之前，其优先级就已经比 A 低了。&lt;/p&gt;
+
+&lt;p&gt;网上有文章说，遇到这种情况，可以在 B 的进程监控脚本中把 B 的 keepalived 进程杀掉，来强制触发切换动作，这种作法显然并不优雅。有没有更好的方法呢？&lt;/p&gt;
+
+&lt;p&gt;注意到，当拔网线触发切换时，被拔网线的机器上，keepalived 并不是降低了自己的优先级，而是进入 FAULT 状态（除 MASTER 和 BACKUP 之外的另一种状态），这时是不会有上述由优先级引起的问题的。所以新的思路就是，当进程监控失败时，不要降低优先级，而是令 keepalived 进入 FAULT 状态，同时在主备两机都加上 &lt;code&gt;nopreempt&lt;/code&gt; 选项。&lt;/p&gt;
+
+&lt;p&gt;至于怎么令 keepalived 进入 FAULT 状态，也很简单，直接去掉 &lt;code&gt;vrrp_script&lt;/code&gt; 中的 &lt;code&gt;weight&lt;/code&gt; 选项即可。虽然谁也没说 &lt;code&gt;weight&lt;/code&gt; 是必选项，但因为网上能搜到的示例都是配了 &lt;code&gt;weight&lt;/code&gt; 的，导致很多人（至少包括我）会主观认为这是必选项，从而无法意识到还有其他方法。当然这也跟 keepalived 的文档不太完善有关。&lt;/p&gt;
+
+&lt;p&gt;PS. 让我发现 &lt;code&gt;weight&lt;/code&gt; 不是必选项的来源是……找不着了，囧。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>LoadRunner 中进行 HTTP 测试时使 Keep-Alive 生效的注意事项</title>
+      <link>https://glacjay.info/post/2014-06-19/loadrunner-%E4%B8%AD%E8%BF%9B%E8%A1%8C-http-%E6%B5%8B%E8%AF%95%E6%97%B6%E4%BD%BF-keep-alive-%E7%94%9F%E6%95%88%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/</link>
+      <pubDate>Thu, 19 Jun 2014 00:23:16 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-06-19/loadrunner-%E4%B8%AD%E8%BF%9B%E8%A1%8C-http-%E6%B5%8B%E8%AF%95%E6%97%B6%E4%BD%BF-keep-alive-%E7%94%9F%E6%95%88%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/</guid>
+      <description>&lt;p&gt;工作需要，在使用 LoadRunner 进行 HTTP 测试时，为了使每个虚拟用户在不同的循环周期中都能保持长连接，则除了要打开 Keep-Alive 运行时配置（默认打开）之外，还有两个选项需要修改，这两个选项都在运行时配置的「Browser - Browser Simulation」中：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Simulate browser cache ：取消勾选。禁用对浏览器缓存机制的模拟，令虚拟用户确实的每次都真正发起与 Web 服务器的对话，而不是只读取一下缓存。&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Simulate a new user on each iteration ：取消勾选。不要在每次执行 Action 之前重置虚拟用户的状态，不然会把原来的 TCP 长连接也重置掉，Keep-Alive 就没用了（更准确地说，是在不同循环周期之间就没用了）。&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>VS2010 环境中调试 IE ActiveX 控制时断点不起作用的问题</title>
+      <link>https://glacjay.info/post/2014-06-18/vs2010-%E7%8E%AF%E5%A2%83%E4%B8%AD%E8%B0%83%E8%AF%95-ie-activex-%E6%8E%A7%E5%88%B6%E6%97%B6%E6%96%AD%E7%82%B9%E4%B8%8D%E8%B5%B7%E4%BD%9C%E7%94%A8%E7%9A%84%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Wed, 18 Jun 2014 22:29:01 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-06-18/vs2010-%E7%8E%AF%E5%A2%83%E4%B8%AD%E8%B0%83%E8%AF%95-ie-activex-%E6%8E%A7%E5%88%B6%E6%97%B6%E6%96%AD%E7%82%B9%E4%B8%8D%E8%B5%B7%E4%BD%9C%E7%94%A8%E7%9A%84%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;p&gt;又是惯例的长了好长时间的草，今天先来篇短的。&lt;/p&gt;
+
+&lt;p&gt;工作需要，在使用 VS2010 开发调试 IE ActiveX 插件时，默认条件下下的断点不起作用，这是因为选错了调试器，在工程属性 - Debugging 中的 Debugger to launch 项，选择 Web Browser Debugger ，然后在 HTTP URL 项填本地 HTML 文件的绝对路径，以 file:/// 打头就可以了。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>OpenSSL 与 WinSock2 配合使用时遇到的一个坑</title>
+      <link>https://glacjay.info/post/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91/</link>
+      <pubDate>Sat, 29 Mar 2014 23:06:38 +0800</pubDate>
+      
+      <guid>https://glacjay.info/post/2014-03-29/openssl-%E4%B8%8E-winsock2-%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8%E6%97%B6%E9%81%87%E5%88%B0%E7%9A%84%E4%B8%80%E4%B8%AA%E5%9D%91/</guid>
+      <description>&lt;p&gt;今天才发现，这里已经两年多没有被照看过了，估计连树都要长出来了吧。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;在用 Windows 的 WSAEventSelect 模式进行网络编程时，比较固定的一个模式是这样的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;...
+WSAEventSelect(sock, events[0], FD_READ);
+...
+while (1)
+{
+    ret = WSAWaitForMultipleEvents(1, events, FALSE, timeout, FALSE);
+    if (ret &amp;gt;= WSA_WAIT_EVENT_0 &amp;amp;&amp;amp; ret &amp;lt; WSA_WAIT_EVENT_0 + 1)
+    {
+        eventIndex = ret - WSA_WAIT_EVENT_0;
+        if (eventIndex == 0)
+        {
+            WSAEnumNetworkEvents(sock, events[0], &amp;amp;networkEvents);
+            if (networkEvents.lNetworkEvents &amp;amp; FD_READ)
+            {
+                ...
+                recv(sock, buf, sizeof(buf));
+                ...
+            }
+            ...
+        }
+        ...
+    }
+    ...
+}
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当要处理的 sock 属于一个 OpenSSL 连接时，只要把当中的 recv 换成 SSL_read 就行了，当然前面还得加上些 readWaitonWrite 之类的标志位检查啥的，这里就不详细列举了，请参考《Network Security with OpenSSL》一书中的 5.2.2.3 小节。&lt;/p&gt;
+
+&lt;p&gt;但我在实际使用中（事实上是在压力测试中）发现，当程序运行一段时间之后，WSAWaitForMultipleEvents 就会忽然不再返回可读信号了，从而导致对该 socket 的接收操作完全停止。&lt;/p&gt;
+
+&lt;p&gt;经过各种调试手段，甚至是在 OpenSSL 中加入调试输出之后，终于发现问题出在 SSL_read 的实现机制上，貌似 OpenSSL 实现了某种程度的读写缓冲（具体没细看），使得对 SSL_read 的一次调用，并不一定会触发其对底层 socket 的读取操作。而如果没有对底层 socket 的读取操作，那么 windows 的对应 event 对象就不会被 reenable （参考 MSDN 中对 WSAEventSelect 接口的说明文档），从而导致 WSAWaitForMultipleEvents 不再对该事件作检查。&lt;/p&gt;
+
+&lt;p&gt;原因找到了，那么相应的解决方法也就不难发现了，对于我的使用场景来说（不完全是像上面的示例片断那么清晰），最简单的作法就是在 SSL_read 之前加一个空的 recv 调用，其传给 recv 的第二、三个参数的值分别是 NULL 和 0 ，这样就能强制触发 windows event 的 reenable ，同时又不会影响到 SSL 对象内部的读取状态了。&lt;/p&gt;
+
+&lt;p&gt;PS. 遇到这个问题时，最重要的一步其实是如何能够稳定而快速的复现问题。一开始做压力测试时，只有在连续跑个一天以上时才会不定时的出现，导致效率很低；后来偶然发现，通过虚拟机搭建的受限环境，反而能很快复现问题。想来这也是另一种形式的压力测试吧，正常的压力测试是保持环境不变，加大请求压力；这里则变成了保持请求不变，同时压缩可用环境。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>修改 OpenVPN 实现加密算法的自动协商</title>
+      <link>https://glacjay.info/post/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86/</link>
+      <pubDate>Sat, 17 Sep 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-09-17/%E4%BF%AE%E6%94%B9-openvpn-%E5%AE%9E%E7%8E%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8D%8F%E5%95%86/</guid>
+      <description>&lt;p&gt;由&lt;a href=&#34;https://glacjay.info/post/2011-01-18/openvpn-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B%E5%88%86%E6%9E%90/&#34;&gt;另一篇博&lt;/a&gt;中的分析可知，OpenVPN 中有两个加解密通道。一条是标准的 SSL 协议通道，被 OpenVPN 用于协商自己所用的密钥。这个通道的加密算法当然也是通过 SSL 协议来进行协商的，可以通过 &lt;code&gt;--tls-cipher&lt;/code&gt; 选项来进行配置。另一条是 OpenVPN 自己的加解密通道，用于交换实际的数据，也就是虚拟网卡抓到的 IP 报文。这个通道的加密算法则是通过 &lt;code&gt;--cipher&lt;/code&gt; 和 &lt;code&gt;--auth&lt;/code&gt; 两个选项，分别在通调两端指定的。&lt;/p&gt;
+
+&lt;p&gt;对于第二条通道的加密算法，必须要同时在两端分别指定一致的选项，有时候不是很方便（当然，我研究的还是 2.1.1 版本的 OpenVPN ，不知道最新的版本还是不是这样）。比如说，我想通过在服务端修改配置，指定加密算法，然后让连接我的客户端自动用同一个算法。最简单的修改思路，就是借用第一条通道中的算法协商机制，从 SSL 对象中取得协商出来的算法。&lt;/p&gt;
+
+&lt;p&gt;具体做法就是：&lt;/p&gt;
+
+&lt;p&gt;首先，在函数 &lt;code&gt;do_init_crypto_tls_c1()&lt;/code&gt; 中，去掉对函数 &lt;code&gt;init_key_type()&lt;/code&gt; 的调用。这个调用就是根据 &lt;code&gt;--cipher&lt;/code&gt; 和 &lt;code&gt;--auth&lt;/code&gt; 选项进行算法配置的地方，我们要动态协商，自然是不需要这个了。&lt;/p&gt;
+
+&lt;p&gt;但同时，这会引起接下来一个步骤的错误。在函数 &lt;code&gt;crypto_adjust_frame_parameters()&lt;/code&gt; 中，会根据之前配置的算法进行报文中密钥空间的分配。现在还不知道算法，怎么知道要分配多少空间呢？就只能改成最大值了。分别改为 &lt;code&gt;MAX_CIPHER_KEY_LENGTH&lt;/code&gt; 和 &lt;code&gt;MAX_HMAC_KEY_LENGTH&lt;/code&gt; 就行了。当然，这样改不仅浪费空间，而且也不够严谨，因为 key length 和 IV length 不是一回事，却只能都用 &lt;code&gt;MAX_CIPHER_KEY_LENGTH&lt;/code&gt; 来初始化。&lt;/p&gt;
+
+&lt;p&gt;最后就是在 SSL 协商好之后，从里面取加密算法了。具体位置在 &lt;code&gt;key_method_2_write()&lt;/code&gt; 和 &lt;code&gt;key_method_2_read()&lt;/code&gt; 两个函数中，对 &lt;code&gt;generate_key_expansion()&lt;/code&gt; 函数的调用之处了。在调用之前，初始化一下 &lt;code&gt;key_type&lt;/code&gt; 就行了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;struct key_type *key_type = (struct key_type *) session-&amp;gt;opt-&amp;gt;key_type;
+key_type-&amp;gt;cipher = ks-&amp;gt;ssl-&amp;gt;enc_read_ctx-&amp;gt;cipher;
+key_type-&amp;gt;cipher_length = EVP_CIPHER_key_length (session-&amp;gt;opt-&amp;gt;key_type-&amp;gt;cipher);
+#if OPENSSL_VERSION_NUMBER &amp;gt;= 0x010000000L
+key_type-&amp;gt;digest = ks-&amp;gt;ssl-&amp;gt;read_hash-&amp;gt;digest;
+#else
+key_type-&amp;gt;digest = ks-&amp;gt;ssl-&amp;gt;read_hash;
+#endif
+key_type-&amp;gt;hmac_length = EVP_MD_size (session-&amp;gt;opt-&amp;gt;key_type-&amp;gt;digest);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样就行了。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>编写自己的 Web 版 Google Reader 客户端</title>
+      <link>https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/</link>
+      <pubDate>Thu, 11 Aug 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-08-11/%E7%BC%96%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84-web-%E7%89%88-google-reader-%E5%AE%A2%E6%88%B7%E7%AB%AF/</guid>
+      <description>&lt;p&gt;最近花在路上的时间明显变多了，手机就成了我打发这些路上时间的利器。小说神马的看太多也会腻，正好 Google Reader 中也积累了大量的未读文章，因此用手机看看订阅文章就成了一个比较好的选择。&lt;/p&gt;
+
+&lt;p&gt;但多次使用下来，却也发现了很多 Google 原版 Web 界面的不方便之处。Google 提供了两个版本的 Reader 界面给手机，一个是苹果风格的 &lt;code&gt;/i/&lt;/code&gt; 界面，设计得很漂亮，功能也很全，用 Nokia 手机也能看，但太费流量（未证实，只是感觉，大概是因为一次加载了很多的文章吧），而且在网络状况不好的时候，体验不太好。另一个是 &lt;code&gt;/m/&lt;/code&gt; 界面，很简洁，选项不多，但也总有些这样那样的细节另我不太满意，下面详述。然后又去找 Nokia 的 S60v3 客户端软件，总之是没一个喜欢啦。作为一个 Geek （至少是自称），在这种情况下，最佳选择自然就是打造一个自己专属的解决方案啦。&lt;/p&gt;
+
+&lt;p&gt;正好蹭着同学的一个 PHP 空间（其实也有 Python 和 Ruby 可选啦，但总觉得会很折腾，还是 PHP 好点，虽然折腾也少不了，见下），于是花了几天时间，连复习 PHP （以前只学过没用过，主要还是看 w3schools 的教程和查 php.net 的函数文档）、研究 OAuth （参见&lt;a href=&#34;http://www.ioncannon.net/programming/1443/google-oauth-for-installed-apps-php-example/&#34;&gt;这篇文章&lt;/a&gt;，不过 Web 应用稍有不同）、研究 Google Reader API （参见&lt;a href=&#34;http://blog.martindoms.com/2009/08/15/using-the-google-reader-api-part-1/&#34;&gt;这系列文章&lt;/a&gt;）、编写代码，终于搞定了一个很阳春的 Google Reader Mobile 版，刚刚满足我的手机阅读需要。&lt;/p&gt;
+
+&lt;p&gt;以下就是我针对 Google 原版所做的，针对我个人的改进：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;保存期限的问题&lt;/strong&gt;：以前也有感觉，这次趁着做这个东东，又确认了一下：Google 只会保存 30 天内的未读文章，超过 30 天的就自动标记成已读了。我希望能保存下来慢慢看，所以就搞了一个简单的 SQLite 数据库，定时把曾经是未读文章的 &lt;code&gt;id&lt;/code&gt; 号都给保存下来，直到我通过这个界面读过之后再删除。嗯，这个功能是最重要的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;先看最老的文章&lt;/strong&gt;：当然，通过这两天对 API 的研究，我已经知道怎么在 Google 的 &lt;code&gt;/m/&lt;/code&gt; 界面中实现这个功能了，不过为了上一个功能，打造自己的界面还是必要的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;重复载入的问题&lt;/strong&gt;：当我要给一篇文章加星的时候，我一般都希望能直接看到下一篇文章，而不是再看一次被加星的这篇。这也是一个很小的改进啦，不过用起来很舒服，既节省了流量，也节省了时间。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加载文章的时候先不要标记为已读&lt;/strong&gt;：由于手机的网络状况通常不太好，当我浏览完一篇，想加个星标的时候，结果页面却打不开了，这种情况经常发生。所以，我就把标记为已读的这个步骤，挪到了看一下篇之前，或者加星标之后。这样，就比再去已读文章里面找要来得方便。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;去掉 &lt;code&gt;/m/&lt;/code&gt; 的所有其他功能&lt;/strong&gt;：当然，这不是一个改进啦，只是我不需要而已。既然是用手机来看，当然就没有那么多需要啦，只要能实现浏览与加星标就好了。需要细看的，就加个标，等有电脑的时候再慢慢看。本来， Google Reader 的星标功能，除了作为 ToRead 列表外，就没什么其他用处了（当然，以后也许会跟搜索整合，然后优先显示神马的，那就不管了）。不过话说回来，功能的简化其实也是一种改进啦，最近刚好看到 InstaPaper 的作者也这么说来着。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;功×夫×网&lt;/strong&gt;：不过其实 Google Reader 并没有被封的很严，倒是我自己的实现招来了这个问题，见下。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;简单来说，就是按顺序，对所有文章，看，（可选地）加星标，然后下一篇。需求往往就这么简单啊。&lt;/p&gt;
+
+&lt;p&gt;当然，在做的时候，还是遇到过各种稀奇古怪的问题（ Neta ：编程好难啊），这里也一并记录下。&lt;/p&gt;
+
+&lt;p&gt;先是在自己机器上 OK 了，等部署到空间的时候却报错： an error occured while processing this directive 。同样的脚本，放到其他目录就没事，还以为是 Apache 的权限问题，也没找到有什么特别的配置。直到有机会查看 Apache 的错误日志，才发现原来就是因为新加的这个目录有组的写权限，而 Apache 不允许这样，真是吐血。话说加上组的写权限，也是为了 SQLite 来着，因为 SQLite 会在数据库所在目录中写事务日志文件。&lt;/p&gt;
+
+&lt;p&gt;然后就是发现，我用的 SQLite3 的 PHP 接口，在空间的 PHP 5.2 版本中还没有呢。真是悲剧。然后又吭哧吭哧地用 PDO 接口重写了数据库的代码。&lt;/p&gt;
+
+&lt;p&gt;等到好不容易改好啦，用电脑访问也一切正常，结果用手机访问的时候，看不了两个页面，就会出现“连接被远程服务器关闭”的错误。一开始还没有往功×夫×网的方向想，只以为又是服务器的权限问题（我为什么要加“又”？），来回地看日志，切换测试，不停地折腾。直到在电脑上偶然看到，该网页需要翻×墙的标志，再一看 URL 才恍然，原来是我传的一个 GET 参数，是该文章的订阅源 URL ，而有些文章是从 Feed×Burner 订阅的，这才触发了功×夫×网。真是躺着也中枪啊，赶急加一个 Base64 编码搞定。&lt;/p&gt;
+
+&lt;p&gt;不管怎样，一个简陋的阅读器就这样被实现出来了。鉴于我近期还不想烧钱换手机，这个东东应该还是很有用武之地的吧。不知道 Google 出的 Android 客户端有没有 30 天的限制。&lt;/p&gt;
+
+&lt;p&gt;最后的最后，该版本仅限我个人使用，因为我没有实现多用户的功能，所以大家（如果有的话）也就不要去尝试访问了。我之后会把代码给开源的，到时随你（如果有的话，嗯）折腾。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; 代码已&lt;a href=&#34;https://github.com/glacjay/mreader&#34;&gt;上传&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Update 2012-12-31:&lt;/strong&gt; 现在有了 Android 手机，已经开始用 gReader 这个客户端了，除了“延迟标记已读”这个功能还没有之外，其他所需功能已经都有了，而且还是离线阅读哦（我自己的版本就没有实现离线阅读这个功能，因为太麻烦）。不过我的数据库里面已经存了 7000 多篇文章没看了……囧&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>[转载] Compilers: what are you thinking about?</title>
+      <link>https://glacjay.info/post/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about/</link>
+      <pubDate>Tue, 26 Jul 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-07-26/%E8%BD%AC%E8%BD%BD-compilers-what-are-you-thinking-about/</guid>
+      <description>
+
+&lt;p&gt;最近在翻看以前加星的 Google Reader 文章，把有用的整理出来打标签，然后就看到了这篇。原文作者的博客现在不知道被丢到哪边去了，搜也搜不到，转到这里，权当保存一下吧。&lt;/p&gt;
+
+&lt;p&gt;原文链接：&lt;a href=&#34;http://www.onebadseed.com/blog/?p=119&#34;&gt;Compilers: what are you thinking about?&lt;/a&gt;。当然，已经打不开了。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&#34;compilers-what-are-you-thinking-about:ef1b8fdac518361c2e2ceb322c646507&#34;&gt;Compilers: what are you thinking about?&lt;/h2&gt;
+
+&lt;p&gt;Author: Rotten Cotton&lt;/p&gt;
+
+&lt;p&gt;My recent post &lt;a href=&#34;http://www.onebadseed.com/blog/?p=103&#34;&gt;Compiler bibliography&lt;/a&gt;, a motley list of compiler papers that had been sitting in a box in my attic, generated a surprising amount of traffic: over a thousand unique visitors. But no comments. For those of you interested in compiler design, I ask, what are you trying to understand? What are you trying to do?&lt;/p&gt;
+
+&lt;p&gt;I imagine some of you are interested in understanding how compilers work and, more importantly, how to build them. The first step in learning to design compilers is to build one. (Tautologous, no?) To start, I recommend following the syllabus of a compiler design course. Googling “&lt;a href=&#34;http://www.google.com/search?hl=en&amp;amp;q=compiler+syllabus&amp;amp;aq=f&amp;amp;oq=&amp;amp;aqi=g1&#34;&gt;compiler syllabus&lt;/a&gt;” returns a massive list of syllabi for compiler for compiler classes. The first link, a &lt;a href=&#34;http://web.cecs.pdx.edu/~harry/compilers/syllabus.html&#34;&gt;compiler design&lt;/a&gt; class, at Portand State University, follows Louden’s book &lt;a href=&#34;http://www.amazon.com/gp/product/0534939724?ie=UTF8&amp;amp;tag=wwwonebadseec-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0534939724&#34;&gt;Compiler Construction&lt;/a&gt; to build a SPARC compiler for a toy programming language, &lt;a href=&#34;http://web.cecs.pdx.edu/~harry/compilers/PCATLangSpec.pdf&#34;&gt;PCAT&lt;/a&gt; (pdf). MIT’s compiler design class, &lt;a href=&#34;http://ocw.mit.edu/OcwWeb/Electrical-Engineering-and-Computer-Science/6-035Fall-2005/CourseHome/&#34;&gt;6.035&lt;/a&gt;, is on &lt;a href=&#34;http://ocw.mit.edu/&#34;&gt;OCW&lt;/a&gt;. Following one of these classes will teach you the basic challenges involved in designing a compiler and the organizational principles that have emerged to solve these problems. If you’re ambitious, start with a free C front end and build a C compiler for your favorite architecture. There is &lt;a href=&#34;http://www.smlnj.org/doc/ckit/index.html&#34;&gt;ckit&lt;/a&gt; for ML, &lt;a href=&#34;http://www.sivity.net/projects/language.c/&#34;&gt;Language.C&lt;/a&gt; for Haskell or &lt;a href=&#34;http://clang.llvm.org/&#34;&gt;clang&lt;/a&gt; (part of the &lt;a href=&#34;http://llvm.org/&#34;&gt;LLVM&lt;/a&gt; project) written in, I think, C++. There are others, no doubt. This way, you won’t have to write a front-end and you will have a huge source of potential examples on which to test your compiler and, when your start to design optimizations (the fun part), explore your compiler’s performance.&lt;/p&gt;
+
+&lt;p&gt;For a few years after I first took 6.035, whenever the course was taught again and the project (toy language) for that semester was announced, I would spend a long caffeine-fueled weekend hacking out a new compiler. I must have build three or four compilers this way, targeting different architectures and exploring various design choices. This was a very valuable experience.&lt;/p&gt;
+
+&lt;p&gt;Once you understand the basics of compiler design, what’s next? There are a number of directions you can go.&lt;/p&gt;
+
+&lt;p&gt;You can study programming language features and their implementation in a compiler and runtime. For this, I recommend a book like Scott’s &lt;a href=&#34;http://www.amazon.com/gp/product/0123745144?ie=UTF8&amp;amp;tag=wwwonebadseec-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0123745144&#34;&gt;Programming Language Pragmatics&lt;/a&gt; or Turbak and Gifford’s &lt;a href=&#34;http://www.amazon.com/gp/product/0262201755?ie=UTF8&amp;amp;tag=wwwonebadseec-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0262201755&#34;&gt;Design Concepts in Programming Languages&lt;/a&gt;. I used a draft version of the latter in MIT’s Programming Languages class, 6.821. This will move beyond compiling the standard C- or Pascal-like toy languages standard in most first-year compiler courses. Learn about semantics: denotational, operational and axiomatic. This is important if you (a) want to build a correct compiler, and (b) as a theoretical foundation for program analysis.&lt;/p&gt;
+
+&lt;p&gt;At the other end of the spectrum are computer architectures. Go learn about computer architecture: instruction set architectures and micro-architectures, their implementation. There are many interesting architectures out there to study. Write assembly language programs by hand. Learn to extract maximal performance form an architecture on small examples. Pay attention to the techniques used to extract performance when hand-coding. These will be the basis for compiler optimizations. The standard text for computer architecture is probably Hennessy and Patterson’s text, &lt;a href=&#34;http://www.amazon.com/gp/product/0123704901?ie=UTF8&amp;amp;tag=wwwonebadseec-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0123704901&#34;&gt;Computer Architecture: A Quantitative Approach&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;A deep understanding of both the semantics of your input programming language and your target (micro-)architectures is essential to building a compiler that generates high-performance code. Program analysis and optimization is the bridge between the input program and assembly language. Start with a book on advanced compiler design like Muchnick’s &lt;a href=&#34;http://www.amazon.com/gp/product/1558603204?ie=UTF8&amp;amp;tag=wwwonebadseec-20&amp;amp;linkCode=as2&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=1558603204&#34;&gt;Advanced Compiler Design and Implementation&lt;/a&gt; (or maybe the new dragon book, I haven’t looked at it) or start diving into the literature or program analysis and optimization.&lt;/p&gt;
+
+&lt;p&gt;What are you trying to understand about compilers?&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>[翻译] 用 Ruby 写编译器之六：匿名函数 lambda</title>
+      <link>https://glacjay.info/post/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda/</link>
+      <pubDate>Sat, 21 May 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-05-21/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%85%AD%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0-lambda/</guid>
+      <description>
+
+&lt;p&gt;原文链接：&lt;a href=&#34;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html&#34;&gt;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-6.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;既然上次已经提到说，我们其实是在从 Lisp、Scheme 还有类似的其他语言中借鉴各种要实现的功能（我没想过要把这个项目做成原创的⋯⋯或者至少也要等到以后再说吧），那么现在也&lt;strong&gt;是时候&lt;/strong&gt;实现一些更加强大的功能了。&lt;/p&gt;
+
+&lt;h2 id=&#34;那就来做延迟求值以及匿名函数吧:4bbf12fdd90013097351677638258420&#34;&gt;那就来做延迟求值以及匿名函数吧&lt;/h2&gt;
+
+&lt;p&gt;Lambda ，又名匿名函数，可以像普通的数值或者字符串类型那样被当作函数参数来到处传递，也可以在需要的时候才调用（当然不调也可以）。同时，外层函数（也就是定义匿名函数的函数）作为它们的运行环境，在其中定义的局部变量可以被这些匿名函数所访问。这就形成了&lt;a href=&#34;http://en.wikipedia.org/wiki/Closure_(computer_science)&#34;&gt;一个闭包&lt;/a&gt;。我们这次&lt;strong&gt;并不是&lt;/strong&gt;要实现完整的闭包功能，只是开头的一小步而已，完整的实现要等到再后面了。&lt;/p&gt;
+
+&lt;p&gt;其实说到底，正如编程语言中的其他很多功能一样，闭包也只是又一种语法糖而已。比如说，你可以认为这样其实是定义了一个类，这个类中有唯一一个需要被调用的方法，还有一些作为运行环境的成员变量（或者你也可以反过来&lt;a href=&#34;http://strlen.com/bla/index.html&#34;&gt;用闭包来实现面向对象系统&lt;/a&gt; &amp;ndash; 这是由 &lt;a href=&#34;http://strlen.com/&#34;&gt;Wouter van Oortmerssen&lt;/a&gt; 所提出来的观点。自从我发现 &lt;a href=&#34;http://strlen.com/e/index.html&#34;&gt;Amiga E&lt;/a&gt; 这个项目之后，作为作者的他就成了我的偶像。如果你是一个编程语言方面的极客的话，那你就一定要去看看 Wouter 所做过的东西） &amp;ndash; 有很多功能其实都是相互正交的。&lt;/p&gt;
+
+&lt;p&gt;（ blah blah blah ⋯⋯这个人在说自己很啰嗦之类的，就不翻了）&lt;/p&gt;
+
+&lt;p&gt;那么，为了避免定义很多具名小函数的麻烦，同时降低函数重名的概率， lambda 允许你在任何需要它们的地方进行定义，并且返回一个表示所定义函数的值。&lt;/p&gt;
+
+&lt;p&gt;我们现在所要增加的是像下面这样的东西：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cl&#34;&gt;(lambda (args) body)
+(call f (args))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;第一个表达式会返回所定义的函数（目前来说，其实就是这个函数的起始地址），而不是去执行这个函数。而 &lt;code&gt;call&lt;/code&gt; ，当然就是以指定的参数列表，来调用传给它的那个函数地址。&lt;/p&gt;
+
+&lt;p&gt;那么，这跟“真正”的闭包又有什么区别呢？&lt;/p&gt;
+
+&lt;p&gt;最重要的一点就是，当你在 lambda 中引用了外层作用域中的某个变量后，那么，当以后对同一个 lambda 进行调用时，这个变量还是可以访问的。这样的变量与 lambda 绑定在了一起。当然，只是得到一个函数的地址的话，肯定是实现不了这个功能的。让我们来看一种实现闭包的技术吧，这样你就能够了解大概所要做的工作了（工作量不大，但也不小）：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;我们可以创建一个“环境”，一个存放那些被引用到的外部变量的地方，以使得当外层函数返回之后，它们也可以继续存在。这个环境必须是在堆中，而且每次对外层函数的调用，都需要创建一个新的环境。&lt;/li&gt;
+&lt;li&gt;我们必须返回一个可以用来访问这个环境的东西。你可以返回一个对象，其中的成员变量就是被 lambda 引用到的那些变量。或者你也可以用一个 thunk （中文叫啥呢？），也就是自动生成出来的一个包含有指向这个对象指针的小函数，它会在调用我们的 lambda 之前将这个对象加载到预先指定的地方。或者你也可以用什么其他的办法。&lt;/li&gt;
+&lt;li&gt;你必须决定有哪些变量需要放入这个环境中。可以是外层函数中的所有局部变量，当然也可以只是那些被引用到的变量。后一种作法可以节省一定的内存空间，但是需要作更多的工作。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;好吧，还是让我们先来把匿名函数本身给弄出来吧。就像以前一样，我会一步一步地说明所要做的修改，但我同时也会对之前的代码做一些整理。这些整理的部分我就不一一说明了。&lt;/p&gt;
+
+&lt;p&gt;首先是对 lambda 表达式本身进行处理的方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def compile_lambda args, body
+    name = &amp;quot;lambda__#{@seq}&amp;quot;
+    @seq += 1
+    compile_defun(name, args,body)
+    puts &amp;quot;\tmovl\t$#{name},%eax&amp;quot;
+    return [:subexpr]
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个实现应该是很容易理解的吧。我们在这里做的，就是给要定义的匿名函数，生成一个形如 &lt;code&gt;lambda__[number]&lt;/code&gt; 的函数名，然后就把它当作一个普通函数来处理了。虽然你也可以就把它生成到外层函数的函数体中，但我发现那样做的话，就会显得很乱的样子，所以我现在还是就把它作为单独的函数来处理了。然后我们调用 &lt;code&gt;#compile_defun&lt;/code&gt; 方法来处理这个函数，这样的话，这个函数其实也就只有对用户来说，才是真正匿名的了。然后我们把这个函数的地址保存在寄存器 &lt;code&gt;%eax&lt;/code&gt; 中，这里同时也是我们存放子表达式结果的地方。当然，这是一种很懒的作法啦，我们迟早需要为复杂的表达式，实现更加强大的处理机制的。但寄存器分配果然还是很麻烦的一件事情，所以现在就先这样吧（将所有的中间结果压入栈中也是一种可行的作法啦，不过那样比较慢）。&lt;/p&gt;
+
+&lt;p&gt;最后，我们返回一个 &lt;code&gt;[:subexpr]&lt;/code&gt; ，来告拆调用者到哪边可以得到这个 lambda 的值。&lt;/p&gt;
+
+&lt;p&gt;之后是一些重构。你也许已经注意到了， &lt;code&gt;#compile_exp&lt;/code&gt; 中的代码有点乱，因为要处理不同类型的参数。让我们把这部分代码给提取出来：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def compile_eval_arg arg
+    atype, aparam = get_arg(arg)
+    return &amp;quot;$.LC#{aparam}&amp;quot; if atype == :strconst
+    return &amp;quot;$#{aparam}&amp;quot; if atype == :int
+    return aparam.to_s if atype == :atom
+    return &amp;quot;%eax&amp;quot;
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;要注意的是，这里又出现了一个新的 &lt;code&gt;:atom&lt;/code&gt; 类型。借助于此，我们就可以把一个 C 函数的地址传给 &lt;code&gt;:call&lt;/code&gt; 指令了。反正实现起来也很简单。当然，我们还要在 &lt;code&gt;#get_arg&lt;/code&gt; 方法中加上如下代码，以使其生效：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    return [:atom, a] if (a.is_a?(Symbol))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后，作为重构的一部分，对 &lt;code&gt;:call&lt;/code&gt; 的处理被分离了出来，成为一个单独的方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def compile_call func, args
+    stack_adjustment = PTR_SIZE + (((args.length+0.5)*PTR_SIZE/(4.0*PTR_SIZE)).round) * (4*PTR_SIZE)
+    puts &amp;quot;\tsubl\t$#{stack_adjustment}, %esp&amp;quot;
+    args.each_with_index do |a,i|
+      param = compile_eval_arg(a)
+      puts &amp;quot;\tmovl\t#{param}, #{i&amp;gt;0 ? i*4 : &amp;quot;&amp;quot;}(%esp)&amp;quot;
+    end
+
+    res = compile_eval_arg(func)
+    res = &amp;quot;*%eax&amp;quot; if res == &amp;quot;%eax&amp;quot; # Ugly. Would be nicer if retain some knowledge of what res contains.
+    puts &amp;quot;\tcall\t#{res}&amp;quot;
+    puts &amp;quot;\taddl\t#{stack_adjustment}, %esp&amp;quot;
+    return [:subexpr]
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;看起来很熟悉对不对？因为它就是原来的 &lt;code&gt;#compile_exp&lt;/code&gt; 方法，只不过是用 &lt;code&gt;#compile_eval_arg&lt;/code&gt; 替换掉了其中的一些代码。另外有改动的地方，就是同时也用 &lt;code&gt;#compile_eval_arg&lt;/code&gt; 方法来得到要调用的函数，并对可能得到的 &lt;code&gt;%eax&lt;/code&gt; 做了些手脚，在前面加了个星号。&lt;/p&gt;
+
+&lt;p&gt;如果你知道这是怎么回事的话，你也许已经开始寻思其他的点子了，而不管那是真正的好事，还只是开枪打自己的脚。上面的代码其实就相当于，你把任意一个表达式的值当作指向一段代码的指针，然后也不做任何的检查，就直接跳过去执行它。如果是往一个随机的地址进行跳转的话，你最有可能得到的就是一个段错误了。当然，你也可以很容易地通过这项技术，来实现面向对象系统中的虚函数跳转表，或者其他的什么东西。因此，安全性将会是以后必须要考虑的东西。还有就是，要实现对一个地址（而不是函数名）的间接调用，你必须要在这个地址前面加上星号。&lt;/p&gt;
+
+&lt;p&gt;那么，现在的 &lt;code&gt;#compile_exp&lt;/code&gt; 方法变成什么样子了呢？简单来说就是，变得整齐多了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def compile_do(*exp)
+    exp.each { |e| compile_exp(e) }
+    return [:subexpr]
+  end
+  def compile_exp(exp)
+    return if !exp || exp.size == 0
+    return compile_do(*exp[1..-1]) if exp[0] == :do
+    return compile_defun(*exp[1..-1]) if exp[0] == :defun
+    return compile_ifelse(*exp[1..-1]) if exp[0] == :if
+    return compile_lambda(*exp[1..-1]) if exp[0] == :lambda
+    return compile_call(exp[1], exp[2]) if exp[0] == :call
+    return compile_call(exp[0], *exp[1..-1])
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;看起来很不错，不是吗？&lt;code&gt;#compile_call&lt;/code&gt; 几乎跟之前的 &lt;code&gt;#compile_exp&lt;/code&gt; 一模一样，只不过是把一些代码给提取出来，成为了辅助方法而已。&lt;/p&gt;
+
+&lt;p&gt;那么就来简单地测试一下吧：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;prog = [:do,
+  [:call, [:lambda, [], [:puts, &amp;quot;Test&amp;quot;]], [] ]
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;（看起来也没那么糟不是吗？）&lt;/p&gt;
+
+&lt;p&gt;编译运行之：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;$ ruby step6.rb &amp;gt;step6.s
+$ make step6
+cc      step6.s  -o step6
+$ ./step6
+Test
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这篇的代码在&lt;a href=&#34;http://www.hokstad.com/static/compiler/step6.rb&#34;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h2 id=&#34;之后的部分:4bbf12fdd90013097351677638258420&#34;&gt;之后的部分&lt;/h2&gt;
+
+&lt;p&gt;因为我合并了几篇文章，下面就列一下更新过后的，“已经写完但还需要整理的”文章列表。因为我肯定还会合并下面的某些部分的，所以我想我需要找时间开始写一些新的部分了（为了完成我所定下的 30 篇的计划）。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;步骤七：再看用匿名函数实现循环，以及对函数参数的访问&lt;/li&gt;
+&lt;li&gt;步骤八：实现赋值语句以及简单的四则运算&lt;/li&gt;
+&lt;li&gt;步骤九：一个更简洁的 &lt;code&gt;while&lt;/code&gt; 循环语句&lt;/li&gt;
+&lt;li&gt;步骤十：测试这个语言：实现一个简单的输入转换模块&lt;/li&gt;
+&lt;li&gt;步骤十一：重构代码生成器，分离架构相关的部分&lt;/li&gt;
+&lt;li&gt;步骤十二：对某些功能点的讨论，以及未来的前进方向&lt;/li&gt;
+&lt;li&gt;步骤十三：实现数组&lt;/li&gt;
+&lt;li&gt;步骤十四：局部变量以及多重作用域&lt;/li&gt;
+&lt;li&gt;步骤十五：访问变长参数列表&lt;/li&gt;
+&lt;li&gt;步骤十六：再看输入转换模块，重构以支持新功能，并用其解析它自己&lt;/li&gt;
+&lt;li&gt;步骤十七：总结实现自举所需要的功能点&lt;/li&gt;
+&lt;li&gt;步骤十八：开始实现真正的解析器&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>[翻译] 用 Ruby 写编译器之五：整数常量，以及 if 语句</title>
+      <link>https://glacjay.info/post/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5/</link>
+      <pubDate>Tue, 17 May 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-05-17/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%94%E6%95%B4%E6%95%B0%E5%B8%B8%E9%87%8F%E4%BB%A5%E5%8F%8A-if-%E8%AF%AD%E5%8F%A5/</guid>
+      <description>
+
+&lt;p&gt;原文链接：&lt;a href=&#34;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html&#34;&gt;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-5.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;上次我承诺会发布的更快一些，不过还是失败了⋯⋯作为补偿，这章的内容将会是原计划中的第 5，6，7 章内容的合并，因为这三章确实都很短。闲话少叙：&lt;/p&gt;
+
+&lt;h2 id=&#34;处理数字常量:a8d5e417469934211fedda17d3824d8d&#34;&gt;处理数字常量&lt;/h2&gt;
+
+&lt;p&gt;到目前为止，我们只处理了一些实现所必须的数字常量，也就是当一个外部函数的返回值是数字的情况，而且没有做任何形式的类型检查。&lt;/p&gt;
+
+&lt;p&gt;那么，就让我们来看一下 gcc 在 C 语言中是怎样处理各种类型（包括 &lt;code&gt;long long&lt;/code&gt; 等）的整数的吧。当然，这次还是针对 32 位的 x86 架构：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;void foo1(unsigned short a) {}
+void foo2(signed short a) {}
+void foo3(unsigned int a) {}
+void foo4(signed int a) {}
+void foo5(unsigned long a) {}
+void foo6(signed long a) {}
+void foo7(unsigned long long a) {}
+void foo8(signed long long a) {}
+
+int main()
+{
+  foo1(1);
+  foo2(2);
+  foo3(3);
+  foo4(4);
+  foo5(5);
+  foo6(6);
+  foo7(7);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;我略掉了大部分 gcc 所生成的代码，如果愿意，你可以自己执行 &lt;code&gt;gcc -S&lt;/code&gt; 命令来看。有趣的部分是对各个函数的调用，其生成的代码如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-nasm&#34;&gt;        movl    $1, (%esp)
+        call    foo1
+        movl    $2, (%esp)
+        call    foo2
+        movl    $3, (%esp)
+        call    foo3
+        movl    $4, (%esp)
+        call    foo4
+        movl    $5, (%esp)
+        call    foo5
+        movl    $6, (%esp)
+        call    foo6
+        movl    $7, (%esp)
+        movl    $0, 4(%esp)
+        call    foo7
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;换句话说，至少在处理函数调用的时候，gcc 都会把各种整数类型统一作为 32 位的整型来处理，除了 &lt;code&gt;long long&lt;/code&gt; 类型之外。因此，我们可以暂时忘掉 &lt;code&gt;long long&lt;/code&gt; 类型，而只处理 32 位以内的整数值，这样我们就可以忽略类型处理相关的东西了。&lt;/p&gt;
+
+&lt;p&gt;懒惰还真是一种病啊。&lt;/p&gt;
+
+&lt;p&gt;我们同时也会略过浮点型。为什么呢？因为只要有整数运算，你就可以实现一个完整的编译器了，所以现在就加入对浮点型的支持完全只是浪费时间而已。当然这个东西以后总归是要做的。&lt;/p&gt;
+
+&lt;p&gt;另外，当&lt;strong&gt;我&lt;/strong&gt;还年轻时，我们连 FPU 是啥都还不知道呢。尽管如此，我们依然可以用整数来模拟各种定点运算，一样可以完成很多事情。&lt;/p&gt;
+
+&lt;p&gt;那么，我们真正要做的修改有哪些呢？&lt;/p&gt;
+
+&lt;p&gt;在方法 &lt;code&gt;#get_arg&lt;/code&gt; 中，在处理字符串常量之前，加入如下代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    return [:int, a] if (a.is_a?(Fixnum))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在方法 &lt;code&gt;#compile_exp&lt;/code&gt; 中，我们用如下代码来处理 &lt;code&gt;#get_arg&lt;/code&gt; 的返回值：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    elsif atype == :int then param = &amp;quot;$#{aparam}&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后，就完事了。就这么简单。&lt;/p&gt;
+
+&lt;p&gt;然后就是测试啦：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;prog = [:do,
+  [:printf,&amp;quot;&#39;hello world&#39; takes %ld bytes\n&amp;quot;,[:strlen, &amp;quot;hello world&amp;quot;]],
+  [:printf,&amp;quot;The above should show _%ld_ bytes\n&amp;quot;,11]
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;插曲-针对原生数据类型的一些思考:a8d5e417469934211fedda17d3824d8d&#34;&gt;插曲：针对原生数据类型的一些思考&lt;/h2&gt;
+
+&lt;p&gt;“纯”面向对象类型的语言很棒，但并不是对底层的代码生成器而言的，我想。不管你是否想要实现一个纯的面向对象语言，我仍然坚信，首先实现原生的数据类型和其操作，是非常有价值的。你可以在后面的阶段再来考虑是否要对用户隐藏它们，或者是让它们看起来像是对象，或者是透明地在它们和对象之间执行自动转换的操作，等等。&lt;/p&gt;
+
+&lt;p&gt;要注意的是，Matz 的 Ruby 解释器（Matz Ruby Interpreter，简称MRI）就是这样实现的：里面的数字就跟“真正的”对象神马的完全不一样，但是解释器本身却尽其所能的对用户隐藏这一事实。不过我个人认为 MRI 做的还是不够。&lt;/p&gt;
+
+&lt;h2 id=&#34;if-then-else:a8d5e417469934211fedda17d3824d8d&#34;&gt;&lt;code&gt;If ... then ... else&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;如果没有某种形式的条件逻辑支持的话，我们的语言是没有太大用处的。几乎所有有用的语言都支持某种形式的 &lt;code&gt;if .. then .. else&lt;/code&gt; 构造。现在，我们要实现的是像 &lt;code&gt;[:if, condition, if-arm, else-arm]&lt;/code&gt; 这样的构造，而且是以 C 语言的形式来实现。也就是说， &lt;code&gt;0&lt;/code&gt; 和空指针都表示假，其他值则都为真。&lt;/p&gt;
+
+&lt;p&gt;仍然是一个简单的例子：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;void foo() {}
+void bar() {}
+int main()
+{
+  if (baz()) {
+    foo();
+  } else {
+    bar();
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;相关的汇编输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-nasm&#34;&gt;        call    baz
+        testl   %eax, %eax
+        je      .L6
+        call    foo
+        jmp     .L10
+.L6:
+        call    bar
+.L10:
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;对于大多数的语言和架构来说，这都是一个编译 &lt;code&gt;if .. then .. else&lt;/code&gt; 时会采用的通用模板：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;计算条件表达式。&lt;/li&gt;
+&lt;li&gt;对结果进行测试（这里用的是 &lt;code&gt;testl&lt;/code&gt; 指令 &amp;ndash; 在其他架构中比较通用的还有 &lt;code&gt;cmp&lt;/code&gt; 指令，或者对寄存器进行自减）。 &lt;code&gt;testl&lt;/code&gt; 指令比较它的左右两个操作数，并进行相应的标志位设置。&lt;/li&gt;
+&lt;li&gt;然后，条件跳转到 &lt;strong&gt;&lt;code&gt;else&lt;/code&gt; 语句处。这里，我们检查条件表达式的值是否不为真。在这种情况下我们用的是 &lt;code&gt;je&lt;/code&gt; 指令，即“相等时跳转”（ jump on equal ），也就是当结果相等时跳转（要注意的是，在大多数的 CPU 架构中，很多指令都会设置条件码，而不仅仅是显示的测试指令）。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;然后执行 &lt;code&gt;then&lt;/code&gt; 子句。&lt;/li&gt;
+&lt;li&gt;跳过 &lt;code&gt;else&lt;/code&gt; 子句，继续执行整个 &lt;code&gt;if&lt;/code&gt; 语句之后的部分。&lt;/li&gt;
+&lt;li&gt;生成 &lt;code&gt;else&lt;/code&gt; 子句的标号，以及其中的指令序列。&lt;/li&gt;
+&lt;li&gt;生成 &lt;code&gt;if&lt;/code&gt; 语句的结束标号。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其他还有很多不同的变种，比如根据条件表达式取值的概率，或者某个架构中是否跳转的执行代价，进而调整两个子句的顺序等。不过就目前来说，上面的方法已经足够了。&lt;/p&gt;
+
+&lt;p&gt;总之，编译的方法还是很简单的，应该说就是以上所述流程的直译：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def ifelse cond, if_arg,else_arm
+    compile_exp(cond)
+    puts &amp;quot;\ttestl\t%eax, %eax&amp;quot;
+    @seq += 2
+    else_arm_seq = @seq - 1
+    end_if_arm_seq = @seq
+    puts &amp;quot;\tje\t.L#{else_arm_seq}&amp;quot;
+    compile_exp(if_arm)
+    puts &amp;quot;\tjmp\t.L#{end_if_arm_seq}&amp;quot;
+    puts &amp;quot;.L#{else_arm_seq}:&amp;quot;
+    compile_exp(else_arm)
+    puts &amp;quot;.L#{end_if_arm_seq}:&amp;quot;
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这段代码应该很易懂的，其实就是对所有子句 &amp;ndash; 条件， &lt;code&gt;then&lt;/code&gt; 子句，以及 &lt;code&gt;else&lt;/code&gt; 子句 &amp;ndash; 分别调用 &lt;code&gt;#compile_exp&lt;/code&gt; 方法，并在其间插入所需的辅助指令，同时用 &lt;code&gt;@seq&lt;/code&gt; 成员来生成所需的标号。&lt;/p&gt;
+
+&lt;p&gt;为了使其生效，我们在 &lt;code&gt;#compile_exp&lt;/code&gt; 方法中的 &lt;code&gt;return defun ...&lt;/code&gt; 之后插入如下代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    return ifelse(*exp[1..-1]) if (exp[0] == :if)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;下面是一个简单的测试：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;prog = [:do,
+  [:if, [:strlen,&amp;quot;&amp;quot;],
+    [:puts, &amp;quot;IF: The string was not empty&amp;quot;],
+    [:puts, &amp;quot;ELSE: The string was empty&amp;quot;]
+  ],
+  [:if, [:strlen,&amp;quot;Test&amp;quot;],
+    [:puts, &amp;quot;Second IF: The string was not empty&amp;quot;],
+    [:puts, &amp;quot;Second IF: The string was empty&amp;quot;]
+  ]
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.hokstad.com/static/compiler/step5.rb&#34;&gt;这里是最终结果&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;如往常般，执行的方法如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;$ ruby step5.rb &amp;gt;step5.s
+$ make step5
+cc   step5.s   -o step5
+$ ./step5
+ELSE: The string was empty
+Second IF: The string was not empty
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;有关循环的一些思考:a8d5e417469934211fedda17d3824d8d&#34;&gt;有关循环的一些思考&lt;/h2&gt;
+
+&lt;p&gt;非条件循环是很容易实现的，不过我们需要实现它吗？显然不需要。我们已经可以用递归来实现循环了，又何必要乱加东西呢？&lt;/p&gt;
+
+&lt;p&gt;不过，要令它工作良好，我们还需要实现尾递归优化，可是我现在还没有做好准备。尾递归优化，或者更一般的形式 &amp;ndash; 尾调用优化 &amp;ndash; 所说的情况是，在一个函数的末尾，调用了一个需要相同或者更少个数参数的函数，并返回它所返回的值。在这种情况下，你可以将当前函数的调用栈，复用给被调用的函数来使用，并且是通过 &lt;code&gt;jmp&lt;/code&gt; 而不是 &lt;code&gt;call&lt;/code&gt; 来调用这个函数。 &lt;code&gt;jmp&lt;/code&gt; 指令不会在堆栈中压入一个新的返回地址，因此当这个被调用的函数返回，返回到的就是当前函数的调用者那里，而不是当前的这个函数。&lt;/p&gt;
+
+&lt;p&gt;这就同时完成了几件事情：首先，也是最重要的，就是堆栈不再会随着调用而增长了。其次，我们能够省掉几个指令周期。有了尾调用优化，再配合其他几个优化之后，你就可以这样来写循环，而不用担心堆栈溢出的问题了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;[:defun, :loop, [], [:do,
+  [:puts, &amp;quot;I am all loopy&amp;quot;],
+  [:loop]
+],
+[:loop]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;换句话说，尾调用优化意味着，对任何形如 &lt;code&gt;(defun foo () (do bar foo))&lt;/code&gt; 的函数来说，堆栈的使用率都会从原来的成比例增长减少为定值了。&lt;/p&gt;
+
+&lt;p&gt;当前的版本已经可以编译上面的代码了，不过它会很快用完堆栈并且崩溃掉的。不是很令人满意啊。&lt;/p&gt;
+
+&lt;p&gt;果然（原文： I sense a disturbance in the force ），两位读到这篇文章的极客都指出了堆栈增长的问题。&lt;/p&gt;
+
+&lt;p&gt;现在，让我们先忽略这个问题吧，同时注意下对堆栈空间的使用好了。之后，我们会实现一个专门的循环结构的。目前就这样吧 &amp;ndash; 如果以后我实现了尾调用优化的话，我们还可以重新考虑在运行时库中实现一个循环构造的方案。&lt;/p&gt;
+
+&lt;p&gt;不管怎样，我们现在可以写出一个无限循环了⋯⋯不是太有用，不是吗？&lt;/p&gt;
+
+&lt;p&gt;当然，我们其实也已经可以写 &lt;code&gt;while&lt;/code&gt; 循环了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-cl&#34;&gt;(defun some-while-loop () (if condition (some-while-loop) ()))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;看起来不是太好，不过确实可以工作。但看起来总归还是太丑了，所以我们总归还是要实现一个正尔八经的 &lt;code&gt;while&lt;/code&gt; 循环的。&lt;/p&gt;
+
+&lt;p&gt;我不是一个 Lisp 程序员。我没办法处理那么多的括号⋯⋯不过 Lisp 的语法确实很适合于一门还没有语法的语言。到了一定的阶段之后，我会实现一个完整的解析器的。也许是出于偶然，我已经实现的和将要实现的很多东西在某种程度上来说都是取自于 Lisp 的，至少看起来是这样的。如果你能适应 Lisp 的语法的话，这个语言还是非常强大的。就算你不打算用它来开发你的程序，好好地学一下这门语言也是非常值得的。&lt;/p&gt;
+
+&lt;p&gt;在我想来，很多看起来像是从 Lisp 中得来的点子，大概都是来自于我花在学习 Lisp 的有限经验。&lt;/p&gt;
+
+&lt;p&gt;下一篇：匿名函数，也许不止。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>[翻译] 用 Ruby 写编译器之四：自定义函数，以及运行时支持</title>
+      <link>https://glacjay.info/post/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81/</link>
+      <pubDate>Mon, 09 May 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-05-09/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E5%9B%9B%E8%87%AA%E5%AE%9A%E4%B9%89%E5%87%BD%E6%95%B0%E4%BB%A5%E5%8F%8A%E8%BF%90%E8%A1%8C%E6%97%B6%E6%94%AF%E6%8C%81/</guid>
+      <description>
+
+&lt;p&gt;原文链接：&lt;a href=&#34;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html&#34;&gt;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-4.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;抱歉，又拖了很长时间。要忙的事情实在很多。正如上一篇文章末尾提到的那样，这次要讲的是自定义函数，以及一个简单的“运行时库”。&lt;/p&gt;
+
+&lt;h2 id=&#34;自定义函数:a1905e7840a324707222cc702f5afc30&#34;&gt;自定义函数&lt;/h2&gt;
+
+&lt;p&gt;一门编程语言如果连函数和方法都没有的话，那也就不能算是一门语言了。而且，实践表明，一门面向对象语言中的所有特性都可以通过过程式的语言要素来实现：一个方法也只不过是以一个对象为额外参数的函数而已。因此，增加对函数的支持就是实现一门语言的核心所在。&lt;/p&gt;
+
+&lt;p&gt;其实，这个东东也是很简单的啦。跟以前一样，还是让我们来看一下 C 语言中的函数是怎么实现的吧：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;void foo()
+{
+  puts(&amp;quot;Hello world&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;gcc 生成的汇编代码是这个样子滴：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-nasm&#34;&gt;.globl foo
+        .type   foo, @function
+foo:
+        pushl   %ebp
+        movl    %esp, %ebp
+        subl    $8, %esp
+        movl    $.LC0, (%esp)
+        call    puts
+        leave
+        ret
+        .size   foo, .-foo
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中的函数调用现在应该很容易认了吧。剩下的就是简单的样板代码了：&lt;/p&gt;
+
+&lt;p&gt;在函数的开头，首先是将寄存器 &lt;code&gt;%ebp&lt;/code&gt; 压入堆栈，然后拷贝寄存器 &lt;code&gt;%esp&lt;/code&gt; 到 &lt;code&gt;%ebp&lt;/code&gt; 。而在函数的最后， &lt;code&gt;leave&lt;/code&gt; 指令就是前面两条指令的逆操作，而 &lt;code&gt;ret&lt;/code&gt; 指令则是从堆栈中弹出要返回到的指令地址（也就是调用该函数的那条指令的下一条指令）并跳转。为什么在这里要将 &lt;code&gt;%esp&lt;/code&gt; （也就是堆栈指针）拷到 &lt;code&gt;%ebp&lt;/code&gt; 呢？嘛，一个很明显的好处就是你可以尽情的申请堆栈空间，然后在完事时简单地将 &lt;code&gt;%ebp&lt;/code&gt; 拷回给 &lt;code&gt;%esp&lt;/code&gt; 就行了。从上面就可以看到， GCC 已经充分利用了这一点，直接用 &lt;code&gt;leave&lt;/code&gt; 指令来处理调用函数时对参数所申请的空间 &amp;ndash; 反正手工释放也只是浪费时间而已。&lt;/p&gt;
+
+&lt;p&gt;这么说来的话，要做的事情应该就很简单了啊。&lt;/p&gt;
+
+&lt;p&gt;首先需要修改方法 &lt;code&gt;Compiler#initialize&lt;/code&gt; ，创建一个用来保存所有函数定义的哈希：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def initialize
+    @global_functions = {}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后增加一个输出所有函数定义的方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def output_functions
+    @global_functions.each do |name,data|
+      puts &amp;quot;.globl #{name}&amp;quot;
+      puts &amp;quot;.type   #{name}, @function&amp;quot;
+      puts &amp;quot;#{name}:&amp;quot;
+      puts &amp;quot;\tpushl   %ebp&amp;quot;
+      puts &amp;quot;\tmovl    %esp, %ebp&amp;quot;
+      compile_exp(data[1])
+      puts &amp;quot;\tleave&amp;quot;
+      puts &amp;quot;\tret&amp;quot;
+      puts &amp;quot;\t.size   #{name}, .-#{name}&amp;quot;
+      puts
+    end
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以看到，这里也同时包括了 &lt;code&gt;.globl&lt;/code&gt; 与 &lt;code&gt;.type&lt;/code&gt; 与 &lt;code&gt;.size&lt;/code&gt; 之类的东西。 &lt;code&gt;.globl&lt;/code&gt; 的意思就是你想让这个函数也能够从其他文件（也就是编译单元）中调用，这在链接多个目标文件的时候是很重要的。我想 &lt;code&gt;.type&lt;/code&gt; 和 &lt;code&gt;.size&lt;/code&gt; 主要是用在调试的时候，分别用来表示一个符号对应的是一个函数，以及这个函数的大小。&lt;/p&gt;
+
+&lt;p&gt;除了这些之外，这个方法就很简单啦 &amp;ndash; 它会通过调用 &lt;code&gt;#compile_exp&lt;/code&gt; 方法来完成实际的工作。&lt;/p&gt;
+
+&lt;p&gt;我们再来增加一个用来定义函数的辅助方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def defun name, args, body
+    @global_functions[name] = [args, body]
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后在方法 &lt;code&gt;#compile_exp&lt;/code&gt; 中增加如下的几行代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    return if !exp || exp.size == 0
+    return defun(*exp[1..-1]) if (exp[0] == :defun)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;之所以要增加第一行代码，一方面是出于健壮性的考虑，同时这也允许我们用 &lt;code&gt;nil&lt;/code&gt; 和空数组来表示“啥也不做”的意思，当你要定义一个空函数的时候就会用到这一点了。这样一来，第二行代码就不需要去检查将要定义的是不是一个空函数了。&lt;/p&gt;
+
+&lt;p&gt;不知道你注意到了没有，我们其实已经实现了对函数的递归定义。像 &lt;code&gt;[:defun,:foo,[:defun, :bar, []]]&lt;/code&gt; 这样的代码完全是合法的。同时你也许会注意到，这个实现会导致两个函数其实都是可以从别处调用的。好吧，现在是没关系的啦，我们以后会处理这个的（要么不允许编写这样的代码，要么就只允许外层函数来调用内层函数 &amp;ndash; 我还没有决定到底要做哪个啦）。&lt;/p&gt;
+
+&lt;p&gt;剩下的事情就是输出这些函数的定义了，因此我们在方法 &lt;code&gt;#compile&lt;/code&gt; 中对 &lt;code&gt;#output_constants&lt;/code&gt; 的调用之前增加如下的一行：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    output_functions
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;增加对一个运行时库的支持:a1905e7840a324707222cc702f5afc30&#34;&gt;增加对一个运行时库的支持&lt;/h2&gt;
+
+&lt;p&gt;首先，让我们将现在的 &lt;code&gt;#compile&lt;/code&gt; 方法重命名为 &lt;code&gt;#compile_main&lt;/code&gt; ，然后重新定义 &lt;code&gt;#compile&lt;/code&gt; 方法如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def compile(exp)
+    compile_main([:do, DO_BEFORE, exp, DO_AFTER])
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;之后是对常量 &lt;code&gt;DO_BEFORE&lt;/code&gt; 和 &lt;code&gt;DO_AFTER&lt;/code&gt; 的定义（如果愿意的话，你也可以把它们放在一个单独的文件中，我现在就直接把它们放在开头好了）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;DO_BEFORE= [:do,
+  [:defun, :hello_world,[], [:puts, &amp;quot;Hello World&amp;quot;]]
+]
+DO_AFTER= []
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;你得承认，你想看到的应该是更加高级一些的东东，但那样就违背我们最初的目标了。上面的代码对于实现一个运行时库来说已经足够了。当然，你也可以用一些只能通过 C 或者汇编才能实现的东西，只要把包含那些函数实现的目标文件给链接进来就可以了，因为我们一直都是在按照 C 语言的调用规则来办事的嘛。&lt;/p&gt;
+
+&lt;p&gt;让我们来测试一下吧。在 &lt;code&gt;Compiler.new.compile(prog)&lt;/code&gt; 的前面加入下面的代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;prog = [:hello_world]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后编译运行：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;$ ruby step4.rb &amp;gt;step4.s
+$ make step4
+cc    step4.s   -o step4
+$ ./step4
+Hello World
+$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;你可以在&lt;a href=&#34;http://www.hokstad.com/static/compiler/step4.rb&#34;&gt;这里&lt;/a&gt;找到今天的成果。&lt;/p&gt;
+
+&lt;h2 id=&#34;对函数参数的访问吗:a1905e7840a324707222cc702f5afc30&#34;&gt;对函数参数的访问吗？&lt;/h2&gt;
+
+&lt;p&gt;今天还遗留了一个任务：实现对函数参数的访问。这个的工作量可是不小的。放心，我不会忘了这个的，这将会是第八篇文章的主题。我也不会让你等太久的啦，这次一定 :-)&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>[翻译] 用 Ruby 写编译器之三：语句序列，以及子表达式</title>
+      <link>https://glacjay.info/post/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F/</link>
+      <pubDate>Mon, 02 May 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-05-02/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%89%E8%AF%AD%E5%8F%A5%E5%BA%8F%E5%88%97%E4%BB%A5%E5%8F%8A%E5%AD%90%E8%A1%A8%E8%BE%BE%E5%BC%8F/</guid>
+      <description>
+
+&lt;p&gt;原文链接：&lt;a href=&#34;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up---step-3.html&#34;&gt;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up&amp;mdash;step-3.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;我本来是想要早点发表的，可是我这周又不行了 &amp;ndash; 虽然整理一篇旧文只需要半个小时。不管怎样，这是第三章，而且我会在末尾大概列一下之后的大纲。由于我会试着把一些小的步骤组合成更有内容的章节（下面就有个这样的例子），因此原来的 30 篇文章已经被我给减到了 20 篇左右（当然，这只是我已经完成了的，后面还有新的呢）。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;用-do-语句将表达式给串起来:05b0e8016c5bc2be24a3301233eda28c&#34;&gt;用 do 语句将表达式给串起来&lt;/h2&gt;
+
+&lt;p&gt;到目前为止，&lt;a href=&#34;http://www.hokstad.com/static/compiler/step2b.rb&#34;&gt;上次的第二版程序&lt;/a&gt;只能编译一个单独的表达式。只是这样的话，并不是非常的有用啊。因此我决定实现一种支持顺序执行的结构，就像函数体那样的。当然，如你所想，这是很简单的。我会增加一个关键字 &lt;code&gt;do&lt;/code&gt; ，而其作用就是顺序执行传给它的每一个（个数不限哦，或者说，只受限于内存的大小）参数表达式。看起来就像这样：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;prog = [:do,
+  [:printf,&amp;quot;Hello&amp;quot;],
+  [:printf,&amp;quot; &amp;quot;],
+  [:printf,&amp;quot;World\n&amp;quot;]
+]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;要实现这个是非常简单的。我们只需要在函数 &lt;code&gt;#compile_exp&lt;/code&gt; 的开头加入下列代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    if exp[0] == :do
+      exp[1..-1].each { |e| compile_exp(e) }
+      return
+    end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;递归在这里的作用很重要哦 &amp;ndash; 毕竟你是在处理一个树形结构，那也就需要在越来越深层的树结点之上调用实现编译的核心函数，而这当然也包括我们的下一个目标，即对子表达式的处理。&lt;/p&gt;
+
+&lt;h2 id=&#34;子表达式-步骤一:05b0e8016c5bc2be24a3301233eda28c&#34;&gt;子表达式，步骤一&lt;/h2&gt;
+
+&lt;p&gt;先来给出一个我们想要支持的用例：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;prog = [:printf,&amp;quot;‘hello world’ takes %ld bytes\n&amp;quot;,[:strlen, “hello world&amp;quot;]]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;第一个需要改变的地方，在函数 &lt;code&gt;#get_arg&lt;/code&gt; 中，我们在其开头加入如下的代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    # Handle strings or subexpressions
+    if a.is_a?(Array)
+      compile_exp(a)
+      return nil # What should we return?
+    end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果你这时已经试着用上面的代码来编译测试用例了的话，gcc 会报错给你的，因为我们现在只处理了 &lt;code&gt;#get_arg&lt;/code&gt; 的返回值是一个字符串常量对应的序列号的情况，而这对子表达式来说显然是不适用的。&lt;/p&gt;
+
+&lt;h2 id=&#34;子表达式-步骤二-返回值:05b0e8016c5bc2be24a3301233eda28c&#34;&gt;子表达式，步骤二：返回值&lt;/h2&gt;
+
+&lt;p&gt;那么 gcc 是怎么处理这个的呢。让我们来看看下面这段代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;int main()
+{
+  printf(&amp;quot;&#39;Hello world&#39; takes %ld bytes\n&amp;quot;,foo(&amp;quot;Hello world&amp;quot;));
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所产生的汇编吧（只截取 &lt;code&gt;main&lt;/code&gt; 中相关的部分）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-nasm&#34;&gt;    subl    $20, %esp
+    movl    $.LC0, (%esp)
+    call    foo
+    movl    %eax, 4(%esp)
+    movl    $.LC1, (%esp)
+    call    printf
+    addl    $20, %esp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;应该说还是很直观的吧。gcc 首先会去调用子表达式（ &lt;code&gt;foo&lt;/code&gt; ），并且希望这个函数能够把它的返回值放入寄存器 &lt;code&gt;%eax&lt;/code&gt; 中，然后就会把这个值作为参数拷到堆栈上，而不是什么字符串常量的地址。&lt;/p&gt;
+
+&lt;p&gt;首先是要调整 &lt;code&gt;#get_arg&lt;/code&gt; 函数：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def get_arg(a)
+    # Handle strings and subexpressions
+    if a.is_a?(Array)
+      compile_exp(a)
+      return [:subexpr]
+    end
+    seq = @string_constants[a]
+    return seq if seq
+    seq = @seq
+    @seq += 1
+    @string_constants[a] = seq
+    return [:strconst,seq]
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;唯一需要改动的地方就是返回值了，我们增加了一个表示返回值类型的标识 &amp;ndash; 以后还会加入其他类型的。&lt;/p&gt;
+
+&lt;p&gt;剩下的工作就是改写 &lt;code&gt;#compile_exp&lt;/code&gt; 函数中的相关部分了。这时就不能直接收集 &lt;code&gt;#get_arg&lt;/code&gt; 的返回值了，而是需要对每个参数都做相应的处理并直接输出（而这同时也是 &lt;code&gt;stack_adjustment&lt;/code&gt; 需要修改的原因，因为已经没有 &lt;code&gt;args&lt;/code&gt; 数组了）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;    stack_adjustment = PTR_SIZE + (((exp.length-1+0.5)*PTR_SIZE/(4.0*PTR_SIZE)).round) * (4*PTR_SIZE)
+    puts &amp;quot;\tsubl\t$#{stack_adjustment}, %esp&amp;quot; if exp[0] != :do
+
+    exp[1..-1].each_with_index do |a,i|
+      atype, aparam = get_arg(a)
+      if exp[0] != :do
+        if atype == :strconst
+          param = &amp;quot;$.LC#{aparam}&amp;quot;
+        else
+          param = &amp;quot;%eax&amp;quot;
+        end
+        puts &amp;quot;\tmovl\t#{param},#{i&amp;gt;0 ? i*4 : &amp;quot;&amp;quot;}(%esp)&amp;quot;
+      end
+    end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如你所见，并不是什么复杂的更改。我们只是检查了 &lt;code&gt;#get_arg&lt;/code&gt; 所返回的类型信息，并相应的输出字符串常量或者寄存器 &lt;code&gt;%eax&lt;/code&gt; 而已。随着我们加入更多要处理的情况，这个部分代码还会继续扩充的。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.hokstad.com/static/compiler/step3.rb&#34;&gt;你可以在这里找到最新版本的代码&lt;/a&gt;。&lt;/p&gt;
+
+&lt;h2 id=&#34;之后的计划:05b0e8016c5bc2be24a3301233eda28c&#34;&gt;之后的计划&lt;/h2&gt;
+
+&lt;p&gt;这里只列出的基本完成的部分。我的计划是，当我开始着手写新的部分时，我会将重心放在一个简单的解析器上，以尽快实现编译器的自举（即，编译它自己）。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;步骤四：运行时，以及函数的定义&lt;/li&gt;
+&lt;li&gt;步骤五：处理其他类型的常量值&lt;/li&gt;
+&lt;li&gt;步骤六：条件表达式 &lt;code&gt;if ... then ... else&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;步骤七：循环语句&lt;/li&gt;
+&lt;li&gt;步骤八：匿名函数（ &lt;code&gt;lambda&lt;/code&gt; ）&lt;/li&gt;
+&lt;li&gt;步骤九：用匿名函数来实现循环，以及对函数参数的处理&lt;/li&gt;
+&lt;li&gt;步骤十：赋值，以及简单的代数运算&lt;/li&gt;
+&lt;li&gt;步骤十一：更简结的 &lt;code&gt;while&lt;/code&gt; 循环&lt;/li&gt;
+&lt;li&gt;步骤十二：测试我们的语言：开发一个简单的输入转换模块&lt;/li&gt;
+&lt;li&gt;步骤十三：重构代码生成模块，并抽象出平台相关的部分&lt;/li&gt;
+&lt;li&gt;步骤十四：对一些概念的讨论，以及今后的前进方向&lt;/li&gt;
+&lt;li&gt;步骤十五：数组&lt;/li&gt;
+&lt;li&gt;步骤十六：局部变量以及多种作用域&lt;/li&gt;
+&lt;li&gt;步骤十七：可变长参数列表&lt;/li&gt;
+&lt;li&gt;步骤十八：再看输入转换模块：测试新的功能点，以及自我转换&lt;/li&gt;
+&lt;li&gt;步骤十九：确定自举所需要实现的功能&lt;/li&gt;
+&lt;li&gt;步骤二十：开始实现真正的解析器&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>[翻译] 用 Ruby 写编译器之二：函数调用，以及 Hello World</title>
+      <link>https://glacjay.info/post/2011-04-29/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E4%BB%A5%E5%8F%8A-hello-world/</link>
+      <pubDate>Fri, 29 Apr 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-04-29/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%BA%8C%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E4%BB%A5%E5%8F%8A-hello-world/</guid>
+      <description>
+
+&lt;p&gt;原文地址：&lt;a href=&#34;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-2.html&#34;&gt;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-2.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;我会选择 Ruby 来作为我的实现语言并没有什么特别的理由。在现阶段，语言的选择并不重要；不过，我确实很喜欢 Ruby。&lt;/p&gt;
+
+&lt;p&gt;在这之后，我会采取一系列的步骤令所实现的语言向其实现语言靠拢。我的意思是，我想将编译器实现为可以&lt;strong&gt;自举&lt;/strong&gt;的，即它应该能够编译自身。&lt;/p&gt;
+
+&lt;p&gt;而这也就意味着，要么我的编译器需要至少支持 Ruby 语言的一个子集，要么就需要一个中间的翻译步骤，来将编译器中的实现翻译成它自己可以编译的语言。&lt;/p&gt;
+
+&lt;p&gt;虽然这一点并没有限制你所用的实现语言，但那至少意味着你用来实现的语言跟你要实现的语言之间很相似，除非你对实现编译器的自举没有什么兴趣。&lt;/p&gt;
+
+&lt;p&gt;这也同时意味着，如果你想实现编译器的自举，那你最好不要用实现语言中的什么复杂的特性。要记住，你得实现所有你用过的那些语言特性，不然，当你要开始做自举的时候，你就得对整个编译器的架构做大的调整了。那一点都不好玩。&lt;/p&gt;
+
+&lt;p&gt;话说回来，使用 Ruby 来作为实现语言的一大优点（同样对于其他某些语言来说也是这样，比如说 Lisp ），就是你可以很容易地构建出一个树形的数据结构出来 &amp;ndash; Ruby 的话就是用数组或者哈希， Lisp 的话就是用列表。&lt;/p&gt;
+
+&lt;p&gt;这也就是说，我可以用数组来手工构建抽象语法树，从而避免了实现一个语法分析器的工作。耶！代价就是很丑，不过也可以接受的语法啦。&lt;/p&gt;
+
+&lt;h2 id=&#34;hello-world:e9de4645ccf3bc033ab96239ad817245&#34;&gt;Hello World&lt;/h2&gt;
+
+&lt;p&gt;Hello World 的话看起来会是这个样子的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;[:puts, &amp;quot;Hello World&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里，我们需要处理的东西非常简单：我们需要将一个参数压入堆栈，然后调用一个函数。&lt;/p&gt;
+
+&lt;p&gt;那么就让我们来看一下怎样用 x86 汇编来做这件事吧。我用 &lt;code&gt;gcc -S&lt;/code&gt; 编译了下面的这段 C 程序：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;int main()
+{
+    puts(&amp;quot;Hello World&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后看看输出会是什么样子的。下面给出的是真正相关的部分，是与上一次的输出比较之后的结果：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-nasm&#34;&gt;        .section        .rodata
+.LC0:
+        .string &amp;quot;Hello World&amp;quot;
+        .text
+...
+        subl    $4, %esp
+        movl    $.LC0, (%esp)
+        call    puts
+        addl    $4, %esp
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果你懂一些汇编的话，就算以前没有写过 x86 的汇编程序，也应该可以很容易的看懂这段代码吧：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;这里首先定义了一个字符串常量。&lt;/li&gt;
+&lt;li&gt;通过对堆栈指针的减 &lt;code&gt;4&lt;/code&gt; 操作，在堆栈上申请了一段 &lt;code&gt;4&lt;/code&gt; 个字节大小的空间。&lt;/li&gt;
+&lt;li&gt;然后将之前定义的字符串常量的地址，放入刚刚申请的那 &lt;code&gt;4&lt;/code&gt; 个字节的空间中。&lt;/li&gt;
+&lt;li&gt;接着，我们调用了由 glibc 提供的 &lt;code&gt;puts&lt;/code&gt; 函数（在这个系列中，我会假设你已经有了 gcc/gas + glibc ；Linux 的话这些东东应该已经有了）。&lt;/li&gt;
+&lt;li&gt;最后，通过一个加 &lt;code&gt;4&lt;/code&gt; 操作来释放堆栈空间。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;那么，我们要怎样在我们的编译器中实现这一切呢？首先，我们需要一种方法来处理那些字符串常量，通过在上次的 Compiler 类的实现中添加下面的代码（我的所有 Ruby 代码都在&lt;a href=&#34;http://www.hokstad.com/static/compiler/step2.rb&#34;&gt;这里&lt;/a&gt;，这样你就知道该做什么了）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def initialize
+    @string_constants = {}
+    @seq = 0
+  end
+  def get_arg(a)
+    # For now we assume strings only
+    seq = @string_constants[a]
+    return seq if seq
+    seq = @seq
+    @seq += 1
+    @string_constants[a] = seq
+    return seq
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这段代码就是简单地将一个字符串常量映射到一个整数上，而这个整数则对应着一个标号。相同的字符串常量会对应到相同的整数上，因此也只会被输出一次。用哈希而不是数组来保证这种唯一性是一种很常用的优化手段，不过也不一定非要这样做。&lt;/p&gt;
+
+&lt;p&gt;下面这个函数是用来输出所有的字符串常量的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def output_constants
+    puts &amp;quot;\t.section\t.rodata&amp;quot;
+    @string_constants.each do |c,seq|
+      puts &amp;quot;.LC#{seq}:&amp;quot;
+      puts &amp;quot;\t.string \&amp;quot;#{c}\&amp;quot;&amp;quot;
+    end
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最后剩下的就是编译函数调用的代码了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  def compile_exp(exp)
+    call = exp[0].to_s
+    args = exp[1..-1].collect {|a| get_arg(a)}
+
+    puts &amp;quot;\tsubl\t$4,%esp&amp;quot;
+
+    args.each do |a|
+      puts &amp;quot;\tmovl\t$.LC#{a},(%esp)&amp;quot;
+    end
+
+    puts &amp;quot;\tcall\t#{call}&amp;quot;
+    puts &amp;quot;\taddl\t$4, %esp&amp;quot;
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;也许你已经注意到这里的不一致性了：上面的代码虽然好像是可以处理多参数调用的样子，但却只从堆栈中减掉了一个 &lt;code&gt;4&lt;/code&gt; ，而不是按照实际的参数个数而进行相应的调整，从而导致了不同参数间的相互覆盖。&lt;/p&gt;
+
+&lt;p&gt;我们马上就会处理这个问题的。对于我们简单的 Hello World 程序来说，目前这样已经足够了。&lt;/p&gt;
+
+&lt;p&gt;在这段代码中还有几点需要注意：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;我们甚至都还没有检查被调用的函数到底存不存在 &amp;ndash; gcc/gas 会帮我们处理这个问题的，虽然这也意味着没啥帮助的错误信息。&lt;/li&gt;
+&lt;li&gt;我们可以调用任何一个可以连接的函数，只要这个函数只需一个字符串作为参数。&lt;/li&gt;
+&lt;li&gt;这段代码目前还有很多需要被抽像出去的地方，比如说得到被调函数地址的方法，还有所有那些硬编码进来的 x86 汇编等。相信我，我会（慢慢）解决这些问题的。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;现在我们可以来&lt;a href=&#34;http://www.hokstad.com/static/compiler/step2.rb&#34;&gt;试着运行一下这个编译器&lt;/a&gt;了。你应该会得到下面这样的输出：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-nasm&#34;&gt;        .text
+.globl main
+        .type   main, @function
+main:
+        leal    4(%esp), %ecx
+        andl    $-16, %esp
+        pushl   -4(%ecx)
+        pushl   %ebp
+        movl    %esp, %ebp
+        pushl   %ecx
+        subl    $4,%esp
+        movl    $.LC0,(%esp)
+        call    puts
+        addl    $4, %esp
+        popl    %ecx
+        popl    %ebp
+        leal    -4(%ecx), %esp
+        ret
+        .size   main, .-main
+        .section        .rodata
+.LC0:
+        .string &amp;quot;Hello World&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;下面来测试一下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;[vidarh@dev compiler]$ ruby step2.rb &amp;gt;hello.s
+[vidarh@dev compiler]$ gcc -o hello hello.s
+[vidarh@dev compiler]$ ./hello
+Hello World
+[vidarh@dev compiler]$
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;那么-要怎么处理多个参数的情况呢:e9de4645ccf3bc033ab96239ad817245&#34;&gt;那么，要怎么处理多个参数的情况呢？&lt;/h2&gt;
+
+&lt;p&gt;我不会再展示用来说明的 C 代码和对应的汇编代码了 &amp;ndash; 进行不同参数个数的调用并查看其输出对你来说应该不难。相反，我就直接给出对 compile_exp 函数所做的修改了（完整的代码在&lt;a href=&#34;http://www.hokstad.com/static/compiler/step2b.rb&#34;&gt;这里&lt;/a&gt;）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;  PTR_SIZE=4
+  def compile_exp(exp)
+    call = exp[0].to_s
+
+    args = exp[1..-1].collect {|a| get_arg(a)}
+
+    # gcc on i386 does 4 bytes regardless of arguments, and then
+    # jumps up 16 at a time, We will blindly do the same.
+    stack_adjustment = PTR_SIZE + (((args.length+0.5)*PTR_SIZE/(4.0*PTR_SIZE)).round) * (4*PTR_SIZE)
+    puts &amp;quot;\tsubl\t$#{stack_adjustment}, %esp&amp;quot;
+    args.each_with_index do |a,i|
+      puts &amp;quot;\tmovl\t$.LC#{a},#{i&amp;gt;0 ? i*PTR_SIZE : &amp;quot;&amp;quot;}(%esp)&amp;quot;
+    end
+
+    puts &amp;quot;\tcall\t#{call}&amp;quot;
+    puts &amp;quot;\taddl\t$#{stack_adjustment}, %esp&amp;quot;
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里做了什么呢？改动的地方没几个：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;这里不再是申请固定大小的堆栈空间了（上一个版本中是 &lt;code&gt;4&lt;/code&gt; 个字节），而是根据实际参数的个数来相应的调整堆栈指针。我得承认，我不知道 gcc 为什么会做这样的调整 &amp;ndash; 而且原因并不重要，虽然我猜这是为了堆栈的对齐。优化和清理&lt;strong&gt;以后&lt;/strong&gt;再说，并且，当你不知道某事的运行机理时，那就不要去改变它。&lt;/li&gt;
+&lt;li&gt;这之后，如你所见，参数被一个一个地放到堆栈上了。我们还是假定它们全都是相同大小的指针（因此在 x86 上就是 &lt;code&gt;4&lt;/code&gt; 个字节）。&lt;/li&gt;
+&lt;li&gt;同时你还可以看到，第一个参数是被放在堆栈中最靠下的位置的。如果你还没有写过汇编程序，并且无法想象出这是怎么回事的话，那就把它们画出来吧；还要记住，这里的堆栈是向下扩展的。当申请空间时，我们是将堆栈指针向下移动的，而拷贝参数时则是从下往上（用越来越大的索引来访问 &lt;code&gt;%esp&lt;/code&gt; ，就像你访问数组时一样）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个编译器现在已经可以编译下面这样的代码了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;[:printf,&amp;quot;Hello %s\n&amp;quot;,&amp;quot;World&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;至于以后嘛:e9de4645ccf3bc033ab96239ad817245&#34;&gt;至于以后嘛&lt;/h2&gt;
+
+&lt;p&gt;这就是我们踏出的第一步，而且我保证之后的步骤会越来越实际的，因为只要实现很少的几个功能点，我们就可以编译实际的程序了。而且我会努力令这些步骤更加精炼，更多的说明这样做的原因，而不是仅仅解释做了什么。&lt;/p&gt;
+
+&lt;p&gt;下面我会处理多个参数的调用（译者：我们不是才处理过嘛），然后是语句序列、子表达式，以及对返回值的处理，等等。&lt;/p&gt;
+
+&lt;p&gt;大约十二个这样难度的步骤之后，我们就会完成函数定义、参数传递、条件判断、运行时库，甚至是一个用来实现匿名函数的简单的 lambda （真正的&lt;a href=&#34;http://en.wikipedia.org/wiki/Closure_(computer_science)&#34;&gt;闭包&lt;/a&gt;就要到后面了）。&lt;/p&gt;
+
+&lt;p&gt;再之后，我们会实现一个简单的文本处理程序，来对一个比 Ruby 的数组和符号更好一点的语法提供支持（只是某种程度啦，真正的语法分析得再多等等）。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>[翻译] 用 Ruby 写编译器之一：一个简单的 main 函数模板</title>
+      <link>https://glacjay.info/post/2011-04-11/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84-main-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF/</link>
+      <pubDate>Mon, 11 Apr 2011 00:00:00 +0000</pubDate>
+      
+      <guid>https://glacjay.info/post/2011-04-11/%E7%BF%BB%E8%AF%91-%E7%94%A8-ruby-%E5%86%99%E7%BC%96%E8%AF%91%E5%99%A8%E4%B9%8B%E4%B8%80%E4%B8%80%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84-main-%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF/</guid>
+      <description>
+
+&lt;p&gt;原文链接：&lt;a href=&#34;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html&#34;&gt;http://www.hokstad.com/writing-a-compiler-in-ruby-bottom-up-step-1.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;[译者抱怨：翻译好麻烦啊。]&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;我已经将这件事情搁置了很长时间了 &amp;ndash; 这个系列中最早的文章甚至可以追溯到 2005 年的早期，而那时我还没有开始写这个博客呢。&lt;/p&gt;
+
+&lt;p&gt;我灰常喜欢编译器技术，而且我也已经写过好几个小型的编译器了。不久前我开始用 Ruby 语言写一个简单的编译器，而且我也以发表为目的记下了大量的笔记。问题在于，当我一步步地完成这个系列文章的时候，我的博客却渐渐地，没落了（？原文： Problem was I was that by the time I was finishing up the steps I have so far, my blog was languishing, and so it&amp;rsquo;s been just gathering dust. 啊，我的英文好渣）。&lt;/p&gt;
+
+&lt;p&gt;我已经写完了大概 30 篇文章，并形成了一个简单但是可以工作的编译器。我也许要花上一段时间来发表它们，因为这些文章均需要一定程度的整理，而且我能花在写作上的时间不是很多。不过根据具体的时间安排，我也有可能一周就发表好几篇。&lt;/p&gt;
+
+&lt;p&gt;闲话少叙，第一篇参上：&lt;/p&gt;
+
+&lt;h2 id=&#34;有关一些背景-以及一小段代码:c8341cd3ce6d259f088f9fe37556573b&#34;&gt;有关一些背景，以及一小段代码&lt;/h2&gt;
+
+&lt;p&gt;通常，在开始尝试编写一个编译器时，我会选择自顶向下的开发方式。换句话说就是，我会采取常见的策略，从设计一个语法分析器开始，而不管这个分析器是手写的，还是通过分析器生成器来生成。然后我会通过一系列的树形结构转换程序将 &lt;code&gt;AST&lt;/code&gt;（即 &lt;a href=&#34;http://en.wikipedia.org/wiki/Abstract_syntax_tree&#34;&gt;Abstract Syntax Tree，抽象语法树&lt;/a&gt;）转化为符号表，同时进行错误检查，为树结点附加各类信息，并最终进行代码生成的步骤。在我转而使用 Linux 之后，我在这里就会选择生成 C 代码，前提是你的语言能够很好的契合 C 的语意。从这里也可以看出，C 是一门多么低层的语言了。&lt;/p&gt;
+
+&lt;p&gt;不过，我的第一个编译器是用 M68000 汇编语言写的，而且其输出也是 M68000 的汇编程序。&lt;/p&gt;
+
+&lt;p&gt;我是从允许内嵌的汇编代码片断开始&lt;a href=&#34;http://en.wikipedia.org/wiki/Bootstrapping_(compilers)&#34;&gt;自举&lt;/a&gt;这个编译器的，并在此基础上逐步地增加所支持的语法结构。&lt;/p&gt;
+
+&lt;p&gt;首先我加入了对函数的定义以及调用的支持，并以此为基础构建我的整个编译器。然后我会增加基于寄存器的基本四则运算的支持，然后是局部变量，等等等等，但在同时也会解析汇编，以保证当遇到内嵌汇编代码片段中的寄存器时，还能够保持寄存器分配器的简洁（原文： but parse the assembly so that the register allocator would stay clear of registers used in the assembler that was interspersed. ）。&lt;/p&gt;
+
+&lt;p&gt;然后这个编译器就从编译汇编语言的语法，逐渐演变成编译我所设计的杂牌语言的语法，其中的汇编也越来越少。&lt;/p&gt;
+
+&lt;p&gt;我想再自举一个编译器出来。不过这次我就不打算用汇编来实现它了。这次我会&lt;strong&gt;从底层 &amp;ndash; 也就是代码生成器 &amp;ndash; 开始&lt;/strong&gt;。并且我会完成如下几个目标：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;实现的简洁性优先于其性能。&lt;/strong&gt;要点在于，我希望能够将它重写为以其自身来实现。换句话说，我希望它能够实现自举（ self hosted ，跟 bootstrap 有啥区别呢？）。由于开始的代码最终会被替换掉，那么也就没有必要浪费时间在使它可以运行的更快上面。性能问题大可以以后再考虑。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;不要做限制性能的决定。&lt;/strong&gt;虽然性能并不是我们最初的目标，但也不能太大意，而导致今后不好对此进行改进。 Ruby ，说的就是你（ Ruby 的运行时非常的动态）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;实现的简洁性优先于惯例。&lt;/strong&gt;不要仅仅因为一个特性很方便就去实现它，而仅实现那些可以帮助我们完成对编译器的自举的特性。而这就意味着，这些特性要能使我们的生活更加方便，而不仅仅是无谓地增加了实现编译器本身的难度。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;不要急着设计语言，我们要设计的是特性。&lt;/strong&gt;我想首先实现一个灵活而强大的代码生成器，以及一个可以支持各种功能的简洁的 &lt;code&gt;AST&lt;/code&gt; 。我的意思是像 Lisp 语言那样极富表达能力的语法结构，并尽量用 Ruby 来达到相似的目标（这段翻的太渣了，请参考原文）。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;我并不想深入学习 x86 的汇编语言，虽然我会以其作为我的目标语言。&lt;/strong&gt;这样说有点夸张。我很熟悉 M68K 和 6510 的汇编语言，同时我也具备足够的知识来阅读 x86 的汇编程序。虽然我从来没有用它写过什么像样的代码，而且我也不打算这么做。我所需要知道的一切信息都来自于查看 gcc 产生的汇编输出。要善用 &lt;code&gt;gcc -S&lt;/code&gt; 命令。虽然可能对 x86 的某些细节存在疑问，但我所具备的基础汇编知识已经足够我理解那些个汇编代码了。虽然在此过程中，我很可能会犯一些很愚蠢的错误，但我同时也可以从中学到很多知识（而且那些非常相信能够从我这里学到相关知识的人们也请注意了 - 我在这方面也只是个初学者哦）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;听起来之后貌似会抄很多的小道，同时也会遇到很多痛苦的地方，不是吗？但这同时也会非常有趣哦！&lt;/p&gt;
+
+&lt;p&gt;不管怎样，我们先从一段没什么实际用处的代码开始吧：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;#!/bin/env ruby
+class Compiler
+
+  def compile(exp)
+    # Taken from gcc -S output
+    puts &amp;lt;&amp;lt;PROLOG
+ .file &amp;quot;bootstrap.rb&amp;quot;
+ .text
+.globl main
+ .type main, @function
+main:
+ leal 4(%esp), %ecx
+ andl $-16, %esp
+ pushl -4(%ecx)
+ pushl %ebp
+ movl %esp, %ebp
+ pushl %ecx
+PROLOG
+
+    puts &amp;lt;&amp;lt;EPILOG
+ popl %ecx
+ popl %ebp
+ leal -4(%ecx), %esp
+ ret
+EPILOG
+
+    puts &amp;lt;&amp;lt;GLOBAL_EPILOG
+ .size main, .-main
+GLOBAL_EPILOG
+  end
+end
+
+prog = [:puts,&amp;quot;Hello World&amp;quot;]
+
+Compiler.new.compile(prog)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;说实话，这段代码嘛也没做。它只是把用 &lt;code&gt;gcc -S&lt;/code&gt; 命令将下面这段代码编译出来的结果拆吧拆吧之后给打印出来了而已：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;int main()
+{
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这可是一个完整可工作的编译器哟 &amp;ndash; 某种程度上来说吧。不幸地是，不管用它编译什么程序，得到的都只是一段毫无用处的代码，因些可以说它本身也是同样毫无用处的。但我们总要踏出这最初的一步。&lt;/p&gt;
+
+&lt;p&gt;你可以认为这个系列的文章是我的“意识流”。我做这件事仅仅是因为好玩而已。我并没打算坐下来，好好地完成一个多么赞的设计。我甚至会因为一时兴起而把一段代码给丢掉，或者之后又把它给找回来。&lt;/p&gt;
+
+&lt;p&gt;你在这里将要看到的其实已经是我第二次的代码了：我所做的每一个 SVN 提交都对应于我的一篇文章，不过我会在文章中做很多额外的讲解。有时这些讲解会令我中途改变主意 &amp;ndash; 但我不会对代码做太大的修改，除非我认为这个修改能令我的讲解更清晰，或者我一开始完全就想错掉了。就算是这样，我也多半不会做出修改，除了在那边标注一下我会在之后解决。有些时候，我也会把几个我做起来很麻烦，但解释起来又很简单的步骤合而为一。&lt;/p&gt;
+
+&lt;p&gt;我在这里欢迎大家涌跃发言。不过要记住，虽然我会十分留意您的发言，但我已经完成了这个系列中的很大一部分，我不会因为某些意见而完全重写这些文章。不过我会留下一些笔记，并同时记住我之前都写了些什么内容。&lt;/p&gt;
+
+&lt;p&gt;下次我会让这个编译器真正去处理它的输入的，我保证。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;[译者再次抱怨：翻译好麻烦啊。]&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
